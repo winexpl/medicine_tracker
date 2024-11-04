@@ -7,9 +7,14 @@ module.exports = {
         primary: {
           back: {
             DEFAULT: '#1C1C2B',
-            sub: '#161622',
           },
           text: "#FF8F00",
+        }, 
+        secondary: {
+          back: {
+            DEFAULT: '#161622',
+          },
+          text: "#FFD5AA"
         }
       },
       fontFamily: {

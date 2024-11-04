@@ -2,6 +2,7 @@ import { Image } from 'react-native'
 import { Slot, SplashScreen, Stack } from 'expo-router';
 import { useFonts  } from 'expo-font';
 import { useEffect } from 'react';
+import { StatusBar } from 'expo-status-bar';
 
 SplashScreen.preventAutoHideAsync(); // предотвращает скрытие асинхронности
 
@@ -24,11 +25,15 @@ const RootLayout = () => {
 
   if(!fontsLoaded && !error) return null;
   return (
+    <>
     <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(user)" options={{ headerShown: false }} />
-        <Stack.Screen name="index" options={{ headerShown: false }} />
     </Stack>
+    <StatusBar style='light'/>
+    </>
+    
   )
 }
 export default RootLayout
