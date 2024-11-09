@@ -1,17 +1,35 @@
 import { StatusBar } from "expo-status-bar"
-import { Text, View, ScrollView, Image, TouchableOpacity } from "react-native"
+import { Text, View, ScrollView, Image, TouchableOpacity, TextInput } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Redirect, router } from "expo-router"
 import CustomButton from '@/components/CustomButton'
+import { useState, useEffect } from "react"
 
 
 export default function App() {
+    
+    const [dt, setDt] = useState(new Date().toLocaleString());
+
+    useEffect(() => {
+        let secTimer = setInterval( () => {
+            setDt(new Date().toLocaleString());
+        },1000);
+    
+        return () => clearInterval(secTimer);
+    }, []);
+    
+    const [name, setName] = useState('a');
+    //console.log(`${name}`);
+    //<TextInput value={name} onChange={(e)=>{setName(e.nativeEvent.text);}}/>
+    //<TextInput value={name}/>
 
     return (
         <SafeAreaView className="bg-secondary-back h-full">
             <ScrollView contentContainerStyle={{ height:'100%' }}>
                 <View className="w-full justify-center items-center min-h-[85vh] px-6">
-                    <Text className="text-3xl text-primary-text font-pbold">Welcome to</Text>
+                    <Text className="text-3xl text-primary-text font-pbold">Welcome to {dt}</Text>
+                    
+                    
                     <Image
                         source={require('@/assets/images/logo.png')}
                         className="w-[350px] h-[200px] items-center justify-center"
@@ -39,5 +57,7 @@ export default function App() {
             </ScrollView>
         </SafeAreaView>
     )
-}
+} 
+
+
 

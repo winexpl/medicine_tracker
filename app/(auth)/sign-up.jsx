@@ -25,6 +25,7 @@ const SignUp = () => {
           />
           <Text className='font-pmedium text-lg text-secondary-text text-center'>
             Зарегестрируйтесь
+            
           </Text>
 
           <FormField
