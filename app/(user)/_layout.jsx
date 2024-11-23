@@ -19,7 +19,8 @@ const TabsLayout = () => {
         <Tabs.Screen
           name="schedule"
           options={{
-            headerShown: true,
+            title: "Расписание",
+            headerShown: false,
             tabBarIcon: ({color, focused}) => (
               <Ionicons name={focused ? 'calendar-sharp' : 'calendar-outline'} color={color} size={24} />
             )
