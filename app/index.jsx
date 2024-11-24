@@ -1,3 +1,5 @@
+'use client';
+
 import { StatusBar } from "expo-status-bar"
 import { Text, View, ScrollView, Image, TouchableOpacity, TextInput } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
@@ -24,7 +26,7 @@ export default function App() {
     //<TextInput value={name}/>
 
     return (
-        <SafeAreaView className="bg-secondary-back h-full">
+        <SafeAreaView className="bg-secondary-back h-full.">
             <ScrollView contentContainerStyle={{ height:'100%' }}>
                 <View className="w-full justify-center items-center min-h-[85vh] px-6">
                     <Text className="text-3xl text-primary-text font-pbold">Welcome to {dt}</Text>

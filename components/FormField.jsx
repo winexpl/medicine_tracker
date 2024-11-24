@@ -1,3 +1,5 @@
+'use client';
+
 import { StyleSheet, Text, View, TextInput } from 'react-native'
 import React, { useState } from 'react'
 import { TouchableOpacity } from 'react-native'

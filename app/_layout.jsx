@@ -1,3 +1,5 @@
+'use client';
+
 import { Image } from 'react-native'
 import { Slot, SplashScreen, Stack } from 'expo-router';
 import { useFonts  } from 'expo-font';
