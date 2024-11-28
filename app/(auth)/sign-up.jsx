@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import FormField from '@/components/FormField'
 import CustomButton from '@/components/CustomButton'
-import { Link } from 'expo-router'
+import { Link , router} from 'expo-router'
 
 const submit = () => {
 
@@ -51,8 +51,8 @@ const SignUp = () => {
           />
         </View>
         <CustomButton
-          title = 'Войти'
-          handlePress={submit}
+          title = 'Войти' 
+          handlePress={() => router.push('/schedule')}
           containerStyle='mt-7'
           isLoading={isSubmitting}
         />
