@@ -1,9 +1,9 @@
-  import React, { useState } from 'react';
-  import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
   
 import { SafeAreaView } from 'react-native-safe-area-context'
   
-  const Courses = () => {
+  const CoursesActive = () => {
     const [courses, setCourses] = useState([
       { name: 'Аспирин', remaining: 12, dosage: '1 таблетка' },
       // Add more courses here if needed
@@ -17,20 +17,18 @@ import { SafeAreaView } from 'react-native-safe-area-context'
   
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.tabs}>
-          <Text style={styles.activeTab}>Активные</Text>
-          <Text style={styles.inactiveTab}>Завершенные</Text>
-        </View>
-  
+
         <ScrollView style={styles.scrollView}>
           {courses.map((course, index) => (
+            // я так понимаю курс, вынести в компонент
             <View key={index} style={styles.courseItem}>
               <Text style={styles.courseName}>{course.name}</Text>
               <Text style={styles.courseDetails}>
-                Осталось приемов: {course.remaining}
+                Осталось приемов: {course.remaining} {'\n'}
+                Доза: {course.dosage}
               </Text>
-              <Text style={styles.courseDetails}>Доза: {course.dosage}</Text>
             </View>
+            // конец курса
           ))}
         </ScrollView>
   
@@ -40,7 +38,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
       </SafeAreaView>
     );
   };
-  
+
+  export default CoursesActive;
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -105,5 +104,5 @@ import { SafeAreaView } from 'react-native-safe-area-context'
     },
   });
   
-  export default Courses;
+  
   

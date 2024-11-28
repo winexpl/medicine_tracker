@@ -27,7 +27,7 @@ const TabsLayout = () => {
           }}
         />
         <Tabs.Screen
-          name="courses"
+          name="(courses)"
           options={{
             title: "Курсы",
             headerShown: false,
