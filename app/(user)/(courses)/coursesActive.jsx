@@ -1,5 +1,5 @@
-  import React, { useState } from 'react';
-  import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
   
 import { SafeAreaView } from 'react-native-safe-area-context'
   
@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
       // Add more courses here if needed
     ]);
   
-    // Function to add a new course
+    // Function to add a new course.
     const addCourse = () => {
       const newCourse = { name: 'Новый курс', remaining: 10, dosage: '1 таблетка' };
       setCourses([...courses, newCourse]);
@@ -17,11 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
   
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.tabs}>
-          <Text style={styles.activeTab}>Активные</Text>
-          <Text style={styles.inactiveTab}>Завершенные</Text>
-        </View>
-  
+
         <ScrollView style={styles.scrollView}>
           {courses.map((course, index) => (
             // я так понимаю курс, вынести в компонент
