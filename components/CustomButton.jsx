@@ -23,7 +23,7 @@ const CustomButton = ({
                 size="small"
                 className="ml-2"
             />
-      )}
+        )}
         </TouchableOpacity>
     );
 };

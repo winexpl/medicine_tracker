@@ -5,7 +5,7 @@ import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 
 
-const TabsLayout = () => {
+const AdminLayout = () => {
   return (
     <>
       <StatusBar backgroundColor='#161622' style='light'/>
@@ -17,9 +17,9 @@ const TabsLayout = () => {
       }}
       >
         <Tabs.Screen
-          name="schedule"
+          name="search"
           options={{
-            title: "Расписание",
+            title: "Поиск из открытых источников",
             headerShown: false,
             tabBarIcon: ({color, focused}) => (
               <Ionicons name={focused ? 'calendar-sharp' : 'calendar-outline'} color={color} size={24} />
@@ -27,22 +27,12 @@ const TabsLayout = () => {
           }}
         />
         <Tabs.Screen
-          name="(courses)"
+          name="searchBd"
           options={{
-            title: "Курсы",
+            title: "Поиск в базе",
             headerShown: false,
             tabBarIcon: ({color, focused}) => (
-              <Ionicons name={focused ? 'book-sharp' : 'book-outline'} color={color} size={24} />
-            )
-          }}
-        />
-        <Tabs.Screen
-          name="(setting)"
-          options={{
-            title: "Настройки",
-            headerShown: false,
-            tabBarIcon: ({color, focused}) => (
-              <Ionicons name={focused ? 'settings-sharp' : 'settings-outline'} color={color} size={24} />
+              <Ionicons name={focused ? 'calendar-sharp' : 'calendar-outline'} color={color} size={24} />
             )
           }}
         />
@@ -51,6 +41,6 @@ const TabsLayout = () => {
   )
 }
 
-export default TabsLayout
+export default AdminLayout
 
 const styles = StyleSheet.create({})

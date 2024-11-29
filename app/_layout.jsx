@@ -1,9 +1,9 @@
 'use client';
 
-import { Image } from 'react-native'
-import { Slot, SplashScreen, Stack } from 'expo-router';
+
+import { SplashScreen, Stack } from 'expo-router';
 import { useFonts  } from 'expo-font';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 
 SplashScreen.preventAutoHideAsync(); // предотвращает скрытие асинхронности
@@ -25,17 +25,19 @@ const RootLayout = () => {
     if(fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded, error])
 
-  if(!fontsLoaded && !error) return null;
   return (
-    <>
-    <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(user)" options={{ headerShown: false }} />
-    </Stack>
-    <StatusBar style='light'/>
-    </>
-    
+      <Stack>
+        <Stack.Screen name="(admin)" options={{
+            headerShown: false
+          }}/>
+          <Stack.Screen name="(user)" options={{
+            headerShown: false
+          }}/>
+          <Stack.Screen name="(auth)" options={{
+            headerShown: false
+          }}/>
+      </Stack>
+  
   )
 }
 export default RootLayout
