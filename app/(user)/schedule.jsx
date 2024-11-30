@@ -67,7 +67,12 @@ const Schedule = () => {
   };
 
   const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-
+  const formatFullDate = (date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяцы начинаются с 0
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+  };
   // Функция для удаления приёма
   const removeMedication = (index) => {
     setMedicationLog((prevLog) => {
@@ -80,9 +85,15 @@ const Schedule = () => {
   return (
     <SafeAreaView style={styles.container}>
       <SafeAreaView style={styles.navigation}>
-        <Button title="←" onPress={() => handleWeekChange(-1)} />
-        <Button title="Выбрать неделю" onPress={() => setShowCalendar(true)} />
-        <Button title="→" onPress={() => handleWeekChange(1)} />
+        <TouchableOpacity style={styles.orangeButton} onPress={() => handleWeekChange(-1)}>
+          <Text style={styles.orangeButtonText}>←</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.orangeButton} onPress={() => setShowCalendar(true)}>
+          <Text style={styles.orangeButtonText}>Выбрать неделю</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.orangeButton} onPress={() => handleWeekChange(-1)}>
+          <Text style={styles.orangeButtonText}>→</Text>
+        </TouchableOpacity>
       </SafeAreaView>
 
       {showCalendar && (
@@ -109,7 +120,7 @@ const Schedule = () => {
         ))}
       </SafeAreaView>
 
-      <Text style={styles.dateText}>{`Расписание на ${selectedDay}`}</Text>
+      <Text style={styles.dateText}>{`Расписание на ${formatFullDate(weekDates[daysOfWeek.indexOf(selectedDay)])}`}</Text>
 
       <ScrollView style={styles.scrollView}>
         {medicationLog[selectedDay].map((medication, index) => (
@@ -135,7 +146,9 @@ const Schedule = () => {
         ))}
       </ScrollView>
 
-      <Button title="Добавить прием" onPress={() => { /* Add your handler here */ }} />
+      <TouchableOpacity style={styles.orangeButton} onPress={() => { /* Add your handler here */ }}>
+        <Text style={styles.orangeButtonText}>Добавить прием</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -176,6 +189,19 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  orangeButton: {
+    backgroundColor: '#FF8F00', // Оранжевый цвет
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  orangeButtonText: {
+    color: '#000000', // Черный цвет текста
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   medicationItem: {
     flexDirection: 'row',
