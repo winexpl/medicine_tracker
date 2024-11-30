@@ -40,7 +40,7 @@ export const addCourses = async (data) => {
     }
 };
 
-export const clearCourses = async (data) => {
+export const clearCourses = async () => {
     try {
         await AsyncStorage.deleteItemAsync('courses');
         console.log('Courses removed!');
@@ -49,10 +49,8 @@ export const clearCourses = async (data) => {
     }
 };
 
-
-
 export const CoursesProvider = ({ children }) => {
-    const [courses, setCourses] = useState(null);
+    const [courses, setCourses] = useState([]);
     useEffect(() => {
         setCourses(getCourses());
     }, []);

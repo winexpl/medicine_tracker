@@ -22,9 +22,9 @@ export const removeToken = () => {
 };
 
 // Получение токена из хранилища
-export const getToken = async () => {
+export const getToken = () => {
     try {
-        const token = SecureStorage.getItemAsync('token');
+        const token = SecureStorage.getItem('token');
         console.log(token);
         return token;
     } catch (error) {

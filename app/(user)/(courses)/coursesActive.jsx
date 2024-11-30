@@ -1,18 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { getToken } from '../../../contexts/Secure';
+import { CourseContext } from '../../../contexts/CoursesContext';
   
   const CoursesActive = () => {
     
-    // вытягиваем курсы из удаленного
-    const [courses, setCourses] = useState([
-      { name: 'Аспирин', remaining: 22, dosage: '1 таблетка' },
-      // Add more courses here if needed
-    ]);
-  
-    // Function to add a new course.
+    const { courses, setCourses } = useContext(CourseContext);
+    
     const addCourse = () => {
       const newCourse = { name: 'Новый курс', remaining: 112, dosage: '1 таблетка' };
       setCourses([...courses, newCourse]);
@@ -22,7 +18,7 @@ import { getToken } from '../../../contexts/Secure';
       <SafeAreaView style={styles.container}>
 
         <ScrollView style={styles.scrollView}>
-          {courses.map((course, index) => (
+          {courses.get().map((course, index) => (
             // я так понимаю курс, вынести в компонент
             <View key={index} style={styles.courseItem}>
               <Text style={styles.courseName}>{course.name}</Text>

@@ -10,11 +10,13 @@ export default function App() {
     useEffect(() => {
         // Проверим токен при старте приложения
         const checkToken = async () => {
-            const token = null;
+            let token = null;
             try {
                 console.log('its index');
                 token = await getToken(); // Получаем токен из SecureStorage
                 console.log('in index: ' + token);
+            } catch (error) {
+                console.log('ОШИБКА ', error);
             } finally {
                 if (token) {
                     const role = getUserRoleFromToken(token);

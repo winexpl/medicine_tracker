@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }) => {
     console.log('AuthProvider: ' + token);
     const role = getUserRoleFromToken(token); // Получаем роль пользователя (например, из localStorage или токена)
     useEffect(() => {
-        setUserInfo({role:role, isLoggedIn:true});
+        setUserInfo({role:role, isLoggedIn: role? true: false});
     }, []);
     return (
         <AuthContext.Provider value={{ userInfo, setUserInfo }}>

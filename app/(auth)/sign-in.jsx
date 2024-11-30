@@ -39,19 +39,18 @@ const SignIn = () => {
             });
             console.log(response.data);
             const token = response.data.token;
-            console.log(token);
+            console.log("ВХОД ПО ТОКЕНУ " + token);
             if (token) {
                 saveToken(token); // Сохраняем токен в SecureStorage
                 
-                const role = getUserRoleFromToken(token);
-                console.log(role + " " + token);
-                setUserInfo({role:role, isLoggedIn:true});
-                if(role === "ADMIN") router.replace('/search');
-                else router.replace('/schedule');
+                const role_ = getUserRoleFromToken(token);
+                console.log(role_ + " " + token);
+                setUserInfo({role:role_, isLoggedIn:true});
+                router.replace('../');
             }
         } catch (err) {
             // Обработка ошибки запроса
-            console.log(err)
+            console.log(err);
             setError('Произошла ошибка при отправке данных.');
         } finally {
             setLoading(false); // Выключаем индикатор загрузки
