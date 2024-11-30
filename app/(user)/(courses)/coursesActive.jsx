@@ -33,7 +33,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
           ))}
         </ScrollView>
   
-        <TouchableOpacity style={styles.addButton} onPress={() => router.push('addCourse')}>
+        <TouchableOpacity style={styles.addButton} onPress={() => router.push('/addCourse')}>
           <Text style={styles.addButtonText}>Добавить курс</Text>
         </TouchableOpacity>
       </SafeAreaView>
