@@ -1,17 +1,16 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet } from 'react-native'
 import React from 'react'
 import { SafeAreaView } from "react-native-safe-area-context"
 import { NavigationContainer } from '@react-navigation/native';
 import CoursesActive from './coursesActive';
 import CoursesInactive from './coursesInactive';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Tabs, Redirect } from 'expo-router' ;
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
 const Tab = createBottomTabNavigator();
 
 const CoursesLayout = () => {
+    
     return (
         <SafeAreaView style={styles.container}>
             <NavigationContainer>

@@ -1,10 +1,12 @@
-'use client';
-
 
 import { SplashScreen, Stack } from 'expo-router';
 import { useFonts  } from 'expo-font';
 import { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { AuthProvider } from '../contexts/AuthContext';
+import { CoursesProvider } from '../contexts/CoursesContext';
+import { TakeContext, TakeProvider } from '../contexts/TakesContext';
+import { MedicamentProvider } from '../contexts/MedicamentContext';
 
 SplashScreen.preventAutoHideAsync(); // предотвращает скрытие асинхронности
 
@@ -19,25 +21,36 @@ const RootLayout = () => {
     "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
     "Poppins-SemiBold": require("../assets/fonts/Poppins-SemiBold.ttf"),
     "Poppins-Thin": require("../assets/fonts/Poppins-Thin.ttf"),
-  })
+  });
   useEffect(() => {
     if(error) throw error;
     if(fontsLoaded) SplashScreen.hideAsync();
-  }, [fontsLoaded, error])
+  }, [fontsLoaded, error]);
 
   return (
-      <Stack>
-        <Stack.Screen name="(admin)" options={{
-            headerShown: false
-          }}/>
-          <Stack.Screen name="(user)" options={{
-            headerShown: false
-          }}/>
-          <Stack.Screen name="(auth)" options={{
-            headerShown: false
-          }}/>
-      </Stack>
-  
+    <MedicamentProvider>
+      <TakeProvider>
+        <CoursesProvider>
+          <AuthProvider>
+            <Stack>
+                <Stack.Screen name="(admin)" options={{
+                  headerShown: false
+                }}/>
+                <Stack.Screen name="(user)" options={{
+                  headerShown: false
+                }}/>
+                <Stack.Screen name="(auth)" options={{
+                  headerShown: false
+                }}/>
+            </Stack>
+          </AuthProvider>
+        </CoursesProvider>
+      </TakeProvider>
+    </MedicamentProvider>
+    
+    
+    
+      
   )
 }
 export default RootLayout

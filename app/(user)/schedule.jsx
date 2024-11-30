@@ -10,6 +10,7 @@ const Schedule = () => {
 
   // Состояние для хранения списка приёмов
   const [medicationLog, setMedicationLog] = useState({
+    // нужна логика для выцепления по курсам и приемам текущих приемов
     Пн: [
       { name: 'Аспирин', time: '8:00', taken: null },
       { name: 'Ибупрофен', time: '9:00', taken: null },

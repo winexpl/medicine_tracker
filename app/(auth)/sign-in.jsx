@@ -1,13 +1,13 @@
 import { ScrollView, StyleSheet, Text, View, Image } from 'react-native'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import FormField from '@/components/FormField'
 import CustomButton from '@/components/CustomButton'
 import { Link , router} from 'expo-router'
 import {API_URL_LOGIN} from '../../constants/constants'
 import axios from 'axios';
-import { userRole, setUserRole, getUserRoleFromToken, saveToken, getToken, removeToken } from '../../context/AuthContext'
-
+import { getUserRoleFromToken, AuthContext } from '../../contexts/AuthContext'
+import { saveToken, getToken, removeToken } from '../../contexts/Secure'
 
 
 const SignIn = () => {
@@ -16,14 +16,20 @@ const SignIn = () => {
         username:'',
         password:''
     });
+    const { userInfo, setUserInfo } = useContext(AuthContext);
     
     const [loading, setLoading] = useState(false);  // Статус загрузки
     const [error, setError] = useState(null);  // Статус ошибки
 
+    
+    // Здесь получаем токен с сервера
     const handleButtonClickLogin = async () => {
         setLoading(true); // Включаем индикатор загрузки
         setError(''); // Очищаем предыдущие ошибки
         console.log("send POST LOGIN");
+
+        form.username = form.username.trim();
+        form.password = form.password.trim();
         try {
             // Отправляем запрос на сервер
             const response = await axios.post(API_URL_LOGIN, form, {
@@ -31,14 +37,18 @@ const SignIn = () => {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
             });
-            if (response.data.token) {
-                saveToken(response.data.token); // Сохраняем токен в SecureStorage
-                const role = getUserRoleFromToken(response.data.token);
-                console.log(role);
-                getUserRoleFromToken(decoded.role); // Устанавливаем роль из токена
-                setIsLoggedIn(true); // Статус авторизации
+            console.log(response.data);
+            const token = response.data.token;
+            console.log(token);
+            if (token) {
+                saveToken(token); // Сохраняем токен в SecureStorage
+                
+                const role = getUserRoleFromToken(token);
+                console.log(role + " " + token);
+                setUserInfo({role:role, isLoggedIn:true});
+                if(role === "ADMIN") router.replace('/search');
+                else router.replace('/schedule');
             }
-            console.log(getUserRoleFromToken(response.data.token));
         } catch (err) {
             // Обработка ошибки запроса
             console.log(err)
@@ -81,7 +91,7 @@ const SignIn = () => {
                 </View>
                 <CustomButton
                     title = 'Войти'
-                    handlePress={() => {handleButtonClickLogin();} }
+                    handlePress={() => handleButtonClickLogin() }
                     containerStyle='mt-7'
                 />
                 <View className='pt-7 flex-row gap-4 items-center justify-center'>

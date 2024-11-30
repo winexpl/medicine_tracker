@@ -1,19 +1,65 @@
 import { ScrollView, StyleSheet, Text, View, Image } from 'react-native'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import FormField from '@/components/FormField'
 import CustomButton from '@/components/CustomButton'
 import { Link , router} from 'expo-router'
+import { API_URL_REGISTRATION } from '../../constants/constants'
+import axios from 'axios'
+import { AuthContext, getUserRoleFromToken } from '../../contexts/AuthContext'
+import { saveToken, getToken, removeToken } from '../../contexts/Secure'
 
 const submit = () => {
 
 }
 const SignUp = () => {
+  const { userInfo, setUserInfo } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
+    name:'',
     login:'',
-    password:''
+    password:'',
+    role:'USER'
   })
-  const [isSubmitting, setisSubmitting] = useState(false)
+
+  // Регистрируемся, получаем токен
+  const handleButtonClickReg = async () => {
+    setLoading(true); // Включаем индикатор загрузки
+    console.log("send POST LOGIN");
+    try {
+        // Отправляем запрос на сервер
+        form.login = form.login.trim();
+        form.name = form.name.trim();
+        form.password = form.password.trim();
+        if(form.login === '' || form.name === '' || form.password === '') {
+          console.error('Заполните все поля');
+        }
+        else {
+        const response = await axios.post(API_URL_REGISTRATION, form, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        console.log(response.data);
+        const token = response.data.token;
+        if (token) {
+            saveToken(token); // Сохраняем токен в SecureStorage
+            const role = getUserRoleFromToken(token);
+            console.log(role + " " + token);
+            setUserInfo({role:role, isLoggedIn:true});
+            if(role === "ADMIN") router.replace('/search');
+            else router.replace('/schedule');
+        }
+      }
+    } catch (err) {
+        // Обработка ошибки запроса
+        console.log(err);
+        setError('Произошла ошибка при отправке данных.');
+    } finally {
+        setLoading(false); // Выключаем индикатор загрузки
+    }
+  };
+  const [isSubmitting, setisSubmitting] = useState(false);
   return (
     <SafeAreaView className='bg-secondary-back h-full'>
       <ScrollView className='px-6'>
@@ -24,21 +70,21 @@ const SignUp = () => {
             resizeMode="contain"
           />
           <Text className='font-pmedium text-lg text-secondary-text text-center'>
-            Зарегестрируйтесь
+            Зарегистрируйтесь
             
           </Text>
 
           <FormField
             title='Ваше имя'
-            value={form.username}
-            handleChangeText={(e) => setForm({...form, username: e})}  
+            value={form.name}
+            handleChangeText={(e) => setForm({...form, name: e})}
             otherStyles='mt-3'
           />
 
           <FormField
             title='Логин'
             value={form.login}
-            handleChangeText={(e) => setForm({...form, login: e})}  
+            handleChangeText={(e) => setForm({...form, login: e})}
             otherStyles='mt-3'
             keyboardType='login'
           />
@@ -46,13 +92,13 @@ const SignUp = () => {
           <FormField
             title='Пароль'
             value={form.password}
-            handleChangeText={(e) => setForm({...form, password: e})}  
+            handleChangeText={(e) => setForm({...form, password: e})}
             otherStyles='mt-3'
           />
         </View>
         <CustomButton
-          title = 'Войти' 
-          handlePress={() => router.push('/schedule')}
+          title = 'Войти'
+          handlePress={() => handleButtonClickReg()}
           containerStyle='mt-7'
           isLoading={isSubmitting}
         />
