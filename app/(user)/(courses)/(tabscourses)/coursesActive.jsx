@@ -1,46 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-  
+import { Link , router} from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { getToken } from '../../../../contexts/Secure';
+import { CourseContext, CoursesProvider, getCourses, saveCourses } from '../../../../contexts/CoursesContext';
+import { API_URL_GET_COURSES } from '../../../../constants/constants';
+import { getCourseInfo } from '../../../../components/Models';
   
-  const CoursesInactive = () => {
-    const [courses, setCourses] = useState([
-      { name: 'Аспирин', remaining: 12, dosage: '1 таблетка' },
-
-      // Add more courses here if needed
-    ]);
-  
-    // Function to add a new course.
+  const CoursesActive = () => {
+    const { courses, setCourses } = useContext(CourseContext);
+    
     const addCourse = () => {
-      const newCourse = { name: 'Новый курс', remaining: 10, dosage: '1 таблетка' };
+      const newCourse = { name: 'Новый курс', state: 112, dose: '1 таблетка' };
       setCourses([...courses, newCourse]);
     };
-  
+    
     return (
+    <CoursesProvider>
       <SafeAreaView style={styles.container}>
-
         <ScrollView style={styles.scrollView}>
-          {courses.map((course, index) => (
-            // я так понимаю курс, вынести в компонент
+          {getCourseInfo().active.map((course, index) => (
+            // ДОБАВИТЬ КНОПКУ ПРОСМОТРА ПОЛНОЙ ИНФЫ О КУРСЕ, А ВНУТРИ ИНФА О МЕДИКАМЕНТЕ
             <View key={index} style={styles.courseItem}>
-              <Text style={styles.courseName}>{course.name}</Text>
+              <Text style={styles.name}>{course.medicament}</Text>
               <Text style={styles.courseDetails}>
-                Осталось приемов: {course.remaining} {'\n'}
-                Доза: {course.dosage}
+                Осталось приемов: {course.numberMedicine} {'\n'}
+                Доза: {course.dose}
               </Text>
             </View>
-            // конец курса
           ))}
         </ScrollView>
   
-        <TouchableOpacity style={styles.addButton} onPress={addCourse}>
+        <TouchableOpacity style={styles.addButton} onPress={() => {
+          console.log('push');
+          router.push('../(addcourse)/addCourse');}}>
           <Text style={styles.addButtonText}>Добавить курс</Text>
         </TouchableOpacity>
       </SafeAreaView>
+    </CoursesProvider>
+      
     );
   };
 
-  export default CoursesInactive;
+  export default CoursesActive;
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -94,7 +96,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
       bottom: 20,
       left: 20,
       right: 20,
-      backgroundColor: '#FF8F00',
+      backgroundColor: '#FF8F00', 
       padding: 15,
       borderRadius: 5,
       alignItems: 'center',

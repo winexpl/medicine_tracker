@@ -2,15 +2,14 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { Stack } from 'expo-router'
 
-const MainCoursesLayout = () => {
+const AddCourseLayout = () => {
   return (
     <Stack>
-        <Stack.Screen name="(tabscourses)"/>
-        <Stack.Screen name="(addcourses)"/>
+        <Stack.Screen name="addCourse"/>
     </Stack>
-  );
+  )
 }
 
-export default MainCoursesLayout
+export default AddCourseLayout
 
 const styles = StyleSheet.create({})

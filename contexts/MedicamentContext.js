@@ -21,11 +21,11 @@ export const saveMedicaments = async ({...data}) => {
 export const getMedicaments = async () => {
     try {
         const medicamentsJson = await AsyncStorage.getItem('medicaments');
-        if(medicamentsJson != null) {
-            return JSON.parse(medicamentsJson);
-        } else console.log('Medicaments is null');
+        const medicamentsObj = JSON.parse(medicamentsJson);
+        return Object.values(medicamentsObj);
     } catch (error) {
         console.error('Error receiving medicaments: ', error);
+        return [];
     }
 };
 
@@ -51,12 +51,12 @@ export const clearMedicaments = async (data) => {
 };
 
 export const MedicamentProvider = ({ children }) => {
-    const [medicament, setMedicament] = useState(null);
+    const [medicaments, setMedicaments] = useState(null);
      // Загружаем курсы из AsyncStorage, если они есть
     useEffect(() => {
         async function fetchFromLocal() {
             const localMedicaments = await getMedicaments();
-            setMedicament(localMedicaments);
+            setMedicaments(localMedicaments);
         }
         fetchFromLocal();
     }, []);
@@ -75,7 +75,7 @@ export const MedicamentProvider = ({ children }) => {
                     await saveMedicaments(medicamentsSaved); // Сохраняем курсы, если запрос прошел успешно
                     // По логике здесь, перед обновлением состояния отправить локальное на сервер
                     // а то что с сервера сконкатенировать с локальным
-                    setMedicament(medicamentsSaved); // Обновляем состояние курсов
+                    setMedicaments(medicamentsSaved); // Обновляем состояние курсов
                     console.log('Medicaments fetched and saved!');
                 } else {
                     console.log('No medicaments available.');
@@ -84,14 +84,14 @@ export const MedicamentProvider = ({ children }) => {
                 console.error('Ошибка при получении медикаментов: ', err);
                 // Попробуем получить курсы из локального хранилища, если ошибка сети
                 const localMedicaments = getMedicaments();
-                setMedicament(await localMedicaments);
+                setMedicaments(await localMedicaments);
             }
         }
-
         fetchFromDB();
     }, []);
+    console.log(medicaments);
     return (
-        <MedicamentContext.Provider value={{medicament, setMedicament}}>
+        <MedicamentContext.Provider value={{medicaments, setMedicaments}}>
             {children}
         </MedicamentContext.Provider>
     );

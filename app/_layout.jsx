@@ -28,7 +28,7 @@ const RootLayout = () => {
   }, [fontsLoaded, error]);
 
   return (
-      <MedicamentProvider>
+    <MedicamentProvider>
       <TakeProvider>
         <CoursesProvider>
           <AuthProvider>

@@ -1,48 +1,40 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Link , router} from 'expo-router'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { getToken } from '../../../contexts/Secure';
-import { CourseContext, CoursesProvider, getCourses, saveCourses } from '../../../contexts/CoursesContext';
-import { API_URL_GET_COURSES } from '../../../constants/constants';
+import { getCourseInfo } from '../../../../components/Models';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { CourseContext  } from '../../../../contexts/CoursesContext';
   
-  const CoursesActive = () => {
+  const CoursesInactive = () => {
     const { courses, setCourses } = useContext(CourseContext);
-    
+  
+    // Function to add a new course.
     const addCourse = () => {
-      const newCourse = { name: 'Новый курс', state: 112, dose: '1 таблетка' };
+      const newCourse = { name: 'Новый курс', remaining: 10, dosage: '1 таблетка' };
       setCourses([...courses, newCourse]);
     };
-    
+  
     return (
-    <CoursesProvider>
       <SafeAreaView style={styles.container}>
+
         <ScrollView style={styles.scrollView}>
-          {courses.map((course, index) => (
+          {getCourseInfo().inactive.map((course, index) => (
             // я так понимаю курс, вынести в компонент
             <View key={index} style={styles.courseItem}>
-              <Text style={styles.name}>{course.state}</Text>
+              <Text style={styles.courseName}>{course.name}</Text>
               <Text style={styles.courseDetails}>
-                Осталось приемов: {course.dose} {'\n'}
-                Доза: {course.dose}
+                Осталось приемов: {course.remaining} {'\n'}
+                Доза: {course.dosage}
               </Text>
             </View>
             // конец курса
           ))}
         </ScrollView>
   
-        <TouchableOpacity style={styles.addButton} onPress={() => {
-          console.log('push');
-          router.push('./addCourse');}}>
-          <Text style={styles.addButtonText}>Добавить курс</Text>
-        </TouchableOpacity>
       </SafeAreaView>
-    </CoursesProvider>
-      
     );
   };
 
-  export default CoursesActive;
+  export default CoursesInactive;
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -96,7 +88,7 @@ import { API_URL_GET_COURSES } from '../../../constants/constants';
       bottom: 20,
       left: 20,
       right: 20,
-      backgroundColor: '#FF8F00', 
+      backgroundColor: '#FF8F00',
       padding: 15,
       borderRadius: 5,
       alignItems: 'center',

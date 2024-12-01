@@ -1,149 +1,150 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, ScrollView, TouchableOpacity, Button, StyleSheet } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { CourseContext, getCourses, saveCourses } from '../../contexts/CoursesContext';
-import axios from 'axios';
-import { API_URL_GET_COURSES } from '../../constants/constants';
-import { getToken } from '../../contexts/Secure';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { Calendar } from 'react-native-calendars';
+import { CourseContext } from '../../contexts/CoursesContext';
 
 const Schedule = () => {
-  const [selectedDay, setSelectedDay] = useState('Пн'); // Выбранный день недели
-  const [currentDate, setCurrentDate] = useState(new Date()); // Текущая дата для недели
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Выбранная дата
+  const [selectedDayIndex, setSelectedDayIndex] = useState(new Date().getDay() || 7); // Индекс выбранного дня недели
   const [showCalendar, setShowCalendar] = useState(false); // Состояние для показа календаря
   const { courses, setCourses } = useContext(CourseContext);
 
-
-
-  // Состояние для хранения списка приёмов
-  const [medicationLog, setMedicationLog] = useState({
-    // нужна логика для выцепления по курсам и приемам текущих приемов
-    Пн: [
-      { name: 'Аспирин', time: '8:00', taken: null },
-      { name: 'Ибупрофен', time: '9:00', taken: null },
-      { name: 'Парацетамол', time: '10:00', taken: null },
-      { name: 'Аспирин', time: '8:00', taken: null },
-      { name: 'Ибупрофен', time: '9:00', taken: null },
-      { name: 'Парацетамол', time: '10:00', taken: null },
-      { name: 'Аспирин', time: '8:00', taken: null },
-      { name: 'Ибупрофен', time: '9:00', taken: null },
-      { name: 'Парацетамол', time: '10:00', taken: null },
-      { name: 'Аспирин', time: '8:00', taken: null },
-      { name: 'Ибупрофен', time: '9:00', taken: null },
-      { name: 'Парацетамол', time: '10:00', taken: null },
-    ],
-    Вт: [{ name: 'Аспирин', time: '8:00', taken: null }],
-    Ср: [{ name: 'Аспирин', time: '8:00', taken: null }],
-    Чт: [{ name: 'Аспирин', time: '8:00', taken: null }],
-    Пт: [{ name: 'Аспирин', time: '8:00', taken: null }],
-    Сб: [{ name: 'Аспирин', time: '8:00', taken: null }],
-    Вс: [{ name: 'Аспирин', time: '8:00', taken: null }],
-  });
-
-  // Получение дат недели на основе текущей даты
-  const getWeekDates = (date) => {
-    const weekDates = [];
-    const startOfWeek = new Date(date);
-    startOfWeek.setDate(date.getDate() - (date.getDay() === 0 ? 6 : date.getDay() - 1)); // Начало недели
-
-    for (let i = 0; i < 7; i++) {
-      const newDate = new Date(startOfWeek);
-      newDate.setDate(startOfWeek.getDate() + i);
-      weekDates.push(newDate);
-    }
-    return weekDates;
-  };
-
-  const weekDates = getWeekDates(currentDate);
-
-  const handleWeekChange = (direction) => {
-    const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() + direction * 7); // Перемещение на неделю вперед или назад
-    setCurrentDate(newDate);
-  };
-
-  const handleDateChange = (date) => {
-    if (date) {
-      setCurrentDate(date);
-    }
-    setShowCalendar(false); // Скрытие календаря
-  };
-
-  const formatDate = (date) => {
-    const day = date.getDate();
-    return `${day}`;
-  };
-
   const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 
-  // Функция для удаления приёма
+  const [medicationLog, setMedicationLog] = useState({
+    // Данные для приёмов
+    '2024-12-01': [
+      { name: 'Аспирин', time: '8:00', taken: null },
+      { name: 'Ибупрофен', time: '9:00', taken: null },
+    ],
+    '2024-12-02': [
+      { name: 'Аспирин', time: '8:00', taken: null },
+      { name: 'Ибупрофен', time: '9:00', taken: null },
+    ],
+    '2024-12-03': [{ name: 'Парацетамол', time: '10:00', taken: null }],
+  });
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    setSelectedDayIndex(new Date(date).getDay() || 7);
+    setShowCalendar(false); // Скрыть календарь после выбора даты
+  };
+
+  const handleWeekChange = (direction) => {
+    const current = new Date(selectedDate);
+    current.setDate(current.getDate() + direction * 7); // Изменение недели
+    const updatedDate = current.toISOString().split('T')[0];
+    setSelectedDate(updatedDate);
+  };
+
+  const handleDaySelect = (dayIndex) => {
+    const current = new Date(selectedDate);
+    const currentDay = current.getDay() || 7; // Текущий день недели
+    const diff = dayIndex - currentDay;
+    current.setDate(current.getDate() + diff);
+    setSelectedDate(current.toISOString().split('T')[0]);
+    setSelectedDayIndex(dayIndex);
+  };
+
   const removeMedication = (index) => {
     setMedicationLog((prevLog) => {
       const updatedLog = { ...prevLog };
-      updatedLog[selectedDay] = updatedLog[selectedDay].filter((_, i) => i !== index);
+      updatedLog[selectedDate] = updatedLog[selectedDate].filter((_, i) => i !== index);
       return updatedLog;
     });
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <SafeAreaView style={styles.navigation}>
-        <Button title="←" onPress={() => handleWeekChange(-1)} />
-        <Button title="Выбрать неделю" onPress={() => setShowCalendar(true)} />
-        <Button title="→" onPress={() => handleWeekChange(1)} />
+      {/* Кнопки для переключения недель */}
+      <SafeAreaView style={styles.weekNavigation}>
+        <TouchableOpacity style={styles.weekButton} onPress={() => handleWeekChange(-1)}>
+          <Text style={styles.weekButtonText}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.weekText}>Выбрать неделю</Text>
+        <TouchableOpacity style={styles.weekButton} onPress={() => handleWeekChange(1)}>
+          <Text style={styles.weekButtonText}>→</Text>
+        </TouchableOpacity>
       </SafeAreaView>
 
-      {showCalendar && (
-        <DateTimePicker
-          value={currentDate}
-          mode="date"
-          display="default"
-          onChange={(event, date) => handleDateChange(date)}
-        />
-      )}
-
+      {/* Дни недели */}
       <SafeAreaView style={styles.daySelector}>
         {daysOfWeek.map((day, index) => (
           <TouchableOpacity
-            key={day}
+            key={index}
             style={[
               styles.dayButton,
-              selectedDay === day && styles.selectedDayButton,
+              selectedDayIndex === index + 1 && styles.selectedDayButton,
             ]}
-            onPress={() => setSelectedDay(day)}
+            onPress={() => handleDaySelect(index + 1)}
           >
-            <Text style={styles.dayText}>{`${day} ${formatDate(weekDates[index])}`}</Text>
+            <Text style={styles.dayButtonText}>{day}</Text>
           </TouchableOpacity>
         ))}
       </SafeAreaView>
 
-      <Text style={styles.dateText}>{`Расписание на ${selectedDay}`}</Text>
+      {/* Кнопка для календаря */}
+      <SafeAreaView style={styles.navigation}>
+        <TouchableOpacity
+          style={styles.orangeButton}
+          onPress={() => setShowCalendar(!showCalendar)}
+        >
+          <Text style={styles.orangeButtonText}>
+            {showCalendar ? 'Скрыть календарь' : 'Выбрать дату'}
+          </Text>
+        </TouchableOpacity>
+      </SafeAreaView>
 
+      {/* Календарь */}
+      {showCalendar && (
+        <Calendar
+          onDayPress={(day) => handleDateChange(day.dateString)}
+          markedDates={{
+            [selectedDate]: { selected: true, selectedColor: '#FF8F00' },
+          }}
+          theme={{
+            backgroundColor: '#1C1C2B',
+            calendarBackground: '#FF8F00',
+            textSectionTitleColor: '#fff',
+            selectedDayBackgroundColor: '#000',
+            selectedDayTextColor: '#fff',
+            todayTextColor: '#000',
+            dayTextColor: '#000',
+            arrowColor: '#fff',
+            monthTextColor: '#FFF',
+            textDayFontWeight: '300',
+            textMonthFontWeight: 'bold',
+            textDayHeaderFontWeight: '300',
+            textDayFontSize: 16,
+            textMonthFontSize: 16,
+            textDayHeaderFontSize: 16,
+          }}
+        />
+      )}
+
+      {/* Список приёмов */}
+      <Text style={styles.dateText}>{`Расписание на ${selectedDate}`}</Text>
       <ScrollView style={styles.scrollView}>
-        {medicationLog[selectedDay].map((medication, index) => (
+        {(medicationLog[selectedDate] || []).map((medication, index) => (
           <View key={index} style={styles.medicationItem}>
             <Text style={styles.medicationText}>
               {`${medication.time} ${medication.name}`}
             </Text>
-            <View style={styles.buttonGroup}>
-              <TouchableOpacity
-                style={styles.checkButton}
-                onPress={() => removeMedication(index)}
-              >
-                <Text style={styles.buttonText}>✔️</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.crossButton}
-                onPress={() => removeMedication(index)}
-              >
-                <Text style={styles.buttonText}>❌</Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              style={styles.crossButton}
+              onPress={() => removeMedication(index)}
+            >
+              <Text style={styles.buttonText}>❌</Text>
+            </TouchableOpacity>
           </View>
         ))}
       </ScrollView>
 
-      <Button title="Добавить прием" onPress={() => { /* Add your handler here */ }} />
+      {/* Кнопка добавить */}
+      <TouchableOpacity style={styles.orangeButton} onPress={() => { /* Add your handler here */ }}>
+        <Text style={styles.orangeButtonText}>Добавить приём</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -154,33 +155,66 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#1C1C2B',
   },
-  navigation: {
+  weekNavigation: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 10,
+  },
+  weekButton: {
+    backgroundColor: '#FF8F00',
+    padding: 10,
+    borderRadius: 5,
+  },
+  weekButtonText: {
+    fontSize: 16,
+    color: '#000',
+    fontWeight: 'bold',
+  },
+  weekText: {
+    fontSize: 16,
+    color: '#FFF',
   },
   daySelector: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     marginBottom: 10,
   },
   dayButton: {
     padding: 10,
-    paddingHorizontal: 5,
     borderRadius: 5,
     backgroundColor: '#FF8F00',
   },
   selectedDayButton: {
     backgroundColor: '#FFF',
   },
-  dayText: {
+  dayButtonText: {
     color: '#000',
+    fontWeight: 'bold',
+  },
+  navigation: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  orangeButton: {
+    backgroundColor: '#FF8F00',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  orangeButtonText: {
+    color: '#000000',
+    fontSize: 16,
     fontWeight: 'bold',
   },
   dateText: {
     fontSize: 16,
     marginVertical: 10,
     color: 'white',
+    textAlign: 'center',
   },
   scrollView: {
     flex: 1,
@@ -195,12 +229,6 @@ const styles = StyleSheet.create({
   },
   medicationText: {
     fontSize: 16,
-  },
-  buttonGroup: {
-    flexDirection: 'row',
-  },
-  checkButton: {
-    marginRight: 5,
   },
   crossButton: {
     marginLeft: 5,
