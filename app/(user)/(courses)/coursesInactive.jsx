@@ -94,14 +94,14 @@ import { SafeAreaView } from 'react-native-safe-area-context'
       bottom: 20,
       left: 20,
       right: 20,
-      backgroundColor: '#2196F3',
+      backgroundColor: '#FF8F00',
       padding: 15,
       borderRadius: 5,
       alignItems: 'center',
     },
     addButtonText: {
       fontSize: 16,
-      color: '#FFF',
+      color: '#000',
     },
   });
   

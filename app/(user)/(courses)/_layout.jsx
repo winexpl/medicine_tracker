@@ -24,16 +24,18 @@ const CoursesLayout = () => {
                         right: 0,
                         backgroundColor: '#1C1C2B', // Цвет панели
                     },
-                    tabBarActiveTintColor: 'white', // Цвет активного текста
-                    tabBarInactiveTintColor: 'orange', // Цвет неактивного текста
+                    tabBarActiveTintColor: 'orange', // Цвет активного текста
+                    tabBarInactiveTintColor: 'white', // Цвет неактивного текста
                     tabBarIcon: () => (
                         <AntDesign name="carryout" size={24} color="orange" />
                     ),
                 }}
+                
             >
-
+                
             <Tab.Screen name="Активные" component={CoursesActive} />
             <Tab.Screen name="Завершенные" component={CoursesInactive} />
+        
             </Tab.Navigator>
             </NavigationContainer>
         </SafeAreaView>

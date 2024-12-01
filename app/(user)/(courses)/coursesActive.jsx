@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import axios from 'axios';
+import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { Link , router} from 'expo-router'
+
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { getToken } from '../../../contexts/Secure';
 import { CourseContext, CoursesProvider, getCourses, saveCourses } from '../../../contexts/CoursesContext';
@@ -31,7 +32,7 @@ import { API_URL_GET_COURSES } from '../../../constants/constants';
           ))}
         </ScrollView>
   
-        <TouchableOpacity style={styles.addButton} onPress={addCourse}>
+        <TouchableOpacity style={styles.addButton} onPress={() => router.push('addCourse')}>
           <Text style={styles.addButtonText}>Добавить курс</Text>
         </TouchableOpacity>
       </SafeAreaView>
@@ -94,14 +95,14 @@ import { API_URL_GET_COURSES } from '../../../constants/constants';
       bottom: 20,
       left: 20,
       right: 20,
-      backgroundColor: '#2196F3',
+      backgroundColor: '#FF8F00', 
       padding: 15,
       borderRadius: 5,
       alignItems: 'center',
     },
     addButtonText: {
       fontSize: 16,
-      color: '#FFF',
+      color: '#000',
     },
   });
   
