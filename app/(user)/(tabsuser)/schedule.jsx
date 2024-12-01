@@ -1,30 +1,41 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import { CourseContext } from '../../contexts/CoursesContext';
+import { CourseContext } from '../../../contexts/CoursesContext';
+import { getTakesByDate } from '../../../components/Models';
+import { Ionicons } from '@expo/vector-icons'; // Импортируем иконки
+import { saveTakes, TakeContext } from '../../../contexts/TakesContext';
+import { router } from 'expo-router';
 
-const Schedule = () => {
+export default function Schedule () {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Выбранная дата
   const [selectedDayIndex, setSelectedDayIndex] = useState(new Date().getDay() || 7); // Индекс выбранного дня недели
   const [showCalendar, setShowCalendar] = useState(false); // Состояние для показа календаря
   const { courses, setCourses } = useContext(CourseContext);
 
   const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+  const { takes, setTakes } = useContext(TakeContext);
+  
+  const take = (id) => {  
+    const updatedTakes = [...takes];  // Создаем копию массива
+    const index = updatedTakes.findIndex(m => m.id === id);
+    if (index !== -1) {
+      updatedTakes[index] = { ...updatedTakes[index], state: true };  // Обновляем элемент
+    }
+    setTakes(updatedTakes);  // Обновляем состояние с новым массивом
+    saveTakes(takes);
+  }
 
-  const [medicationLog, setMedicationLog] = useState({
-    // Данные для приёмов
-    '2024-12-01': [
-      { name: 'Аспирин', time: '8:00', taken: null },
-      { name: 'Ибупрофен', time: '9:00', taken: null },
-    ],
-    '2024-12-02': [
-      { name: 'Аспирин', time: '8:00', taken: null },
-      { name: 'Ибупрофен', time: '9:00', taken: null },
-    ],
-    '2024-12-03': [{ name: 'Парацетамол', time: '10:00', taken: null }],
-  });
-
+  function donttake(id) {
+    const updatedTakes = [...takes];  // Создаем копию массива
+    const index = updatedTakes.findIndex(m => m.id === id);
+    if (index !== -1) {
+      updatedTakes[index] = { ...updatedTakes[index], state: false };  // Обновляем элемент
+    }
+    setTakes(updatedTakes);  // Обновляем состояние с новым массивом
+    saveTakes(takes);
+  }
   const handleDateChange = (date) => {
     setSelectedDate(date);
     setSelectedDayIndex(new Date(date).getDay() || 7);
@@ -47,13 +58,6 @@ const Schedule = () => {
     setSelectedDayIndex(dayIndex);
   };
 
-  const removeMedication = (index) => {
-    setMedicationLog((prevLog) => {
-      const updatedLog = { ...prevLog };
-      updatedLog[selectedDate] = updatedLog[selectedDate].filter((_, i) => i !== index);
-      return updatedLog;
-    });
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -126,23 +130,32 @@ const Schedule = () => {
       {/* Список приёмов */}
       <Text style={styles.dateText}>{`Расписание на ${selectedDate}`}</Text>
       <ScrollView style={styles.scrollView}>
-        {(medicationLog[selectedDate] || []).map((medication, index) => (
-          <View key={index} style={styles.medicationItem}>
+        {getTakesByDate(selectedDate).map((takem, index) => (
+          <View key={index} style={takem.state ? styles.medicationItemTaked : styles.medicationItemUntaked}>
             <Text style={styles.medicationText}>
-              {`${medication.time} ${medication.name}`}
+              {`${new Date(takem.datetime).toLocaleTimeString()} ${(takem.title)}`}
             </Text>
+
             <TouchableOpacity
               style={styles.crossButton}
-              onPress={() => removeMedication(index)}
-            >
-              <Text style={styles.buttonText}>❌</Text>
+              onPress={() => {take(takem.id);}}>
+              
+              <Ionicons name="thumbs-up" size={24} color="green" />
             </TouchableOpacity>
+
+            <TouchableOpacity className="items-end"
+              style={styles.crossButton}
+              onPress={() => {donttake(takem.id);}}>
+              <Ionicons name="thumbs-down" size={24} color="red" />
+            </TouchableOpacity>
+
+
           </View>
         ))}
       </ScrollView>
 
       {/* Кнопка добавить */}
-      <TouchableOpacity style={styles.orangeButton} onPress={() => { /* Add your handler here */ }}>
+      <TouchableOpacity style={styles.orangeButton} onPress={() => { router.push('addTake') }}>
         <Text style={styles.orangeButtonText}>Добавить приём</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -219,11 +232,19 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  medicationItem: {
+  medicationItemTaked: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     padding: 10,
-    backgroundColor: '#FFF',
+    backgroundColor: 'lightgreen',
+    marginBottom: 5,
+    borderRadius: 5,
+  },
+  medicationItemUntaked: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+    backgroundColor: 'lightcoral',
     marginBottom: 5,
     borderRadius: 5,
   },
@@ -231,11 +252,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   crossButton: {
-    marginLeft: 5,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    marginLeft: 10,
   },
   buttonText: {
     fontSize: 16,
   },
 });
-
-export default Schedule;

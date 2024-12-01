@@ -8,6 +8,7 @@ import {
   FlatList,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const MedicationForm = ({ navigation }) => {
   const [medication, setMedication] = useState('Аспирин');
@@ -35,7 +36,8 @@ const MedicationForm = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView>
+      <View style={styles.container}>
       {/* Верхняя часть с текущим курсом */}
       <Text style={styles.label}>Текущий курс</Text>
 
@@ -107,6 +109,7 @@ const MedicationForm = ({ navigation }) => {
         />
       )}
     </View>
+    </SafeAreaView>
   );
 };
 

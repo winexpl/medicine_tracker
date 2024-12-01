@@ -91,7 +91,7 @@ export const TakeProvider = ({ children }) => {
 
         fetchCourses();
     }, []);
-
+    console.log(takes);
     return (
         <TakeContext.Provider value={{takes, setTakes}}>
             {children}

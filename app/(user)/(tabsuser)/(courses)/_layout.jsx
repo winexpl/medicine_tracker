@@ -6,7 +6,6 @@ import CoursesActive from './coursesActive';
 import CoursesInactive from './coursesInactive';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { MedicationForm } from '../(addcourse)/addCourse'
 
 const Tab = createBottomTabNavigator();
 

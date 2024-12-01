@@ -6,6 +6,9 @@ import RouterButton from '../../../components/RouterButton'
 import { router } from 'expo-router'
 import { AuthContext } from '../../../contexts/AuthContext'
 import { removeToken } from '../../../contexts/Secure'
+import { clearCourses } from '../../../contexts/CoursesContext'
+import { clearTakes } from '../../../contexts/TakesContext'
+import { clearMedicaments } from '../../../contexts/MedicamentContext'
 
 const SettingLayout = () => {
   const { userInfo, setUserInfo } = useContext(AuthContext);
@@ -19,6 +22,9 @@ const SettingLayout = () => {
                             handlePress={() => {
                             removeToken();
                             setUserInfo({role:null, isLoggedIn:false});
+                            clearCourses();
+                            clearTakes();
+                            clearMedicaments();
                             router.replace('../../');}}
                             containerStyle="w-full"
       />

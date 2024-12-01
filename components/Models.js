@@ -1,6 +1,7 @@
 import { CourseContext } from "../contexts/CoursesContext"
 import { MedicamentContext } from "../contexts/MedicamentContext"
-import { useContext } from "react";
+import { TakeContext } from "../contexts/TakesContext";
+import { useContext, useEffect } from "react";
 
 export const getCourseInfo = () => {
     const { courses, setCourses } = useContext(CourseContext);
@@ -20,4 +21,28 @@ export const getCourseInfo = () => {
     }
     console.log(array);
     return array;
+}
+
+export const getTakesByDate = (date) => {
+    console.log(date);
+    const { takes, setTakes } = useContext(TakeContext);
+    const { courses, setCourses } = useContext(CourseContext);
+    const { medicaments, setMedicaments } = useContext(MedicamentContext);
+    const takesForDate = [];
+    console.log(takes);
+    for(let index in takes) {
+        let take = takes[index];
+        if(new Date(take.datetime).toLocaleDateString() === new Date(date).toLocaleDateString()) {
+            console.log(123);
+            const mId = courses[courses.findIndex(m => m.id === take.courseId)].medicamentId;
+            const title = medicaments[medicaments.findIndex(m => m.id === mId)].title;
+            take.title = title;
+            takesForDate.push(take);
+        }
+    }
+    return takesForDate;
+}
+
+export const updateCourseState = (id) => {
+
 }

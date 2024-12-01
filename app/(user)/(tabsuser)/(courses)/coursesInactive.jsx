@@ -29,7 +29,6 @@ import { CourseContext  } from '../../../../contexts/CoursesContext';
             // конец курса
           ))}
         </ScrollView>
-  
       </SafeAreaView>
     );
   };

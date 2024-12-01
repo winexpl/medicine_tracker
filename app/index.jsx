@@ -2,6 +2,8 @@ import { useState, useEffect, useContext } from "react";
 import { router } from "expo-router";
 import { getUserRoleFromToken, AuthContext } from "../contexts/AuthContext";
 import { saveToken, getToken, removeToken } from "../contexts/Secure";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Text } from "react-native";
 
 export default function App() {
     
@@ -22,15 +24,31 @@ export default function App() {
                     const role = getUserRoleFromToken(token);
                     setUserInfo({role:role, isLoggedIn:true});
                     if(role === "ADMIN") router.replace('/search');
-                    else router.replace('/schedule');
+                    else {
+                        console.log('ПЕРЕХОД В /schedule');
+                        router.replace('/schedule');
+                    }
                 }
-                else router.replace('/sign');
+                else {
+                    console.log('ПЕРЕХОД В /SIGN');
+                    router.replace('/sign');
+                }
             }
         };
         checkToken();
     });
     
-    return null;
+    return (
+        <SafeAreaView>
+            <Text>ЖОПА!</Text>
+            <Text>ЖОПА!</Text>
+            <Text>ЖОПА!</Text>
+            <Text>ЖОПА!</Text>
+            <Text>ЖОПА!</Text>
+            <Text>ЖОПА!</Text>
+            <Text>ЖОПА!</Text>
+        </SafeAreaView>
+    );
 }
 
 
