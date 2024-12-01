@@ -4,7 +4,9 @@ import { Stack } from 'expo-router'
 
 const MainCoursesLayout = () => {
   return (
-    <Stack>
+    <Stack screenOptions={{
+      headerShown: false }}>
+      
         <Stack.Screen name="(tabscourses)"/>
         <Stack.Screen name="(addcourses)"/>
     </Stack>

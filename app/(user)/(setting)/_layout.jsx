@@ -4,7 +4,8 @@ import { Tabs } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import RouterButton from '../../../components/RouterButton'
 import { router } from 'expo-router'
-import { AuthContext, removeToken } from '../../../contexts/AuthContext'
+import { AuthContext } from '../../../contexts/AuthContext'
+import {  removeToken } from '../../../contexts/Secure'
 
 const SettingLayout = () => {
   const { userInfo, setUserInfo } = useContext(AuthContext);
