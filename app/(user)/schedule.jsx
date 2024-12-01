@@ -1,12 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, ScrollView, TouchableOpacity, Button, StyleSheet } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { CourseContext, getCourses, saveCourses } from '../../contexts/CoursesContext';
+import axios from 'axios';
+import { API_URL_GET_COURSES } from '../../constants/constants';
+import { getToken } from '../../contexts/Secure';
 
 const Schedule = () => {
   const [selectedDay, setSelectedDay] = useState('Пн'); // Выбранный день недели
   const [currentDate, setCurrentDate] = useState(new Date()); // Текущая дата для недели
   const [showCalendar, setShowCalendar] = useState(false); // Состояние для показа календаря
+  const { courses, setCourses } = useContext(CourseContext);
+
+  // Тут получаем все курсы
+  useEffect(() => {
+    async function fetchCourses() {
+      try {
+          const response = await axios.get(API_URL_GET_COURSES, {
+              headers: {
+                  'Authorization': `Bearer ${getToken()}`,
+              },
+          });
+          if(response) {
+            const coursesSaved = response.data;
+            saveCourses(coursesSaved);
+            setCourses(coursesSaved);
+          } else setCourses(getCourses());
+      } catch (err) {
+          console.error('Нет доступа к базе данных. ' + err);
+          setCourses(getCourses());
+      };
+    }
+    fetchCourses();
+  }, []);
+
 
   // Состояние для хранения списка приёмов
   const [medicationLog, setMedicationLog] = useState({

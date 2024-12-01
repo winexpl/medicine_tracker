@@ -3,28 +3,28 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { getToken } from '../../../contexts/Secure';
-import { CourseContext } from '../../../contexts/CoursesContext';
+import { CourseContext, CoursesProvider, getCourses, saveCourses } from '../../../contexts/CoursesContext';
+import { API_URL_GET_COURSES } from '../../../constants/constants';
   
   const CoursesActive = () => {
-    
     const { courses, setCourses } = useContext(CourseContext);
     
     const addCourse = () => {
-      const newCourse = { name: 'Новый курс', remaining: 112, dosage: '1 таблетка' };
+      const newCourse = { name: 'Новый курс', state: 112, dose: '1 таблетка' };
       setCourses([...courses, newCourse]);
     };
-  
+    
     return (
+    <CoursesProvider>
       <SafeAreaView style={styles.container}>
-
         <ScrollView style={styles.scrollView}>
-          {courses.get().map((course, index) => (
+          {courses.map((course, index) => (
             // я так понимаю курс, вынести в компонент
             <View key={index} style={styles.courseItem}>
-              <Text style={styles.courseName}>{course.name}</Text>
+              <Text style={styles.name}>{course.state}</Text>
               <Text style={styles.courseDetails}>
-                Осталось приемов: {course.remaining} {'\n'}
-                Доза: {course.dosage}
+                Осталось приемов: {course.dose} {'\n'}
+                Доза: {course.dose}
               </Text>
             </View>
             // конец курса
@@ -35,6 +35,8 @@ import { CourseContext } from '../../../contexts/CoursesContext';
           <Text style={styles.addButtonText}>Добавить курс</Text>
         </TouchableOpacity>
       </SafeAreaView>
+    </CoursesProvider>
+      
     );
   };
 

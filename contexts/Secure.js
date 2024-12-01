@@ -25,7 +25,6 @@ export const removeToken = () => {
 export const getToken = () => {
     try {
         const token = SecureStorage.getItem('token');
-        console.log(token);
         return token;
     } catch (error) {
         console.error('Ошибка получения токена:', error);

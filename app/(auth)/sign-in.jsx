@@ -39,10 +39,8 @@ const SignIn = () => {
             });
             console.log(response.data);
             const token = response.data.token;
-            console.log("ВХОД ПО ТОКЕНУ " + token);
             if (token) {
                 saveToken(token); // Сохраняем токен в SecureStorage
-                
                 const role_ = getUserRoleFromToken(token);
                 console.log(role_ + " " + token);
                 setUserInfo({role:role_, isLoggedIn:true});

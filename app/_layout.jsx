@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { AuthProvider } from '../contexts/AuthContext';
 import { CoursesProvider } from '../contexts/CoursesContext';
-import { TakeContext, TakeProvider } from '../contexts/TakesContext';
+import { TakeProvider } from '../contexts/TakesContext';
 import { MedicamentProvider } from '../contexts/MedicamentContext';
 
 SplashScreen.preventAutoHideAsync(); // предотвращает скрытие асинхронности
@@ -28,7 +28,7 @@ const RootLayout = () => {
   }, [fontsLoaded, error]);
 
   return (
-    <MedicamentProvider>
+      <MedicamentProvider>
       <TakeProvider>
         <CoursesProvider>
           <AuthProvider>
@@ -46,11 +46,6 @@ const RootLayout = () => {
           </AuthProvider>
         </CoursesProvider>
       </TakeProvider>
-    </MedicamentProvider>
-    
-    
-    
-      
-  )
+    </MedicamentProvider>);
 }
-export default RootLayout
+export default RootLayout;

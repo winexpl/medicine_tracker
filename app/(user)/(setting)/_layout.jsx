@@ -1,13 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useContext } from 'react'
 import { Tabs } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import RouterButton from '../../../components/RouterButton'
 import { router } from 'expo-router'
-import { removeToken } from '../../../contexts/AuthContext'
+import { AuthContext, removeToken } from '../../../contexts/AuthContext'
 
 const SettingLayout = () => {
-  const { userInfo, setUserInfo } = useAuth();
+  const { userInfo, setUserInfo } = useContext(AuthContext);
   return (
     <SafeAreaView>
       <RouterButton title="О разработчиках"

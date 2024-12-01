@@ -11,33 +11,6 @@ import { CourseContext, CoursesProvider, getCourses, saveCourses } from '../../c
 import { TakeProvider } from '../../contexts/TakesContext';
 
 const UserLayout = () => {
-  const { courses, setCourses } = useContext(CourseContext);
-  // загружаем курсы
-  useEffect(() => {
-    async function checkCourses() {
-      const coursesSaved = getCourses();
-      console.log('check ' + coursesSaved);
-    }
-    async function fetchCourses() {
-      try {
-          console.log(getToken());
-          const response = await axios.get(API_URL_GET_COURSES, {
-              headers: {
-                  'Authorization': `Bearer ${getToken()}`,
-              },
-          });
-          const coursesSaved = response.data;
-          console.log('response ' + response.data);
-          //saveCourses(coursesSaved);
-          console.log('courses = ' + coursesSaved);
-          setCourses(coursesSaved);
-      } catch (err) {
-          console.error('Нет доступа к базе данных. ' + err);
-      };
-    }
-    fetchCourses();
-    checkCourses();
-  }, []);
 
   return (
     <TakeProvider>
