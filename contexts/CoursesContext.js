@@ -52,10 +52,6 @@ export const clearCourses = async () => {
 
 export const CoursesProvider = ({ children }) => {
     const [courses, setCourses] = useState([]);
-    if(Array.isArray(courses)) console.log('Array');
-    else console.log('No array');
-
-
      // Загружаем курсы из AsyncStorage, если они есть
     useEffect(() => {
         async function fetchFromLocal() {
@@ -88,8 +84,8 @@ export const CoursesProvider = ({ children }) => {
             } catch (err) {
                 console.error('Ошибка при получении курсов: ', err);
                 // Попробуем получить курсы из локального хранилища, если ошибка сети
-                const localCourses = await getCourses();
-                setCourses(localCourses);
+                const localCourses = getCourses();
+                setCourses(await localCourses);
             }
         }
 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Link , router} from 'expo-router'
-
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { getToken } from '../../../contexts/Secure';
 import { CourseContext, CoursesProvider, getCourses, saveCourses } from '../../../contexts/CoursesContext';
@@ -32,7 +31,9 @@ import { API_URL_GET_COURSES } from '../../../constants/constants';
           ))}
         </ScrollView>
   
-        <TouchableOpacity style={styles.addButton} onPress={() => router.push('addCourse')}>
+        <TouchableOpacity style={styles.addButton} onPress={() => {
+          console.log('push');
+          router.push('./addCourse');}}>
           <Text style={styles.addButtonText}>Добавить курс</Text>
         </TouchableOpacity>
       </SafeAreaView>
