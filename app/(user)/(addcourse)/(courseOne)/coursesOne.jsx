@@ -29,7 +29,7 @@ const MedicationCourseScreen = () => {
   ]);
   
   const [startDate, setStartDate] = useState(new Date()); // 2 мая 2024
-  const [endDate, setEndDate] = useState(new Date()); // 15 мая 2024
+  const [endDate, setEndDate] = useState(new Date()); // 15 мая 2024  
   const [periodicity, setPeriodicity] = useState(1); // В днях
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -39,8 +39,10 @@ const MedicationCourseScreen = () => {
   const [selectedDose, setSelectedDose] = useState('1 табл'); 
 
   const [showPeriodicityModal, setShowPeriodicityModal] = useState(false);
-  const [selectedMode, setSelectedMode] = useState('До еды');
-
+  const [dose, setDoses] = useState(0); // для выбора дозы  
+  const [mode, setMode] = useState(''); // Режим приема кнопки до еды и тд
+  const [appointments, setAppointments] = useState([]); //хранить приемы
+  const [totalAppointments, setTotalAppointments] = useState(0); //для записи количиства приемов(для правильного подсчета количества приемов)
   // Добавление нового приема
   const addAppointment = () => {
     const newAppointment = {
@@ -198,7 +200,32 @@ const MedicationCourseScreen = () => {
           </TouchableOpacity>
         </View>
       </Modal>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          // Открытие окна для выбора дозы
+          const newDose = prompt('Введите дозу:');
+          setDoses(newDose);
+        }}
+      >
+        <Text>{`Доза: ${doses.amount} ${doses.unit}`}</Text>
+      </TouchableOpacity>
+      <View style={styles.modes}>
+        {['До еды', 'После еды', 'Во время еды', 'Независимо от еды'].map((item) => (
+          <TouchableOpacity
+            key={item}
+            style={[
+              styles.modeButton,
+              { backgroundColor: mode === item ? '#000' : '#FFF' },
+            ]}
+            onPress={() => setMode(item)}
+          >
+            <Text>{item}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
     </View>
+    
   );
 };
 
