@@ -43,7 +43,7 @@ export const addCourses = async (data) => {
 
 export const clearCourses = async () => {
     try {
-        await AsyncStorage.deleteItemAsync('courses');
+        await AsyncStorage.removeItem('courses');
         console.log('Courses removed!');
     } catch (error) {
         console.error('Error removing courses: ', error);
@@ -67,7 +67,7 @@ export const CoursesProvider = ({ children }) => {
             try {
                 const response = await axios.get(API_URL_GET_COURSES, {
                     headers: {
-                        'Authorization': `Bearer ${getToken()}`,
+                        'Authorization': `Bearer ${await getToken()}`,
                     },
                 });
 

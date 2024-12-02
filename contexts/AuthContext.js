@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import jwt_decode from 'jwt-decode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getToken} from './Secure';
+const jwtDecode = require('jwt-decode');
 
 export const AuthContext = createContext();
 
@@ -9,12 +9,12 @@ export const AuthContext = createContext();
 // Получение роли из токена, декодирование
 export const getUserRoleFromToken = (token) => {
     try {
-        const decoded = jwt_decode(token); // Декодируем токен
-        console.log(decoded);
-        return decoded.role; // Роль пользователя обычно находится в payload
+        console.log('getUserRoleFromToken', token);
+        const decoded = jwtDecode(token); // Декодируем токен
+        console.debug('DECODED',decoded);
+        return decoded.role;
     } catch (error) {
         console.error('Ошибка декодирования токена:', error);
-        return null;
     }
 };
 
@@ -22,10 +22,14 @@ export const getUserRoleFromToken = (token) => {
 
 export const AuthProvider = ({ children }) => {
     const [userInfo, setUserInfo] = useState({role:null, isLoggedIn:false});
-    const token = getToken();
-    const role = getUserRoleFromToken(token); // Получаем роль пользователя (например, из localStorage или токена)
+    
     useEffect(() => {
-        setUserInfo({role:role, isLoggedIn: role? true: false});
+        async function fetch() {
+            const token = await getToken();
+            const role = getUserRoleFromToken(token); // Получаем роль пользователя (например, из localStorage или токена)
+            setUserInfo({role:role, isLoggedIn: role? true: false});
+        };
+        fetch();
     }, []);
     return (
         <AuthContext.Provider value={{ userInfo, setUserInfo }}>

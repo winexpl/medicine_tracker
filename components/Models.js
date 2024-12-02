@@ -6,7 +6,7 @@ import { useContext, useEffect } from "react";
 export const getCourseInfo = () => {
     const { courses, setCourses } = useContext(CourseContext);
     const { medicaments, setMedicaments } = useContext(MedicamentContext);
-    let array = {active:[], inactive:[]};
+    const array = {active:[], inactive:[]};
     for(let i in courses) {
         
         console.log('123', courses[i]);
@@ -19,7 +19,7 @@ export const getCourseInfo = () => {
             array.inactive[array[active].length-1].medicament = medicaments[index].title;
         }
     }
-    console.log(array);
+    console.log('array', array);
     return array;
 }
 
@@ -33,7 +33,6 @@ export const getTakesByDate = (date) => {
     for(let index in takes) {
         let take = takes[index];
         if(new Date(take.datetime).toLocaleDateString() === new Date(date).toLocaleDateString()) {
-            console.log(123);
             const mId = courses[courses.findIndex(m => m.id === take.courseId)].medicamentId;
             const title = medicaments[medicaments.findIndex(m => m.id === mId)].title;
             take.title = title;

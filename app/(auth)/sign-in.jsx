@@ -8,6 +8,7 @@ import {API_URL_LOGIN} from '../../constants/constants'
 import axios from 'axios';
 import { getUserRoleFromToken, AuthContext } from '../../contexts/AuthContext'
 import { saveToken, getToken, removeToken } from '../../contexts/Secure'
+import { replace } from 'expo-router/build/global-state/routing'
 
 
 const SignIn = () => {
@@ -30,29 +31,33 @@ const SignIn = () => {
 
         form.username = form.username.trim();
         form.password = form.password.trim();
-        try {
-            // Отправляем запрос на сервер
-            const response = await axios.post(API_URL_LOGIN, form, {
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-            });
-            console.log(response.data);
-            const token = response.data.token;
-            if (token) {
-                saveToken(token); // Сохраняем токен в SecureStorage
-                const role_ = getUserRoleFromToken(token);
-                console.log(role_ + " " + token);
-                setUserInfo({role:role_, isLoggedIn:true});
-                router.replace('../');
+        if(form.username === '' || form.password === '') {
+            console.error('Заполните все поля');
+        } else {
+            try {
+                // Отправляем запрос на сервер
+                const response = await axios.post(API_URL_LOGIN, form, {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                });
+                console.log(response.data);
+                const token = await response.data.token;
+                if (token) {
+                    saveToken(token); // Сохраняем токен в SecureStorage
+                    const role_ = getUserRoleFromToken(token);
+                    setUserInfo({role:role_, isLoggedIn:true});
+                    router.replace('../../');
+                }
+            } catch (err) {
+                // Обработка ошибки запроса
+                console.log(err);
+                setError('Произошла ошибка при отправке данных.');
+            } finally {
+                setLoading(false); // Выключаем индикатор загрузки
             }
-        } catch (err) {
-            // Обработка ошибки запроса
-            console.log(err);
-            setError('Произошла ошибка при отправке данных.');
-        } finally {
-            setLoading(false); // Выключаем индикатор загрузки
         }
+        
     };
     
 
@@ -93,7 +98,7 @@ const SignIn = () => {
                 />
                 <View className='pt-7 flex-row gap-4 items-center justify-center'>
                     <Text className='font-psemibold'>У Вас нет учетной записи?</Text>
-                    <Link href='/sign-up' className='text-primary-text font-psemibold'>Зарегестрируйтесь!</Link>
+                    <Link replace href='/sign-up' className='text-primary-text font-psemibold'>Зарегестрируйтесь!</Link>
                 </View>
             </ScrollView>
 	    </SafeAreaView>

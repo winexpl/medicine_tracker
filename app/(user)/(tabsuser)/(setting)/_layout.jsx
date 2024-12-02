@@ -6,6 +6,8 @@ import RouterButton from '../../../../components/RouterButton'
 import { router } from 'expo-router'
 import { AuthContext } from '../../../../contexts/AuthContext'
 import { removeToken } from '../../../../contexts/Secure'
+import { clearCourses } from '../../../../contexts/CoursesContext'
+import { clearTakes } from '../../../../contexts/TakesContext'
 
 const SettingLayout = () => {
   const { userInfo, setUserInfo } = useContext(AuthContext);
@@ -18,8 +20,10 @@ const SettingLayout = () => {
       <RouterButton title="Выход"
                             handlePress={() => {
                               removeToken();
+                              clearCourses();
+                              clearTakes();
                               setUserInfo({role:null, isLoggedIn:false});
-                              router.replace('../../');}}
+                              router.replace('../../..');}}
                             containerStyle="w-full"
       />
     </SafeAreaView>

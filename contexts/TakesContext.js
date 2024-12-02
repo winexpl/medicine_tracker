@@ -20,9 +20,8 @@ export const saveTakes = async ({...data}) => {
 export const getTakes = async () => {
     try {
         const takesJson = await AsyncStorage.getItem('takes');
-        if(takesJson != null) {
-            return JSON.parse(takesJson);
-        } else console.log('Takes is null');
+        const takesObj = JSON.parse(takesJson);
+        return Object.values(takesObj);
     } catch (error) {
         console.error('Error receiving takes: ', error);
     }
@@ -42,7 +41,7 @@ export const addTakes = async (data) => {
 
 export const clearTakes = async (data) => {
     try {
-        await AsyncStorage.deleteItemAsync('courses');
+        await AsyncStorage.removeItem('courses');
         console.log('Courses removed!');
     } catch (error) {
         console.error('Error removing courses: ', error);
@@ -53,13 +52,13 @@ export const TakeProvider = ({ children }) => {
     const [takes, setTakes] = useState(null);
 
     // Загружаем курсы из AsyncStorage, если они есть
-    useEffect(() => {
-        async function fetchFromLocal() {
-            const localTakes = await getTakes();
-            setCourses(localTakes);
-        }
-        fetchFromLocal();
-    }, []);
+    // useEffect(() => {
+    //     async function fetchFromLocal() {
+    //         const localTakes = await getTakes();
+    //         setCourses(localTakes);
+    //     }
+    //     fetchFromLocal();
+    // }, []);
 
     // Загружаем курсы с сервера
     useEffect(() => {
@@ -67,7 +66,7 @@ export const TakeProvider = ({ children }) => {
             try {
                 const response = await axios.get(API_URL_GET_TAKEMEDICINE, {
                     headers: {
-                        'Authorization': `Bearer ${getToken()}`,
+                        'Authorization': `Bearer ${await getToken()}`,
                     },
                 });
 
@@ -84,11 +83,10 @@ export const TakeProvider = ({ children }) => {
             } catch (err) {
                 console.error('Ошибка при получении приемов: ', err);
                 // Попробуем получить курсы из локального хранилища, если ошибка сети
-                const localTakes = getTakes();
-                setTakes(await localTakes);
+                const localTakes = await getTakes();
+                setTakes(localTakes);
             }
         }
-
         fetchCourses();
     }, []);
     console.log(takes);

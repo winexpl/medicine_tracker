@@ -1,13 +1,18 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet } from 'react-native'
 import React from 'react'
+import { CreateCourseProvider } from '../../../contexts/CreateCourseContext'
 import { Stack } from 'expo-router'
-import { SafeAreaView } from 'react-native-safe-area-context'
+
 
 const AddCourseLayout = () => {
   return (
+    <CreateCourseProvider>
       <Stack>
-        <Stack.Screen name="addCourse" options={{title:'Добавить курс'}}/>
-    </Stack>
+        <Stack.Screen name="addCourses" options={{title:'Добавить курс'}}/>
+        <Stack.Screen name="changeMedicament" options={{title:'Выбор препарата'}}/>
+        <Stack.Screen name="(courseOne)" options={{title:'Выбор препарата'}}/>
+      </Stack>
+    </CreateCourseProvider>
   )
 }
 

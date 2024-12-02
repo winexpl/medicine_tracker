@@ -7,46 +7,31 @@ import { Text } from "react-native";
 
 export default function App() {
     
-    const {userInfo, setUserInfo} = useContext(AuthContext);
-
+    const { userInfo, setUserInfo } = useContext(AuthContext);
+    
+    
     useEffect(() => {
-        // Проверим токен при старте приложения
-        const checkToken = async () => {
-            let token = null;
-            try {
-                console.log('its index');
-                token = await getToken(); // Получаем токен из SecureStorage
-                console.log('in index: ' + token);
-            } catch (error) {
-                console.log('ОШИБКА ', error);
-            } finally {
-                if (token) {
-                    const role = getUserRoleFromToken(token);
-                    setUserInfo({role:role, isLoggedIn:true});
-                    if(role === "ADMIN") router.replace('/search');
-                    else {
-                        console.log('ПЕРЕХОД В /schedule');
-                        router.replace('/schedule');
-                    }
-                }
-                else {
-                    console.log('ПЕРЕХОД В /SIGN');
-                    router.replace('/sign');
-                }
+        console.log('ВЫЗЫВАЕМ USEEFFECT');
+        async function name() {
+            console.log('asdasd', userInfo.role);
+            if(userInfo.role === "ADMIN") {
+                console.log('ПЕРЕХОД В /SEARCH');
+                router.replace('/search');
             }
-        };
-        checkToken();
+            else if(userInfo.role === "USER") {
+                console.log('ПЕРЕХОД В /schedule');
+                router.replace('/(tabsuser)/schedule');
+            }
+            else if(!userInfo.role) {
+                console.log('ПЕРЕХОД В /SIGN');
+                router.replace('/sign');
+            }
+        }
+        name();
     });
     
     return (
         <SafeAreaView>
-            <Text>ЖОПА!</Text>
-            <Text>ЖОПА!</Text>
-            <Text>ЖОПА!</Text>
-            <Text>ЖОПА!</Text>
-            <Text>ЖОПА!</Text>
-            <Text>ЖОПА!</Text>
-            <Text>ЖОПА!</Text>
         </SafeAreaView>
     );
 }

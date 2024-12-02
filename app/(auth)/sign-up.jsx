@@ -47,8 +47,7 @@ const SignUp = () => {
             const role = getUserRoleFromToken(token);
             console.log(role + " " + token);
             setUserInfo({role:role, isLoggedIn:true});
-            if(role === "ADMIN") router.replace('/search');
-            else router.replace('/schedule');
+            router.replace('../../');
         }
       }
     } catch (err) {
@@ -105,7 +104,7 @@ const SignUp = () => {
         
         <View className='pt-7 flex-row gap-4 items-center justify-center'>
           <Text className='font-psemibold'>У Вас уже есть учетная запись?</Text>
-          <Link href='/sign-in' className='text-primary-text font-psemibold'>Войдите!</Link>
+          <Link replace href='/sign-in' className='text-primary-text font-psemibold'>Войдите!</Link>
         </View>
       </ScrollView>
     </SafeAreaView>
