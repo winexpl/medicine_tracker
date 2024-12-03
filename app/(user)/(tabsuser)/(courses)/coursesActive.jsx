@@ -2,26 +2,36 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Link , router } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { CourseContext, CoursesProvider, getCourses, saveCourses } from '../../../../contexts/CoursesContext';
+import { CourseContext, getCourses, saveCourses } from '../../../../contexts/CoursesContext';
 import { getCourseInfo } from '../../../../components/Models';
+import { MedicamentContext } from '../../../../contexts/MedicamentContext';
+import axios from 'axios';
+import { getToken } from '../../../../contexts/Secure';
 
-  
 export default function CoursesActive () {
-
-  const [courses, setCourses] = useState(getCourseInfo());
-  
+  const { courses, setCourses } = useContext(CourseContext);
+  const { medicaments, setMedicaments } = useContext(MedicamentContext);
+  const [activeCourses, setActiveCourses] = useState(getCourseInfo(courses, medicaments));
+  useEffect(() => {
+    async function update() {
+      setCourses(await getCourses());
+      setActiveCourses(getCourseInfo(courses, medicaments));
+    }
+    update();
+  },[]);
+  console.log(activeCourses);
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
-      {courses.active.length > 0 ? (
-        courses.active.map((course, index) => (
-        <TouchableOpacity onPress={() => {
+      {activeCourses.active.length > 0 ? (
+        activeCourses.active.map((course, index) => (
+        <TouchableOpacity key={course.id} onPress={() => {
           router.push({
           pathname: 'activeCourseInfo',
-          params: course,  // передаем объект курса в параметры
+          params: course  // передаем объект курса в параметры
         });
         }}>
-          <View key={index} style={styles.courseItem}>
+          <View style={styles.courseItem}>
             <Text style={styles.name}>{course.medicament}</Text>
             <Text style={styles.courseDetails}>
               Осталось приемов: {course.numberMedicine} {'\n'}
@@ -36,7 +46,18 @@ export default function CoursesActive () {
         )}
       </ScrollView>
 
-      <TouchableOpacity style={styles.addButton} onPress={() => {
+      <TouchableOpacity style={styles.addButton} onPress={async () => {
+        try {
+          const response = await axios.get('http://172.10.20.9:7634/courses', {
+              courses,
+              headers: {
+                  'Authorization': `Bearer ${await getToken()}`,
+              },
+          });
+          console.log(response);
+      } catch (error) {
+          console.error('Невозможно отправить курсы на сервер: ', error);
+      }
         router.push('(addcourse)/addCourses');}}>
         <Text style={styles.addButtonText}>Добавить курс</Text>
       </TouchableOpacity>

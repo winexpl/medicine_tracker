@@ -1,10 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { Stack } from 'expo-router'
+import { CoursesProvider } from '../../contexts/CoursesContext'
+import { TakeProvider } from '../../contexts/TakesContext'
 
 const MainUserLayout = () => {
     return (
-    <Stack>
+    <CoursesProvider>
+    <TakeProvider>
+        <Stack>
         <Stack.Screen name="(tabsuser)" options={{
             headerShown: false
         }}/>
@@ -17,7 +21,10 @@ const MainUserLayout = () => {
         <Stack.Screen name="activeCourseInfo" options={{
             title:"Информация о курсе"
         }}/>
-    </Stack>
+        </Stack>
+    </TakeProvider>
+    </CoursesProvider>
+    
     )
 }
 

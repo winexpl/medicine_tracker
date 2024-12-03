@@ -6,11 +6,13 @@ import CoursesActive from './coursesActive';
 import CoursesInactive from './coursesInactive';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { CoursesProvider } from '../../../../contexts/CoursesContext';
 
 const Tab = createBottomTabNavigator();
 
 const CoursesLayout = () => {
     return (
+    <CoursesProvider>
         <SafeAreaView style={styles.container}>
             <Tab.Navigator
                     screenOptions={{
@@ -35,6 +37,8 @@ const CoursesLayout = () => {
             <Tab.Screen name="Завершенные" component={CoursesInactive} />
             </Tab.Navigator>
         </SafeAreaView>
+    </CoursesProvider>
+        
 
     )
 }

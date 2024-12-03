@@ -8,10 +8,8 @@ import { API_URL_GET_MEDICAMENTS_SEARCH } from '../../../constants/constants';
 import axios from 'axios';
 import { getToken } from '../../../contexts/Secure';
 import { router } from 'expo-router';
-import { CreateCourseContext } from '../../../contexts/CreateCourseContext';
 
 const MedicineSelectionScreen = () => {
-  const { typeOfCourse, setTypeOfCourse } = useContext(CreateCourseContext);
   const [searchQuery, setSearchQuery] = useState(''); // Состояние для строки поиска
   const [filteredMedicines, setFilteredMedicines] = useState([]); // Состояние для найденных лекарств
 
@@ -41,7 +39,6 @@ const MedicineSelectionScreen = () => {
   const renderMedicineItem = ({ item }) => (
     <TouchableOpacity style={styles.item} onPress={() => {
       console.log('item',item);
-      setTypeOfCourse(prevState => ({ ...prevState, medicament: item }));
       router.push('coursesOne')}}>
       <Text style={styles.itemText}>
         {item.title} ({item.dosageForm})

@@ -1,13 +1,10 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import jwt_decode from 'jwt-decode';
-import * as SecureStorage from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { API_URL_GET_COURSES } from '../constants/constants';
+import { API_URL_GET_COURSES, API_URL_POST_COURSES } from '../constants/constants';
 import { getToken } from './Secure';
 
 export const CourseContext = createContext();
-
 
 export const saveCourses = async ({...data}) => {
     try {
@@ -51,48 +48,50 @@ export const clearCourses = async () => {
 };
 
 export const CoursesProvider = ({ children }) => {
+
     const [courses, setCourses] = useState([]);
-     // Загружаем курсы из AsyncStorage, если они есть
+    
     useEffect(() => {
-        async function fetchFromLocal() {
+        async function fetch() {
             const localCourses = await getCourses();
             setCourses(localCourses);
-        }
-        fetchFromLocal();
-    }, []);
-
-    // Загружаем курсы с сервера
-    useEffect(() => {
-        async function fetchCourses() {
-            try {
-                const response = await axios.get(API_URL_GET_COURSES, {
-                    headers: {
-                        'Authorization': `Bearer ${await getToken()}`,
-                    },
-                });
-
-                if (response.data && response.data.length > 0) {
-                    const coursesSaved = response.data;
-                    await saveCourses(coursesSaved); // Сохраняем курсы, если запрос прошел успешно
-                    // По логике здесь, перед обновлением состояния отправить локальное на сервер
-                    // а то что с сервера сконкатенировать с локальным
-                    setCourses(coursesSaved); // Обновляем состояние курсов
-                    console.log('Courses fetched and saved!');
-                } else {
-                    console.log('No courses available.');
+            if(localCourses.length > 0) {
+                try {
+                    const response = await axios.post('http://172.10.20.9:7634/courses', {
+                        courses,
+                        headers: {
+                            'Authorization': `Bearer ${await getToken()}`,
+                        },
+                    });
+                    console.log(response);
+                } catch (error) {
+                    console.error('Невозможно отправить курсы на сервер: ', error);
                 }
-            } catch (err) {
-                console.error('Ошибка при получении курсов: ', err);
-                // Попробуем получить курсы из локального хранилища, если ошибка сети
-                const localCourses = getCourses();
-                setCourses(await localCourses);
+            } else {
+                try {
+                    const response = await axios.get(API_URL_GET_COURSES, {
+                        headers: {
+                            'Authorization': `Bearer ${await getToken()}`,
+                        },
+                    });
+    
+                    if (response.data && response.data.length > 0) {
+                        const coursesSaved = response.data;
+                        await saveCourses(coursesSaved); 
+                        setCourses(coursesSaved);
+                        console.log('Courses fetched and saved!');
+                    } else {
+                        console.log('No courses available.');
+                    }
+                } catch (err) {
+                    console.error('Нет связи с сервером, ошибка получения курсов: ', err);
+                }
             }
         }
-
-        fetchCourses();
+        fetch();
     }, []);
 
-    console.log(courses);
+    console.log('КУРСЫ', courses);
     
     return (
         <CourseContext.Provider value={{ courses, setCourses }}>

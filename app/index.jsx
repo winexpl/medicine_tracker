@@ -11,9 +11,7 @@ export default function App() {
     
     
     useEffect(() => {
-        console.log('ВЫЗЫВАЕМ USEEFFECT');
         async function name() {
-            console.log('asdasd', userInfo.role);
             if(userInfo.role === "ADMIN") {
                 console.log('ПЕРЕХОД В /SEARCH');
                 router.replace('/search');

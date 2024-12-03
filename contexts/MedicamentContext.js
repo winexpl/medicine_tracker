@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import jwt_decode from 'jwt-decode';
 import * as SecureStorage from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL_GET_MEDICAMEN } from '../constants/constants';
+import { API_URL_GET_MEDICAMENTS, API_URL_POST_MEDICAMENTS } from '../constants/constants';
 import axios from 'axios';
 import { getToken } from './Secure';
 import { CourseContext } from './CoursesContext';
@@ -57,26 +57,29 @@ export const MedicamentProvider = ({ children }) => {
     const { courses } = useContext(CourseContext);
 
     useEffect(() => {
-        console.log('in medicaments',courses);
+        async function fetchFromLocal() {
+            const localMedicaments = await getMedicaments();
+            setMedicaments(localMedicaments);
+        }
+        fetchFromLocal();
+    }, []);
+
+    useEffect(() => {
         async function fetchFromDB() {
             try {
                 const newMedicaments = [];
                 for(let index in courses ) {
-                    const response = await axios.get(API_URL_GET_MEDICAMENT + courses[index].medicamentId, {
+                    const response = await axios.get(API_URL_GET_MEDICAMENTS + courses[index].medicamentId, {
                         headers: {
                             'Authorization': `Bearer ${await getToken()}`,
                         },
                     });
                     const medicament = await response.data;
-                    console.log(medicament);
                     newMedicaments.push(medicament);
                 }
                 if(newMedicaments.length > 0) {
                     setMedicaments(newMedicaments);
-                    await saveMedicaments(newMedicaments);
                 }
-                
-                console.log(medicaments);
             }
             catch (error) {
                 // Попробуем получить курсы из локального хранилища, если ошибка сети
@@ -86,7 +89,8 @@ export const MedicamentProvider = ({ children }) => {
         }
         fetchFromDB();
     }, [router, courses]);
-    console.log('medicaments',medicaments);
+
+    console.log('МЕДИКАМЕНТЫ',medicaments);
     return (
         <MedicamentContext.Provider value={{medicaments, setMedicaments}}>
             {children}

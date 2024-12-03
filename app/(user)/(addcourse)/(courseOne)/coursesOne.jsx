@@ -39,7 +39,7 @@ const MedicationCourseScreen = () => {
   const [selectedDose, setSelectedDose] = useState('1 табл'); 
 
   const [showPeriodicityModal, setShowPeriodicityModal] = useState(false);
-  const [dose, setDoses] = useState(0); // для выбора дозы  
+  const [dose, setDose] = useState(0); // для выбора дозы  
   const [mode, setMode] = useState(''); // Режим приема кнопки до еды и тд
   const [appointments, setAppointments] = useState([]); //хранить приемы
   const [totalAppointments, setTotalAppointments] = useState(0); //для записи количиства приемов(для правильного подсчета количества приемов)

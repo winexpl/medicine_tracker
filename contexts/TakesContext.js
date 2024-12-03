@@ -1,8 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import jwt_decode from 'jwt-decode';
-import * as SecureStorage from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL_GET_TAKEMEDICINE } from '../constants/constants';
+import { API_URL_GET_TAKES, API_URL_POST_TAKES } from '../constants/constants';
 import axios from 'axios';
 import { getToken } from './Secure';
 
@@ -49,47 +47,48 @@ export const clearTakes = async (data) => {
 };
 
 export const TakeProvider = ({ children }) => {
-    const [takes, setTakes] = useState(null);
+    const [takes, setTakes] = useState([]);
 
-    // Загружаем курсы из AsyncStorage, если они есть
-    // useEffect(() => {
-    //     async function fetchFromLocal() {
-    //         const localTakes = await getTakes();
-    //         setCourses(localTakes);
-    //     }
-    //     fetchFromLocal();
-    // }, []);
-
-    // Загружаем курсы с сервера
     useEffect(() => {
-        async function fetchCourses() {
-            try {
-                const response = await axios.get(API_URL_GET_TAKEMEDICINE, {
-                    headers: {
-                        'Authorization': `Bearer ${await getToken()}`,
-                    },
-                });
-
-                if (response.data && response.data.length > 0) {
-                    const takesSaved = response.data;
-                    await saveTakes(takesSaved); // Сохраняем курсы, если запрос прошел успешно
-                    // По логике здесь, перед обновлением состояния отправить локальное на сервер
-                    // а то что с сервера сконкатенировать с локальным
-                    setTakes(takesSaved); // Обновляем состояние курсов
-                    console.log('Takes fetched and saved!');
-                } else {
-                    console.log('No takes available.');
+        async function fetch() {
+            const localTakes = await getTakes();
+            setTakes(localTakes);
+            if(localCourses.length > 0) {
+                try {
+                    const response = await axios.post(API_URL_POST_TAKES, {
+                        localTakes,
+                        headers: {
+                            'Authorization': `${await getToken()}`,
+                        },
+                    });
+                } catch (error) {
+                    console.error('Невозможно отправить приемы на сервер: ', error);
                 }
-            } catch (err) {
-                console.error('Ошибка при получении приемов: ', err);
-                // Попробуем получить курсы из локального хранилища, если ошибка сети
-                const localTakes = await getTakes();
-                setTakes(localTakes);
+            } else {
+                try {
+                    const response = await axios.get(API_URL_GET_TAKES, {
+                        headers: {
+                            'Authorization': `Bearer ${await getToken()}`,
+                        },
+                    });
+    
+                    if (response.data && response.data.length > 0) {
+                        const takesSaved = response.data;
+                        await saveTakes(takesSaved); 
+                        setCourses(takesSaved);
+                        console.log('Courses fetched and saved!');
+                    } else {
+                        console.log('No courses available.');
+                    }
+                } catch (err) {
+                    console.error('Нет связи с сервером, ошибка получения курсов: ', err);
+                }
             }
         }
-        fetchCourses();
+        fetch();
     }, []);
-    console.log(takes);
+
+    console.log('ПРИЕМЫ',takes);
     return (
         <TakeContext.Provider value={{takes, setTakes}}>
             {children}

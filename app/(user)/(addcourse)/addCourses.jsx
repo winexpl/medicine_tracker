@@ -4,31 +4,26 @@
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Link , router} from 'expo-router'
-import { CreateCourseContext } from '../../../contexts/CreateCourseContext';
+import { router} from 'expo-router'
 
 const HomeScreen = ({ navigation }) => {
-  const { typeOfCourse, setTypeOfCourse } = useContext(CreateCourseContext);
   return (
     <SafeAreaView style={styles.container}>
 
       <TouchableOpacity style={styles.button} onPress={() => {
         setTypeOfCourse(prevState => ({ ...prevState, type: 1 }));
-        console.log('push');
         router.push('changeMedicament');}}>
         <Text style={styles.text}>Составить расписание на 1 день и выбрать периодичность</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.button} onPress={() => {
         setTypeOfCourse(prevState => ({ ...prevState, type: 2 }));
-        console.log('push');
         router.push('changeMedicament');}}>
         <Text style={styles.text}>Составить расписание на неделю</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.button} onPress={() => {
         setTypeOfCourse(prevState => ({ ...prevState, type: 3 }));
-        console.log('push');
         router.push('changeMedicament');}}>
         <Text style={styles.text}>Принимать лекарственные средства по необходимости</Text>
       </TouchableOpacity>
