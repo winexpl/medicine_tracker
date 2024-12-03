@@ -12,7 +12,6 @@ const Tab = createBottomTabNavigator();
 
 const CoursesLayout = () => {
     return (
-    <CoursesProvider>
         <SafeAreaView style={styles.container}>
             <Tab.Navigator
                     screenOptions={{
@@ -37,7 +36,6 @@ const CoursesLayout = () => {
             <Tab.Screen name="Завершенные" component={CoursesInactive} />
             </Tab.Navigator>
         </SafeAreaView>
-    </CoursesProvider>
         
 
     )

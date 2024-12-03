@@ -1,6 +1,4 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import jwt_decode from 'jwt-decode';
-import * as SecureStorage from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL_GET_MEDICAMENTS, API_URL_POST_MEDICAMENTS } from '../constants/constants';
 import axios from 'axios';
@@ -34,7 +32,7 @@ export const getMedicaments = async () => {
 export const addMedicaments = async (data) => {
     try {
         const medicamentsJson = await AsyncStorage.getItem('medicaments');
-        const medicaments = takesMedicineJson ? JSON.parse(medicamentsJson) : [];
+        const medicaments = medicamentsJson ? JSON.parse(medicamentsJson) : [];
         medicaments.push(data);
         await AsyncStorage.setItem('medicaments', JSON.stringify(medicaments));
         console.log('Medicaments added!');
@@ -69,16 +67,19 @@ export const MedicamentProvider = ({ children }) => {
             try {
                 const newMedicaments = [];
                 for(let index in courses ) {
-                    const response = await axios.get(API_URL_GET_MEDICAMENTS + courses[index].medicamentId, {
+                    const response = await axios.get(API_URL_GET_MEDICAMENTS + '/id=' + courses[index].medicamentId, {
                         headers: {
                             'Authorization': `Bearer ${await getToken()}`,
                         },
                     });
-                    const medicament = await response.data;
+                    const medicament = response.data;
+                    console.log(medicament);
                     newMedicaments.push(medicament);
                 }
                 if(newMedicaments.length > 0) {
                     setMedicaments(newMedicaments);
+                    console.log('МЕДИКАМЕНТЫ',newMedicaments);
+                    saveMedicaments(newMedicaments);
                 }
             }
             catch (error) {

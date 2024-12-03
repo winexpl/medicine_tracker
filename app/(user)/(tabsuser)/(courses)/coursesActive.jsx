@@ -12,13 +12,14 @@ export default function CoursesActive () {
   const { courses, setCourses } = useContext(CourseContext);
   const { medicaments, setMedicaments } = useContext(MedicamentContext);
   const [activeCourses, setActiveCourses] = useState(getCourseInfo(courses, medicaments));
+  
   useEffect(() => {
     async function update() {
-      setCourses(await getCourses());
       setActiveCourses(getCourseInfo(courses, medicaments));
     }
     update();
-  },[]);
+  },[courses]);
+  
   console.log(activeCourses);
   return (
     <SafeAreaView style={styles.container}>
@@ -47,17 +48,6 @@ export default function CoursesActive () {
       </ScrollView>
 
       <TouchableOpacity style={styles.addButton} onPress={async () => {
-        try {
-          const response = await axios.get('http://172.10.20.9:7634/courses', {
-              courses,
-              headers: {
-                  'Authorization': `Bearer ${await getToken()}`,
-              },
-          });
-          console.log(response);
-      } catch (error) {
-          console.error('Невозможно отправить курсы на сервер: ', error);
-      }
         router.push('(addcourse)/addCourses');}}>
         <Text style={styles.addButtonText}>Добавить курс</Text>
       </TouchableOpacity>

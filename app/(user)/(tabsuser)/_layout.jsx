@@ -3,14 +3,11 @@ import { Tabs } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { CoursesProvider } from '../../../contexts/CoursesContext';
-import { TakeProvider } from '../../../contexts/TakesContext';
 
 const UserLayout = () => {
 
   return (
-    <TakeProvider>
-    <CoursesProvider>
+    <>
       <StatusBar backgroundColor='#161622' style='light'/>
       <Tabs screenOptions={{
         tabBarActiveTintColor: "#FF8F00", //primary-back
@@ -50,8 +47,8 @@ const UserLayout = () => {
           }}
         />
       </Tabs>
-    </CoursesProvider>
-    </TakeProvider>
+    </>
+
     
   )
 }

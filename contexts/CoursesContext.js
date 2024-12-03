@@ -41,7 +41,7 @@ export const addCourses = async (data) => {
 export const clearCourses = async () => {
     try {
         await AsyncStorage.removeItem('courses');
-        console.log('Courses removed!');
+        console.log('Courses removed!', await getCourses());
     } catch (error) {
         console.error('Error removing courses: ', error);
     }
@@ -57,17 +57,18 @@ export const CoursesProvider = ({ children }) => {
             setCourses(localCourses);
             if(localCourses.length > 0) {
                 try {
-                    const response = await axios.post('http://172.10.20.9:7634/courses', {
-                        courses,
+                    const response = await axios.post(API_URL_GET_COURSES, courses, {
                         headers: {
                             'Authorization': `Bearer ${await getToken()}`,
+                            'Content-Type': 'application/json'
                         },
                     });
                     console.log(response);
                 } catch (error) {
-                    console.error('Невозможно отправить курсы на сервер: ', error);
+                    console.error('Error:', error.response ? error.response.data : error.message);
                 }
-            } else {
+            }
+            else {
                 try {
                     const response = await axios.get(API_URL_GET_COURSES, {
                         headers: {
@@ -89,7 +90,7 @@ export const CoursesProvider = ({ children }) => {
             }
         }
         fetch();
-    }, []);
+    },[]);
 
     console.log('КУРСЫ', courses);
     

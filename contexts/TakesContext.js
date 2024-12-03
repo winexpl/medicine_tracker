@@ -58,7 +58,7 @@ export const TakeProvider = ({ children }) => {
                     const response = await axios.post(API_URL_POST_TAKES, {
                         localTakes,
                         headers: {
-                            'Authorization': `${await getToken()}`,
+                            'Authorization': `Bearer ${await getToken()}`,
                         },
                     });
                 } catch (error) {

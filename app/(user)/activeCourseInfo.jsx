@@ -5,6 +5,7 @@ import { useGlobalSearchParams, useLocalSearchParams } from 'expo-router'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
 import { CourseContext, getCourses, saveCourses } from '../../contexts/CoursesContext';
+import { updateTakes } from '../../components/Models';
 
 const ActiveCourseInfo = () => {
   const { courses, setCourses } = useContext(CourseContext);
@@ -62,9 +63,12 @@ const ActiveCourseInfo = () => {
       
       <TouchableOpacity className='bg-primary-text rounded-xl items-center justify-center' onPress={async () => {
         let newCourses = courses;
-        newCourses[newCourses.findIndex(c => c.id = course.id)].endDate = endDate;
+        const index = newCourses.findIndex(c => c.id = course.id);
+        const oldDate = newCourses[index].endDate;
+        newCourses[index].endDate = endDate;
         setCourses(newCourses);
         await saveCourses(courses);
+        updateTakes(course, oldDate, endDate);
         router.back();
         }}>
         <Text className='items-center justify-center'>Сохранить изменения</Text>
