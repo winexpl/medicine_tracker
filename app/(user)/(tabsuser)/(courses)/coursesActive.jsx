@@ -33,7 +33,7 @@ export default function CoursesActive () {
           });
         }}>
           <View className="p-4 bg-white mb-3 rounded-lg border border-gray-300">
-            <Text className="font-bold">{course.medicament}</Text>
+            <Text className="">{course.medicament}</Text>
             <Text className="text-sm mt-2">
               Осталось приемов: {course.numberMedicine} {'\n'}
               Доза: {course.dose}
