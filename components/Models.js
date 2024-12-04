@@ -27,7 +27,7 @@ export const updateTakes = (course, oldEndDate, newEndDate) => {
     if(oldEndDate < newEndDate) {
         console.lod('меньше');
     }
-    for(; oldEndDate < newEndDate; oldEndDate ++);
+    //for(; oldEndDate < newEndDate; oldEndDate ++);
     const type = course.typeCourse;
     
 }
