@@ -8,48 +8,28 @@ import { router} from 'expo-router'
 
 const HomeScreen = ({ navigation }) => {
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-primary-back p-4">
 
-      <TouchableOpacity style={styles.button} onPress={() => {
+      <TouchableOpacity className="bg-primary-text p-4 my-2 border border-gray-300 rounded" onPress={() => {
         setTypeOfCourse(prevState => ({ ...prevState, type: 1 }));
         router.push('changeMedicament');}}>
-        <Text style={styles.text}>Составить расписание на 1 день и выбрать периодичность</Text>
+        <Text className="text-base text-gray-800">Составить расписание на 1 день и выбрать периодичность</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={() => {
+      <TouchableOpacity className="bg-primary-text p-4 my-2 border border-gray-300 rounded" onPress={() => {
         setTypeOfCourse(prevState => ({ ...prevState, type: 2 }));
         router.push('changeMedicament');}}>
-        <Text style={styles.text}>Составить расписание на неделю</Text>
+        <Text className="text-base text-gray-800">Составить расписание на неделю</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.button} onPress={() => {
+      <TouchableOpacity className="bg-primary-text p-4 my-2 border border-gray-300 rounded" onPress={() => {
         setTypeOfCourse(prevState => ({ ...prevState, type: 3 }));
         router.push('changeMedicament');}}>
-        <Text style={styles.text}>Принимать лекарственные средства по необходимости</Text>
+        <Text className="text-base text-gray-800">Принимать лекарственные средства по необходимости</Text>
       </TouchableOpacity>
       
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#1C1C2B',
-    padding: 16,
-  },
-  button: {
-    backgroundColor: '#FF8F00',
-    padding: 16,
-    marginVertical: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
-  },
-  text: {
-    fontSize: 16,
-    color: '#333',
-  },
-});
 
 export default HomeScreen;

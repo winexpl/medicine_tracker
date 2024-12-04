@@ -37,31 +37,31 @@ const MedicineSelectionScreen = () => {
 
   // Рендеринг одного элемента списка
   const renderMedicineItem = ({ item }) => (
-    <TouchableOpacity style={styles.item} onPress={() => {
+    <TouchableOpacity className="p-4 border-b border-gray-200 bg-white" onPress={() => {
       console.log('item',item);
       router.push('coursesOne')}}>
-      <Text style={styles.itemText}>
+      <Text className="text-base text-gray-800">
         {item.title} ({item.dosageForm})
       </Text>
-      <Text style={styles.itemText}>
+      <Text className="text-base text-gray-800">
         Производитель: {item.sponsorName}
       </Text>
-      <Text style={styles.itemText}>
+      <Text className="text-base text-gray-800">
         Активные вещества: {item.activeIngredients.map(ingredient => `${ingredient.title} (${ingredient.amount})`).join(", ")}
       </Text>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 bg-primary-back p-4">
       {/* Заголовок экрана */}
-      <Text style={styles.header}>Выбор лекарства</Text>
+      <Text className="font-bold mb-4 text-white">Выбор лекарства</Text>
 
       {/* Поле поиска */}
-      <View style={styles.searchContainer}>
-        <Icon name="search" size={20} color="#888" style={styles.icon} />
+      <View className="flex-row items-center bg-white border border-gray-300 rounded-lg px-3 py-2 mb-4">
+        <Icon name="search" size={20} color="#888" className="mr-2" />
         <TextInput
-          style={styles.input}
+          className="flex-1 text-base text-gray-800"
           placeholder="Введите название лекарства"
           value={searchQuery}
           onChangeText={handleSearch}
@@ -73,10 +73,10 @@ const MedicineSelectionScreen = () => {
         data={filteredMedicines}
         keyExtractor={(item, index) => index.toString()}
         renderItem={renderMedicineItem}
-        style={styles.list}
+        className="flex-1"
         ListEmptyComponent={
           searchQuery.length > 0 ? (
-            <Text style={styles.noResults}>Нет результатов</Text>
+            <Text className="text-center text-gray-500 text-base mt-4">Нет результатов</Text>
           ) : null
         }
       />
@@ -85,55 +85,3 @@ const MedicineSelectionScreen = () => {
 };
 
 export default MedicineSelectionScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#1C1C2B',
-    padding: 16,
-  },
-  header: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    color: '#FFF',
-  },
-  searchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    marginBottom: 16,
-  },
-  icon: {
-    marginRight: 8,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: '#333',
-  },
-  list: {
-    flex: 1,
-  },
-  item: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    backgroundColor: '#fff',
-  },
-  itemText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  noResults: {
-    textAlign: 'center',
-    color: '#888',
-    fontSize: 16,
-    marginTop: 16,
-  },
-});
