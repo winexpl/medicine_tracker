@@ -17,7 +17,7 @@ export default function Schedule () {
   const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   const { takes, setTakes } = useContext(TakeContext);
   
-  const take = (id) => {  
+  const take = (id) => {
     const updatedTakes = [...takes];  // Создаем копию массива
     const index = updatedTakes.findIndex(m => m.id === id);
     if (index !== -1) {

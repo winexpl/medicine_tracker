@@ -55,17 +55,21 @@ export const CoursesProvider = ({ children }) => {
         async function fetch() {
             const localCourses = await getCourses();
             setCourses(localCourses);
+            console.log(localCourses);
             if(localCourses.length > 0) {
-                try {
-                    const response = await axios.post(API_URL_GET_COURSES, courses, {
-                        headers: {
-                            'Authorization': `Bearer ${await getToken()}`,
-                            'Content-Type': 'application/json'
-                        },
-                    });
-                    console.log(response);
-                } catch (error) {
-                    console.error('Error:', error.response ? error.response.data : error.message);
+                for(let i = 0; i < localCourses.length; i++) {
+                    try {
+                        
+                        const response = await axios.put(API_URL_POST_COURSES , localCourses[i], {
+                            headers: {
+                                'Authorization': `Bearer ${await getToken()}`,
+                                'Content-Type': 'application/json'
+                            },
+                        });
+                        console.debug(response);
+                    } catch (error) {
+                        console.error('Error:', error.response);
+                    }
                 }
             }
             else {

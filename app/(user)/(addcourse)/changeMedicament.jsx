@@ -8,23 +8,29 @@ import { API_URL_GET_MEDICAMENTS_SEARCH } from '../../../constants/constants';
 import axios from 'axios';
 import { getToken } from '../../../contexts/Secure';
 import { router } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 
 const MedicineSelectionScreen = () => {
   const [searchQuery, setSearchQuery] = useState(''); // Состояние для строки поиска
   const [filteredMedicines, setFilteredMedicines] = useState([]); // Состояние для найденных лекарств
+  let course = useLocalSearchParams();
 
   useEffect(() => {
     async function fetchMedicaments() {
-      console.log("SEARCH!!!");
-      const response = await axios.get(API_URL_GET_MEDICAMENTS_SEARCH + searchQuery, {
-        headers: {
-            'Authorization': `Bearer ${await getToken()}`,
-        },
-      });
-      console.log(response);
-      console.log(response.data);
-      setFilteredMedicines(response.data);
-      console.log(filteredMedicines);
+      try {
+        console.log("SEARCH!!!");
+        const response = await axios.get(API_URL_GET_MEDICAMENTS_SEARCH + searchQuery, {
+          headers: {
+              'Authorization': `Bearer ${await getToken()}`,
+          },
+        });
+        console.log(response.data);
+        setFilteredMedicines(response.data);
+        console.log(filteredMedicines);
+      } catch (error) {
+        console.error('Нет доступа к серверу, невозможно получить список медикаментов: ', error);
+      }
+      
     }
     fetchMedicaments();
   }, [searchQuery])
@@ -32,14 +38,17 @@ const MedicineSelectionScreen = () => {
   const handleSearch = (text) => {
     console.log("SEARCH!");
     setSearchQuery(text);
-    
   };
 
   // Рендеринг одного элемента списка
   const renderMedicineItem = ({ item }) => (
     <TouchableOpacity style={styles.item} onPress={() => {
       console.log('item',item);
-      router.push('coursesOne')}}>
+      course.medicamentId = item.id;
+      router.push({
+        pathname: '/coursesOne',
+        params: course  // передаем объект курса в параметры
+        });}}>
       <Text style={styles.itemText}>
         {item.title} ({item.dosageForm})
       </Text>

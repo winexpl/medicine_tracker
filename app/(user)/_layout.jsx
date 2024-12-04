@@ -3,11 +3,14 @@ import React from 'react'
 import { Stack } from 'expo-router'
 import { CoursesProvider } from '../../contexts/CoursesContext'
 import { TakeProvider } from '../../contexts/TakesContext'
+import { MedicamentProvider } from '../../contexts/MedicamentContext'
 
 const MainUserLayout = () => {
     return (
     <CoursesProvider>
+    <MedicamentProvider>
     <TakeProvider>
+    
         <Stack>
         <Stack.Screen name="(tabsuser)" options={{
             headerShown: false
@@ -22,7 +25,9 @@ const MainUserLayout = () => {
             title:"Информация о курсе"
         }}/>
         </Stack>
+    
     </TakeProvider>
+    </MedicamentProvider>
     </CoursesProvider>
     
     )

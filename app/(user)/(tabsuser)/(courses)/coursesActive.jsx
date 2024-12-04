@@ -30,7 +30,7 @@ export default function CoursesActive () {
           router.push({
           pathname: 'activeCourseInfo',
           params: course  // передаем объект курса в параметры
-        });
+          });
         }}>
           <View style={styles.courseItem}>
             <Text style={styles.name}>{course.medicament}</Text>
@@ -38,6 +38,8 @@ export default function CoursesActive () {
               Осталось приемов: {course.numberMedicine} {'\n'}
               Доза: {course.dose}
             </Text>
+            <Text>Начало: {new Date(course.startDate).toLocaleDateString()}</Text>
+            <Text>Завершится: {new Date(course.endDate).toLocaleDateString()}</Text>
           </View>
         </TouchableOpacity>
           
