@@ -8,7 +8,6 @@ import { router } from 'expo-router';
 
 export const MedicamentContext = createContext();
 
-
 export const saveMedicaments = async ({...data}) => {
     try {
         await AsyncStorage.setItem('medicaments', JSON.stringify(data));
@@ -51,7 +50,7 @@ export const clearMedicaments = async (data) => {
 };
 
 export const MedicamentProvider = ({ children }) => {
-    const [medicaments, setMedicaments] = useState(null);
+    const [medicaments, setMedicaments] = useState([]);
     const { courses } = useContext(CourseContext);
 
     useEffect(() => {
@@ -65,7 +64,7 @@ export const MedicamentProvider = ({ children }) => {
     useEffect(() => {
         async function fetchFromDB() {
             try {
-                const newMedicaments = [];
+                let newMedicaments = [];
                 for(let index in courses ) {
                     const response = await axios.get(API_URL_GET_MEDICAMENTS + '/id=' + courses[index].medicamentId, {
                         headers: {
@@ -78,18 +77,16 @@ export const MedicamentProvider = ({ children }) => {
                 }
                 if(newMedicaments.length > 0) {
                     setMedicaments(newMedicaments);
-                    console.log('МЕДИКАМЕНТЫ',newMedicaments);
                     saveMedicaments(newMedicaments);
                 }
             }
             catch (error) {
                 // Попробуем получить курсы из локального хранилища, если ошибка сети
-                const localMedicaments = await getMedicaments();
-                setMedicaments(localMedicaments);
+                console.error('Невозможно получить медикаменты с сервера: ', error);
             }
         }
         fetchFromDB();
-    }, [router, courses]);
+    }, [courses]);
 
     console.log('МЕДИКАМЕНТЫ',medicaments);
     return (

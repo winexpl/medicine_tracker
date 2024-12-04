@@ -11,23 +11,12 @@ import {
   Modal,
   FlatList,
 } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 const MedicationCourseScreen = () => {
-  // добавила без инициализации, сам запихай в поля что то
-  // СМОТРИ ТИПЫ ПЕРЕМЕННЫХ!!! ЭТО ВСЕ В МОДЕЛЯХ В СПРИНГЕ А НЕ В БД ЕСЛИ ЧТО
-  // ТИПЫ И НАЗВАНИЯ СООТВЕТСТВУЮТ ТИПАМ И НАЗВАНИЯМ В СПРИНГЕ!!! НЕ В БД
-  //  Н Е В Б Д
-  // что то еще поудаляла не помню короче офк переделывать
-  // и сделай сразу нормальные названия здесь везде
-  // текущее название компонента вообще не отражает какой это курс
-  // + я в ActiveCourseInfo из courseActive с помощью router.push передаю еще параметр который можно использовать в ActiveCourseInfo
-  // так и передавай все текущие состояния курса
+  const [course, setCourse] = useState(useLocalSearchParams());
 
-  const [course, setCourse] = useState([
-    { dose: 0, startDate, endDate, medicamentId },
-  ]);
-  
   const [startDate, setStartDate] = useState(new Date()); // 2 мая 2024
   const [endDate, setEndDate] = useState(new Date()); // 15 мая 2024  
   const [periodicity, setPeriodicity] = useState(1); // В днях
@@ -42,14 +31,9 @@ const MedicationCourseScreen = () => {
   const [dose, setDose] = useState(0); // для выбора дозы  
   const [mode, setMode] = useState(''); // Режим приема кнопки до еды и тд
   const [appointments, setAppointments] = useState([]); //хранить приемы
-  const [totalAppointments, setTotalAppointments] = useState(0); //для записи количиства приемов(для правильного подсчета количества приемов)
+  const [schedule, setSchedule] = useState([]); //для записи количиства приемов(для правильного подсчета количества приемов)
   // Добавление нового приема
   const addAppointment = () => {
-    const newAppointment = {
-      courseId: null,
-      datetime: null,
-      state: null
-    };
     setAppointments([...appointments, newAppointment]);
   };
 
@@ -66,8 +50,7 @@ const MedicationCourseScreen = () => {
   const calculateTotalAppointments = () => {
     const days =
       Math.ceil(
-        (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-      ) + 1; // +1 чтобы включить начальную дату
+        (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1; // +1 чтобы включить начальную дату
     return Math.floor(days / periodicity);
   };
 

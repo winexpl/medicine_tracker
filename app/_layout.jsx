@@ -28,9 +28,6 @@ const RootLayout = () => {
   }, [fontsLoaded, error]);
 
   return (
-    <CoursesProvider>
-      <MedicamentProvider>
-        <TakeProvider>
           <AuthProvider>
             <Stack>
                 <Stack.Screen name="(admin)" options={{
@@ -46,9 +43,6 @@ const RootLayout = () => {
                   headerShown: false
                 }}/>
             </Stack>
-          </AuthProvider>
-        </TakeProvider>
-      </MedicamentProvider>
-    </CoursesProvider>);
+          </AuthProvider>);
 }
 export default RootLayout;
