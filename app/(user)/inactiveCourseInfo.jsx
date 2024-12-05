@@ -56,9 +56,6 @@ const ActiveCourseInfo = () => {
             )))}
         </ScrollView>
         </View>
-        
-        
-        
         <TouchableOpacity className='bg-primary-text rounded-xl items-center justify-center' onPress={ () => {
             router.back();
             }}>

@@ -13,7 +13,8 @@ import { useLocalSearchParams } from 'expo-router';
 const MedicineSelectionScreen = () => {
   const [searchQuery, setSearchQuery] = useState(''); // Состояние для строки поиска
   const [filteredMedicines, setFilteredMedicines] = useState([]); // Состояние для найденных лекарств
-  let course = useLocalSearchParams();
+  const course = useLocalSearchParams();
+
 
   useEffect(() => {
     async function fetchMedicaments() {
@@ -45,10 +46,11 @@ const MedicineSelectionScreen = () => {
     <TouchableOpacity style={styles.item} onPress={() => {
       console.log('item',item);
       course.medicamentId = item.id;
+      console.log(course);
       router.push({
         pathname: '/coursesOne',
-        params: course  // передаем объект курса в параметры
-        });}}>
+        params: {course: JSON.stringify(course), medicament:JSON.stringify(item)}  // передаем объект курса в параметры
+      });}}>
       <Text style={styles.itemText}>
         {item.title} ({item.dosageForm})
       </Text>

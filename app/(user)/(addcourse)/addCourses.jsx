@@ -8,8 +8,9 @@ import { router} from 'expo-router'
 import { useState } from 'react';
 
 const HomeScreen = ({ navigation }) => {
-  const [ course, setCourse ] = useState({id:null,accountId:null,medicamentId:null,
-        dose:null,startDate:null,endDate:null,typeCourse:null,weekday:null,period:null,regimen:null,numberMedicine:null,schedule:null,state:null})
+  const [ course, setCourse ] = useState({id:'',accountId:'',medicamentId:'',
+        dose:0,startDate:new Date(),endDate:new Date(),typeCourse:0,weekday:0,period:1,regimen:'',
+        numberMedicine:0,schedule:[],state:'Активный'})
   return (
     <SafeAreaView style={styles.container}>
 

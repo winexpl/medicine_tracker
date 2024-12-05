@@ -96,7 +96,7 @@ export const CoursesProvider = ({ children }) => {
         fetch();
     },[]);
 
-    console.log('КУРСЫ', courses);
+    console.log('КУРСЫ', courses, courses.schedule);
     
     return (
         <CourseContext.Provider value={{ courses, setCourses }}>

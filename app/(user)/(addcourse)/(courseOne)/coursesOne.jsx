@@ -1,135 +1,128 @@
 
 //ЭКРАННАЯ ФОРМА ДОБАВЛЕНИЕ КУРСА ВАРИАНТ 1 (НЕДОДЕЛАННАЯ)
 
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Modal,
-  FlatList,
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, FlatList} from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 const MedicationCourseScreen = () => {
-  const [course, setCourse] = useState(useLocalSearchParams());
-
-  const [startDate, setStartDate] = useState(new Date()); // 2 мая 2024
-  const [endDate, setEndDate] = useState(new Date()); // 15 мая 2024  
-  const [periodicity, setPeriodicity] = useState(1); // В днях
+  const localParams = useLocalSearchParams();
+  console.debug(localParams);
+  const [course, setCourse] = useState(JSON.parse(localParams.course));
+  const [medicament] = useState(JSON.parse(localParams.medicament));
+  console.debug(course, medicament);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDateType, setSelectedDateType] = useState(null); // 'start' или 'end'
-  const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
-
-  const [selectedDose, setSelectedDose] = useState('1 табл'); 
-
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [takeIndex, setTakeIndex] = useState(0);
   const [showPeriodicityModal, setShowPeriodicityModal] = useState(false);
-  const [dose, setDose] = useState(0); // для выбора дозы  
-  const [mode, setMode] = useState(''); // Режим приема кнопки до еды и тд
-  const [appointments, setAppointments] = useState([]); //хранить приемы
-  const [schedule, setSchedule] = useState([]); //для записи количиства приемов(для правильного подсчета количества приемов)
+  const [showDoseModal, setShowDoseModal] = useState(false);
+  
+  const [ defaultDate, setDefaultDate ] = useState(new Date('2024-12-05T00:00:00'));
+  useEffect(() => {
+    if(selectedDateType === 'start') setSelectedDate(new Date(course.startDate));
+    else setSelectedDate(new Date(course.endDate));
+  }, [selectedDateType]);
   // Добавление нового приема
-  const addAppointment = () => {
-    setAppointments([...appointments, newAppointment]);
+  const addTake = () => {
+    setCourse(prevState => ({ ...prevState, schedule: ["00:00:00", ...course.schedule]}));
   };
 
   // Обновление времени для конкретного приема
-  const updateAppointmentTime = (id, newTime) => {
-    setAppointments((prevAppointments) =>
-      prevAppointments.map((appointment) =>
-        appointment.id === id ? { ...appointment, time: newTime } : appointment
-      )
-    );
+  const updateTakeTime = (newTime) => {
+    const newSchedule = [...course.schedule];
+    newSchedule[takeIndex] = newTime.toLocaleTimeString();
+    newSchedule.sort();
+    setCourse(prevState => ({ ...prevState, schedule: newSchedule}));
   };
 
   // Расчет общего количества приемов
-  const calculateTotalAppointments = () => {
-    const days =
-      Math.ceil(
-        (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1; // +1 чтобы включить начальную дату
-    return Math.floor(days / periodicity);
+  const calculateTotalTakes = () => {
+    console.log(course.schedule.length );
+    const days = Math.ceil(
+        (new Date(course.endDate).getTime() - new Date(course.startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1; // +1 чтобы включить начальную дату
+    return (days / course.period * course.schedule.length);
   };
-
-  // Рендеринг элемента приема
-  const renderAppointmentItem = ({ item }) => (
-    <View style={styles.appointmentRow}>
-      <Text style={styles.appointmentText}>{item.id} прием</Text>
-
-      <TouchableOpacity
-        style={styles.timeButton}
-        onPress={() => {
-          setSelectedAppointmentId(item.id);
-          setShowTimePicker(true);
-        }}
-      >
-        <Text style={styles.timeText}>{item.time}</Text>
-      </TouchableOpacity>
-    </View>
-  );
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Добавление курса</Text>
-
-      {/* Периодичность и даты */}
+      
       <View style={styles.row}>
         <TouchableOpacity
           style={styles.dateButton}
           onPress={() => {
             setSelectedDateType('start');
             setShowDatePicker(true);
-          }}
-        >
-          <Text style={styles.dateText}>
-            Начало: {startDate.toLocaleDateString()}
-          </Text>
+          }}>
+          <Text style={styles.dateText}>Начало: {new Date(course.startDate).toLocaleDateString()}</Text>
         </TouchableOpacity>
       </View>
+
       <View>
-      <TouchableOpacity
+        <TouchableOpacity
           style={styles.dateButton}
           onPress={() => {
             setSelectedDateType('end');
             setShowDatePicker(true);
-          }}
-        >
-          <Text style={styles.dateText}>
-            Окончание: {endDate.toLocaleDateString()}
-          </Text>
+          }}>
+          <Text style={styles.dateText}>Окончание: {new Date(course.endDate).toLocaleDateString()}</Text>
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity
-        style={styles.dateButton}
-        onPress={() => setShowPeriodicityModal(true)}
-      >
-        <Text style={styles.periodicityText}>
-          Периодичность: {periodicity} д.
-        </Text>
-      </TouchableOpacity>
+      <View>
+        <TouchableOpacity
+          style={styles.dateButton}
+          onPress={() => setShowPeriodicityModal(true)}>
+          <Text style={styles.periodicityText}>Периодичность: {course.period} д.</Text>
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.totalAppointments}>Всего приемов: {calculateTotalTakes()}</Text>
 
-      <Text style={styles.totalAppointments}>
-        Всего приемов: {calculateTotalAppointments()}
-      </Text>
+      <View>
+        <TouchableOpacity
+          style={styles.dateButton}
+          onPress={() => setShowDoseModal(true)}>
+          <Text style={styles.periodicityText}>Доза: {course.dose} д.</Text>
+        </TouchableOpacity>
+      </View>
 
-      {/* Список приемов */}
       <FlatList
-        data={appointments}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderAppointmentItem}
+        data={course.schedule}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({item, index}) => {
+          return(<View style={styles.appointmentRow}>
+            <Text style={styles.appointmentText}>{index+1}</Text>
+            <TouchableOpacity
+              style={styles.timeButton}
+              onPress={() => {
+                setTakeIndex(index);
+                setShowTimePicker(true);
+            }}>
+
+            <Text style={styles.timeText}>{item}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.timeButton}
+              onPress={() => {
+                const newTakes = [...course.schedule];
+                newTakes.splice(index, 1);
+                setCourse(prevState => ({...prevState, schedule: newTakes}))
+              }}>
+                <Text>Удалить</Text>
+              </TouchableOpacity>
+          </View>)
+        }}
         style={styles.list}
       />
 
-      {/* Добавить прием */}
-      <TouchableOpacity style={styles.addButton} onPress={addAppointment}>
+      <TouchableOpacity style={styles.addButton} onPress={addTake}>
         <Text style={styles.addButtonText}>+ Добавить прием</Text>
       </TouchableOpacity>
 
-      {/* Выбор времени */}
       {showTimePicker && (
         <DateTimePicker
           mode="time"
@@ -137,43 +130,36 @@ const MedicationCourseScreen = () => {
           onChange={(event, selectedTime) => {
             setShowTimePicker(false);
             if (selectedTime) {
-              const hours = selectedTime.getHours();
-              const minutes = selectedTime.getMinutes();
-              const formattedTime = `${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
-              if (selectedAppointmentId !== null) {
-                updateAppointmentTime(selectedAppointmentId, formattedTime);
-              }
+              updateTakeTime(selectedTime);
             }
           }}
         />
       )}
 
-      {/* Выбор даты */}
       {showDatePicker && (
         <DateTimePicker
           mode="date"
-          value={selectedDateType === 'start' ? startDate : endDate}
+          value={selectedDate}
           onChange={(event, selectedDate) => {
             setShowDatePicker(false);
             if (selectedDate) {
               if (selectedDateType === 'start') {
-                setStartDate(selectedDate);
+                setCourse(prevState => ({ ...prevState, startDate: selectedDate}));
               } else {
-                setEndDate(selectedDate);
+                setCourse(prevState => ({ ...prevState, endDate: selectedDate}));
               }
             }
           }}
         />
       )}
 
-      {/* Модальное окно для выбора периодичности */}
       <Modal visible={showPeriodicityModal} transparent>
         <View style={styles.modal}>
           <TextInput
             style={styles.input}
             keyboardType="number-pad"
             placeholder="Введите периодичность"
-            onChangeText={(text) => setPeriodicity(Number(text))}
+            onChangeText={(text) => setCourse(prevState => ({...prevState, period: Number(text)}))}
           />
           <TouchableOpacity
             style={styles.modalButton}
@@ -183,26 +169,33 @@ const MedicationCourseScreen = () => {
           </TouchableOpacity>
         </View>
       </Modal>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          // Открытие окна для выбора дозы
-          const newDose = prompt('Введите дозу:');
-          setDoses(newDose);
-        }}
-      >
-        <Text>{`Доза: ${doses.amount} ${doses.unit}`}</Text>
-      </TouchableOpacity>
+
+      <Modal visible={showDoseModal} transparent>
+        <View style={styles.modal}>
+          <TextInput
+            style={styles.input}
+            keyboardType="number-pad"
+            placeholder="Введите размер дозы"
+            onChangeText={(text) => setCourse(prevState => ({...prevState, dose: Number(text)}))}
+          />
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={() => setShowDoseModal(false)}
+          >
+            <Text style={styles.modalButtonText}>OK</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+      <Text>{`Доза: ${course.dose} `}</Text>
       <View style={styles.modes}>
-        {['До еды', 'После еды', 'Во время еды', 'Независимо от еды'].map((item) => (
+        {['До еды', 'После еды', 'Во время еды', 'Независимо от приема пищи'].map((item) => (
           <TouchableOpacity
             key={item}
             style={[
               styles.modeButton,
-              { backgroundColor: mode === item ? '#000' : '#FFF' },
+              { backgroundColor: course.regimen === item ? '#000' : '#FFF' },
             ]}
-            onPress={() => setMode(item)}
-          >
+            onPress={() => setCourse(prevState => ({...prevState, regimen: item}))}>
             <Text>{item}</Text>
           </TouchableOpacity>
         ))}
@@ -257,7 +250,7 @@ const styles = StyleSheet.create({
   appointmentRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 12,
+    padding: 10,
     backgroundColor: '#ffffff',
     borderRadius: 8,
     marginBottom: 8,
