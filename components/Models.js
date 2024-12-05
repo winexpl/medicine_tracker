@@ -27,7 +27,10 @@ export const getCourseInfo = (courses, medicaments) => {
 export const updateTakes = async (course, oldEndDate, newEndDate, takes) => {
     oldEndDate = new Date(oldEndDate);
     newEndDate = new Date(newEndDate);
-    if(oldEndDate.getTime() === newEndDate.getTime()) return takes;
+    if(oldEndDate < newEndDate) {
+        console.lod('меньше');
+    }
+    for(; oldEndDate < newEndDate; oldEndDate ++);
     const type = course.typeCourse;
     let daysOfWeek = [];
     let newTakes = [...takes];

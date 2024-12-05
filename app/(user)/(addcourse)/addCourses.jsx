@@ -12,8 +12,26 @@ const HomeScreen = ({ navigation }) => {
         dose:0,startDate:new Date(),endDate:new Date(),typeCourse:0,weekday:0,period:1,regimen:'',
         numberMedicine:0,schedule:[],state:'Активный'})
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-primary-back p-4">
 
+<<<<<<< HEAD
+      <TouchableOpacity className="bg-primary-text p-4 my-2 border border-gray-300 rounded" onPress={() => {
+        setTypeOfCourse(prevState => ({ ...prevState, type: 1 }));
+        router.push('changeMedicament');}}>
+        <Text className="text-base text-gray-800">Составить расписание на 1 день и выбрать периодичность</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity className="bg-primary-text p-4 my-2 border border-gray-300 rounded" onPress={() => {
+        setTypeOfCourse(prevState => ({ ...prevState, type: 2 }));
+        router.push('changeMedicament');}}>
+        <Text className="text-base text-gray-800">Составить расписание на неделю</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity className="bg-primary-text p-4 my-2 border border-gray-300 rounded" onPress={() => {
+        setTypeOfCourse(prevState => ({ ...prevState, type: 3 }));
+        router.push('changeMedicament');}}>
+        <Text className="text-base text-gray-800">Принимать лекарственные средства по необходимости</Text>
+=======
       <TouchableOpacity style={styles.button} onPress={() => {
         setCourse(prevState => ({
           ...prevState, typeCourse:2
@@ -46,30 +64,11 @@ const HomeScreen = ({ navigation }) => {
           params: course  // передаем объект курса в параметры
           });}}>
         <Text style={styles.text}>Принимать лекарственные средства по необходимости</Text>
+>>>>>>> 75220c7044a89603250ee2026c9dbba0090f454c
       </TouchableOpacity>
       
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#1C1C2B',
-    padding: 16,
-  },
-  button: {
-    backgroundColor: '#FF8F00',
-    padding: 16,
-    marginVertical: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 4,
-  },
-  text: {
-    fontSize: 16,
-    color: '#333',
-  },
-});
 
 export default HomeScreen;

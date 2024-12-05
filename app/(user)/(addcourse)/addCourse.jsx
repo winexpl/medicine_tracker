@@ -36,36 +36,36 @@ const MedicationForm = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView>
-      <View style={styles.container}>
+    <SafeAreaView className="flex-1 bg-gray-100 p-4">
+      <View className="mb-4">
       {/* Верхняя часть с текущим курсом */}
-      <Text style={styles.label}>Текущий курс</Text>
+      <Text className="font-bold mb-2">Текущий курс</Text>
 
       {/* Поле для выбора лекарства */}
-      <View style={styles.row}>
-        <Text style={styles.label}>Лекарство:</Text>
+      <View className="flex-row items-center mb-4">
+        <Text className="font-bold">Лекарство:</Text>
         <TouchableOpacity
-          style={styles.selectField}
+          className="flex-1 border border-gray-300 rounded px-2 py-1 mx-2"
           onPress={() => navigation.navigate('MedicationSelection')} // Переход на другую форму
         >
-          <Text style={styles.text}>{medication}</Text>
+          <Text className="">{medication}</Text>
         </TouchableOpacity>
       </View>
 
       {/* Поле для дозы */}
-      <View style={styles.row}>
-        <Text style={styles.label}>Доза:</Text>
+      <View className="flex-row items-center mb-4">
+        <Text className="font-bold">Доза:</Text>
         <TouchableOpacity
-          style={styles.selectField}
+          className="flex-1 border border-gray-300 rounded px-2 py-1 mx-2"
           onPress={() => {
             // Логика выбора дозы (можно реализовать через модальное окно)
             const newDosage = prompt('Введите дозу:', dosage); // prompt используется как пример
             if (newDosage) setDosage(newDosage);
           }}
         >
-          <Text style={styles.text}>{dosage}</Text>
+          <Text className="">{dosage}</Text>
         </TouchableOpacity>
-        <Text style={styles.text}>Таблетки</Text>
+        <Text className="">Таблетки</Text>
       </View>
 
       {/* Список приёмов */}
@@ -73,29 +73,29 @@ const MedicationForm = ({ navigation }) => {
         data={schedules}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item, index }) => (
-          <View style={styles.row}>
-            <Text style={styles.text}>{`${item.id} прием`}</Text>
+          <View className="flex-row items-center mb-4">
+            <Text className="">{`${item.id} прием`}</Text>
             <TouchableOpacity
-              style={styles.selectField}
+              className="flex-1 border border-gray-300 rounded px-2 py-1 mx-2"
               onPress={() => {
                 setCurrentScheduleIndex(index);
                 setShowTimePicker(true);
               }}
             >
-              <Text style={styles.text}>{item.time}</Text>
+              <Text className="">{item.time}</Text>
             </TouchableOpacity>
           </View>
         )}
       />
 
       {/* Кнопка добавления приёма */}
-      <TouchableOpacity style={styles.addButton} onPress={addSchedule}>
-        <Text style={styles.addButtonText}>+ Добавить прием</Text>
+      <TouchableOpacity className="bg-orange-500 rounded px-4 py-3 items-center my-4" onPress={addSchedule}>
+        <Text className="text-white font-bold">+ Добавить прием</Text>
       </TouchableOpacity>
 
       {/* Кнопка завершения курса */}
-      <TouchableOpacity style={styles.finishButton}>
-        <Text style={styles.finishButtonText}>Завершить курс</Text>
+      <TouchableOpacity className="bg-gray-300 rounded px-4 py-3 items-center">
+        <Text className="text-black font-bold">Завершить курс</Text>
       </TouchableOpacity>
 
       {/* Всплывающее окно выбора времени */}
@@ -114,53 +114,3 @@ const MedicationForm = ({ navigation }) => {
 };
 
 export default MedicationForm;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
-    padding: 16,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  selectField: {
-    flex: 1,
-    padding: 8,
-    borderWidth: 1,
-    borderColor: '#CCC',
-    borderRadius: 4,
-    marginHorizontal: 8,
-  },
-  text: {
-    fontSize: 16,
-  },
-  addButton: {
-    padding: 12,
-    backgroundColor: '#FF8F00',
-    borderRadius: 4,
-    alignItems: 'center',
-    marginVertical: 16,
-  },
-  addButtonText: {
-    fontSize: 16,
-    color: '#FFF',
-  },
-  finishButton: {
-    padding: 12,
-    backgroundColor: '#CCC',
-    borderRadius: 4,
-    alignItems: 'center',
-  },
-  finishButtonText: {
-    fontSize: 16,
-    color: '#000',
-  },
-});

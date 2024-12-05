@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { CourseContext } from '../../../contexts/CoursesContext';
 import { getTakesByDate } from '../../../components/Models';
@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons'; // Импортируем ико�
 import { saveTakes, TakeContext } from '../../../contexts/TakesContext';
 import { router } from 'expo-router';
 
-export default function Schedule () {
+export default function Schedule() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Выбранная дата
   const [selectedDayIndex, setSelectedDayIndex] = useState(new Date().getDay() || 7); // Индекс выбранного дня недели
   const [showCalendar, setShowCalendar] = useState(false); // Состояние для показа календаря
@@ -17,25 +17,26 @@ export default function Schedule () {
   const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   const { takes, setTakes } = useContext(TakeContext);
   
-  const take = (id) => {
+  const take = (id) => {  
     const updatedTakes = [...takes];  // Создаем копию массива
     const index = updatedTakes.findIndex(m => m.id === id);
     if (index !== -1) {
-      updatedTakes[index] = { ...updatedTakes[index], state: true };  // Обновляем элемент
+      updatedTakes[index] = { ...updatedTakes[index], state: true }; // Обновляем элемент
     }
-    setTakes(updatedTakes);  // Обновляем состояние с новым массивом
+    setTakes(updatedTakes); // Обновляем состояние с новым массивом
     saveTakes(takes);
-  }
+  };
 
-  function donttake(id) {
-    const updatedTakes = [...takes];  // Создаем копию массива
+  const donttake = (id) => {
+    const updatedTakes = [...takes]; // Создаем копию массива
     const index = updatedTakes.findIndex(m => m.id === id);
     if (index !== -1) {
-      updatedTakes[index] = { ...updatedTakes[index], state: false };  // Обновляем элемент
+      updatedTakes[index] = { ...updatedTakes[index], state: false }; // Обновляем элемент
     }
-    setTakes(updatedTakes);  // Обновляем состояние с новым массивом
+    setTakes(updatedTakes); // Обновляем состояние с новым массивом
     saveTakes(takes);
-  }
+  };
+
   const handleDateChange = (date) => {
     setSelectedDate(date);
     setSelectedDayIndex(new Date(date).getDay() || 7);
@@ -58,43 +59,41 @@ export default function Schedule () {
     setSelectedDayIndex(dayIndex);
   };
 
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 p-2 bg-primary-back">
       {/* Кнопки для переключения недель */}
-      <SafeAreaView style={styles.weekNavigation}>
-        <TouchableOpacity style={styles.weekButton} onPress={() => handleWeekChange(-1)}>
-          <Text style={styles.weekButtonText}>←</Text>
+      <SafeAreaView className="flex-row justify-between items-center mb-2">
+        <TouchableOpacity className="bg-primary-text p-3 rounded" onPress={() => handleWeekChange(-1)}>
+          <Text className="text-black">←</Text>
         </TouchableOpacity>
-        <Text style={styles.weekText}>Выбрать неделю</Text>
-        <TouchableOpacity style={styles.weekButton} onPress={() => handleWeekChange(1)}>
-          <Text style={styles.weekButtonText}>→</Text>
+        <Text className="text-white ">Выбрать неделю</Text>
+        <TouchableOpacity className="bg-primary-text p-3 rounded" onPress={() => handleWeekChange(1)}>
+          <Text className="text-black">→</Text>
         </TouchableOpacity>
       </SafeAreaView>
 
       {/* Дни недели */}
-      <SafeAreaView style={styles.daySelector}>
+      <SafeAreaView className="flex-row justify-around mt-[-26px] mb-2">
         {daysOfWeek.map((day, index) => (
           <TouchableOpacity
             key={index}
-            style={[
-              styles.dayButton,
-              selectedDayIndex === index + 1 && styles.selectedDayButton,
-            ]}
+            className={`p-3 rounded bg-primary-text ${selectedDayIndex === index + 1 ? 'bg-white' : ''}`}
             onPress={() => handleDaySelect(index + 1)}
           >
-            <Text style={styles.dayButtonText}>{day}</Text>
+            <Text className={` ${selectedDayIndex === index + 1 ? 'text-black' : 'text-black'}`}>
+              {day}
+            </Text>
           </TouchableOpacity>
         ))}
       </SafeAreaView>
 
       {/* Кнопка для календаря */}
-      <SafeAreaView style={styles.navigation}>
+      <SafeAreaView className="flex-row justify-center mb-2">
         <TouchableOpacity
-          style={styles.orangeButton}
+          className="bg-primary-text px-5 mt-[-26px] py-3 rounded items-center justify-center"
           onPress={() => setShowCalendar(!showCalendar)}
         >
-          <Text style={styles.orangeButtonText}>
+          <Text className="text-black">
             {showCalendar ? 'Скрыть календарь' : 'Выбрать дату'}
           </Text>
         </TouchableOpacity>
@@ -128,136 +127,42 @@ export default function Schedule () {
       )}
 
       {/* Список приёмов */}
-      <Text style={styles.dateText}>{`Расписание на ${selectedDate}`}</Text>
-      <ScrollView style={styles.scrollView}>
+      <Text className="text-white text-center my-2">{`Расписание на ${selectedDate}`}</Text>
+      <ScrollView className="flex-1">
         {getTakesByDate(selectedDate).map((takem, index) => (
-          <View key={index} style={takem.state ? styles.medicationItemTaked : styles.medicationItemUntaked}>
-            <Text style={styles.medicationText}>
-              {`${new Date(takem.datetime).toLocaleTimeString()} ${(takem.title)}`}
+          <View
+            key={index}
+            style={takem.state ? styles.medicationItemTaked : styles.medicationItemUntaked}
+          >
+            <Text className="">
+              {`${new Date(takem.datetime).toLocaleTimeString()} ${takem.title}`}
             </Text>
 
             <TouchableOpacity
-              style={styles.crossButton}
-              onPress={() => {take(takem.id);}}>
-              
+              className="ml-3"
+              onPress={() => {
+                take(takem.id);
+              }}
+            >
               <Ionicons name="thumbs-up" size={24} color="green" />
             </TouchableOpacity>
 
-            <TouchableOpacity className="items-end"
-              style={styles.crossButton}
-              onPress={() => {donttake(takem.id);}}>
+            <TouchableOpacity
+              className="ml-3"
+              onPress={() => {
+                donttake(takem.id);
+              }}
+            >
               <Ionicons name="thumbs-down" size={24} color="red" />
             </TouchableOpacity>
-
-
           </View>
         ))}
       </ScrollView>
 
       {/* Кнопка добавить */}
-      <TouchableOpacity style={styles.orangeButton} onPress={() => { router.push('addTake') }}>
-        <Text style={styles.orangeButtonText}>Добавить приём</Text>
+      <TouchableOpacity className="bg-primary-text px-5 py-3 rounded items-center mt-3" onPress={() => { router.push('addTake'); }}>
+        <Text className="text-black">Добавить приём</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 10,
-    backgroundColor: '#1C1C2B',
-  },
-  weekNavigation: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  weekButton: {
-    backgroundColor: '#FF8F00',
-    padding: 10,
-    borderRadius: 5,
-  },
-  weekButtonText: {
-    fontSize: 16,
-    color: '#000',
-    fontWeight: 'bold',
-  },
-  weekText: {
-    fontSize: 16,
-    color: '#FFF',
-  },
-  daySelector: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 10,
-  },
-  dayButton: {
-    padding: 10,
-    borderRadius: 5,
-    backgroundColor: '#FF8F00',
-  },
-  selectedDayButton: {
-    backgroundColor: '#FFF',
-  },
-  dayButtonText: {
-    color: '#000',
-    fontWeight: 'bold',
-  },
-  navigation: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 10,
-  },
-  orangeButton: {
-    backgroundColor: '#FF8F00',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  orangeButtonText: {
-    color: '#000000',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  dateText: {
-    fontSize: 16,
-    marginVertical: 10,
-    color: 'white',
-    textAlign: 'center',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  medicationItemTaked: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 10,
-    backgroundColor: 'lightgreen',
-    marginBottom: 5,
-    borderRadius: 5,
-  },
-  medicationItemUntaked: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 10,
-    backgroundColor: 'lightcoral',
-    marginBottom: 5,
-    borderRadius: 5,
-  },
-  medicationText: {
-    fontSize: 16,
-  },
-  crossButton: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    marginLeft: 10,
-  },
-  buttonText: {
-    fontSize: 16,
-  },
-});
+}
