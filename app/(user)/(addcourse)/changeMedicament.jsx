@@ -9,11 +9,17 @@ import axios from 'axios';
 import { getToken } from '../../../contexts/Secure';
 import { router } from 'expo-router';
 import { useLocalSearchParams } from 'expo-router';
+import { MedicamentContext, saveMedicaments } from '../../../contexts/MedicamentContext';
+import { addCourses, CourseContext, saveCourses } from '../../../contexts/CoursesContext';
+import { TakeContext } from '../../../contexts/TakesContext';
 
 const MedicineSelectionScreen = () => {
   const [searchQuery, setSearchQuery] = useState(''); // Состояние для строки поиска
   const [filteredMedicines, setFilteredMedicines] = useState([]); // Состояние для найденных лекарств
   const course = useLocalSearchParams();
+  const { medicaments, setMedicaments } = useContext(MedicamentContext);
+  const { courses, setCourses } = useContext(CourseContext);
+  const { takes, setTakes } = useContext(TakeContext);
 
 
   useEffect(() => {
@@ -45,18 +51,34 @@ const MedicineSelectionScreen = () => {
   const renderMedicineItem = ({ item }) => (
     <TouchableOpacity className="p-4 border-b border-gray-200 bg-white" onPress={() => {
       console.log('item',item);
-<<<<<<< HEAD
-      router.push('coursesOne')}}>
-      <Text className="text-base text-gray-800">
-=======
       course.medicamentId = item.id;
       console.log(course);
-      router.push({
-        pathname: '/coursesOne',
-        params: {course: JSON.stringify(course), medicament:JSON.stringify(item)}  // передаем объект курса в параметры
-      });}}>
-      <Text style={styles.itemText}>
->>>>>>> 75220c7044a89603250ee2026c9dbba0090f454c
+      setMedicaments([...medicaments, item]);
+      saveMedicaments([...medicaments, item]);
+      if(Number(course.typeCourse) === 2) {
+        router.push({
+          pathname: '/addCourseWithPeriod',
+          params: {course: JSON.stringify(course), medicament:JSON.stringify(item)}  // передаем объект курса в параметры
+        });
+      }
+      if(Number(course.typeCourse) === 1) {
+        router.push({
+          pathname: '/addCourseForAWeek',
+          params: {course: JSON.stringify(course), medicament:JSON.stringify(item)}  // передаем объект курса в параметры
+        });
+      } 
+      if(Number(course.typeCourse) === 3) {
+        course.regimen = "Независимо от приема пищи";
+        course.schedule = [];
+        addCourses(course,takes);
+        setCourses([...courses, course]);
+        router.push({
+          pathname: '/schedule',
+          params: {course: JSON.stringify(course), medicament:JSON.stringify(item)}  // передаем объект курса в параметры
+        });
+      }
+      }}>
+      <Text className="text-base text-gray-800">
         {item.title} ({item.dosageForm})
       </Text>
       <Text className="text-base text-gray-800">

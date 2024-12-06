@@ -3,7 +3,7 @@ import { View, Text, Button, StyleSheet, ScrollView, TouchableOpacity } from 're
 import { Link , router } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { CourseContext, getCourses, saveCourses } from '../../../../contexts/CoursesContext';
-import { getCourseInfo } from '../../../../components/Models';
+import { dosageFormTo, getCourseInfo } from '../../../../components/Models';
 import { MedicamentContext } from '../../../../contexts/MedicamentContext';
 import axios from 'axios';
 import { getToken } from '../../../../contexts/Secure';
@@ -18,10 +18,8 @@ export default function CoursesActive () {
       setActiveCourses(getCourseInfo(courses, medicaments));
     }
     update();
-  },[courses]);
-  
-  console.log(activeCourses);
-  return (
+  },[courses, medicaments]);
+    return (
     <SafeAreaView className="flex-1 bg-primary-back p-4">
       <ScrollView className="flex-1 mb-12">
       {activeCourses.active.length > 0 ? (
@@ -33,10 +31,10 @@ export default function CoursesActive () {
           });
         }}>
           <View className="p-4 bg-white mb-3 rounded-lg border border-gray-300">
-            <Text className="">{course.medicament}</Text>
+            <Text className="font-bold">{course.medicament}</Text>
             <Text className="text-sm mt-2">
               Осталось приемов: {course.numberMedicine} {'\n'}
-              Доза: {course.dose}
+              Доза: {course.dose} {dosageFormTo(course.dosageForm)}
             </Text>
             <Text>Начало: {new Date(course.startDate).toLocaleDateString()}</Text>
             <Text>Завершится: {new Date(course.endDate).toLocaleDateString()}</Text>
@@ -50,7 +48,7 @@ export default function CoursesActive () {
       </ScrollView>
 
       <TouchableOpacity className="absolute bottom-5 left-5 right-5 bg-primary-text p-4 rounded-lg items-center" onPress={async () => {
-        router.push('(addcourse)/addCourses');}}>
+        router.push('(addcourse)/addCourse');}}>
         <Text className="text-black">Добавить курс</Text>
       </TouchableOpacity>
     </SafeAreaView>

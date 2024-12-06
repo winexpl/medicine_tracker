@@ -1,116 +1,52 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  FlatList,
-} from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+
+//ЭКРАННАЯ ФОРМА С ВЫБОРОМ ОДНОГО ИЗ 3 ВАРИАНТОВ ПРИЕМА КУРСА (ВЫБОР КУРСА)
+
+import React, { useContext, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router'
+import { useState } from 'react';
+import uuid from 'react-native-uuid';
 
-const MedicationForm = ({ navigation }) => {
-  const [medication, setMedication] = useState('Аспирин');
-  const [dosage, setDosage] = useState(2);
-  const [schedules, setSchedules] = useState([{ id: 1, time: '8:00' }]); // Список приёмов
-  const [showTimePicker, setShowTimePicker] = useState(false);
-  const [currentScheduleIndex, setCurrentScheduleIndex] = useState(null); // Текущий индекс для изменения времени
 
-  // Функция для добавления нового приёма
-  const addSchedule = () => {
-    const newSchedule = { id: schedules.length + 1, time: '8:00' };
-    setSchedules([...schedules, newSchedule]);
-  };
-
-  // Функция для изменения времени приёма
-  const changeTime = (event, selectedTime) => {
-    if (selectedTime) {
-      const updatedSchedules = [...schedules];
-      const hours = selectedTime.getHours();
-      const minutes = selectedTime.getMinutes();
-      updatedSchedules[currentScheduleIndex].time = `${hours}:${minutes.toString().padStart(2, '0')}`;
-      setSchedules(updatedSchedules);
-    }
-    setShowTimePicker(false);
-  };
+const AddCourse = () => {
+  const course = {id:uuid.v4(),accountId:'',medicamentId:'',
+        dose:0,startDate: (new Date()).toLocaleDateString("en-CA"),
+        endDate:new Date().toLocaleDateString("en-CA"),typeCourse:0,weekday:0,period:1,regimen:'',
+        numberMedicine:0,schedule:[],state:'Активный'};
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100 p-4">
-      <View className="mb-4">
-      {/* Верхняя часть с текущим курсом */}
-      <Text className="font-bold mb-2">Текущий курс</Text>
+    <SafeAreaView className="flex-1 bg-primary-back p-4">
 
-      {/* Поле для выбора лекарства */}
-      <View className="flex-row items-center mb-4">
-        <Text className="font-bold">Лекарство:</Text>
-        <TouchableOpacity
-          className="flex-1 border border-gray-300 rounded px-2 py-1 mx-2"
-          onPress={() => navigation.navigate('MedicationSelection')} // Переход на другую форму
-        >
-          <Text className="">{medication}</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Поле для дозы */}
-      <View className="flex-row items-center mb-4">
-        <Text className="font-bold">Доза:</Text>
-        <TouchableOpacity
-          className="flex-1 border border-gray-300 rounded px-2 py-1 mx-2"
-          onPress={() => {
-            // Логика выбора дозы (можно реализовать через модальное окно)
-            const newDosage = prompt('Введите дозу:', dosage); // prompt используется как пример
-            if (newDosage) setDosage(newDosage);
-          }}
-        >
-          <Text className="">{dosage}</Text>
-        </TouchableOpacity>
-        <Text className="">Таблетки</Text>
-      </View>
-
-      {/* Список приёмов */}
-      <FlatList
-        data={schedules}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item, index }) => (
-          <View className="flex-row items-center mb-4">
-            <Text className="">{`${item.id} прием`}</Text>
-            <TouchableOpacity
-              className="flex-1 border border-gray-300 rounded px-2 py-1 mx-2"
-              onPress={() => {
-                setCurrentScheduleIndex(index);
-                setShowTimePicker(true);
-              }}
-            >
-              <Text className="">{item.time}</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      />
-
-      {/* Кнопка добавления приёма */}
-      <TouchableOpacity className="bg-orange-500 rounded px-4 py-3 items-center my-4" onPress={addSchedule}>
-        <Text className="text-white font-bold">+ Добавить прием</Text>
+      <TouchableOpacity className="bg-primary-text p-4 my-2 border border-gray-300 rounded" onPress={() => {
+        course.typeCourse = 2;
+        router.push({
+          pathname: 'changeMedicament',
+          params: course  // передаем объект курса в параметры
+        }); }}>
+        <Text className="text-base text-gray-800">Составить расписание на 1 день и выбрать периодичность</Text>
       </TouchableOpacity>
 
-      {/* Кнопка завершения курса */}
-      <TouchableOpacity className="bg-gray-300 rounded px-4 py-3 items-center">
-        <Text className="text-black font-bold">Завершить курс</Text>
+      <TouchableOpacity className="bg-primary-text p-4 my-2 border border-gray-300 rounded" onPress={() => {
+        course.typeCourse = 1;
+        router.push({
+          pathname: 'changeMedicament',
+          params: course  // передаем объект курса в параметры
+        }); }}>
+        <Text className="text-base text-gray-800">Составить расписание на неделю</Text>
       </TouchableOpacity>
 
-      {/* Всплывающее окно выбора времени */}
-      {showTimePicker && (
-        <DateTimePicker
-          value={new Date()}
-          mode="time"
-          is24Hour={true}
-          display="default"
-          onChange={changeTime}
-        />
-      )}
-    </View>
+      <TouchableOpacity className="bg-primary-text p-4 my-2 border border-gray-300 rounded" onPress={() => {
+        course.typeCourse = 3;
+        router.push({
+          pathname: 'changeMedicament',
+          params: course  // передаем объект курса в параметры
+        }); }}>
+        <Text className="text-base text-gray-800">Принимать лекарственные средства по необходимости</Text>
+      </TouchableOpacity>
+      
     </SafeAreaView>
   );
 };
 
-export default MedicationForm;
+export default AddCourse;

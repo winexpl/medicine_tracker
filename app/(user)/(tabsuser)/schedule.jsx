@@ -5,19 +5,29 @@ import { Calendar } from 'react-native-calendars';
 import { CourseContext } from '../../../contexts/CoursesContext';
 import { getTakesByDate } from '../../../components/Models';
 import { Ionicons } from '@expo/vector-icons'; // Импортируем иконки
-import { saveTakes, TakeContext } from '../../../contexts/TakesContext';
+import { getTakes, saveTakes, TakeContext } from '../../../contexts/TakesContext';
 import { router } from 'expo-router';
+import { MedicamentContext } from '../../../contexts/MedicamentContext';
 
 export default function Schedule() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Выбранная дата
   const [selectedDayIndex, setSelectedDayIndex] = useState(new Date().getDay() || 7); // Индекс выбранного дня недели
   const [showCalendar, setShowCalendar] = useState(false); // Состояние для показа календаря
   const { courses, setCourses } = useContext(CourseContext);
-
+  const { medicaments } = useContext(MedicamentContext);
   const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   const { takes, setTakes } = useContext(TakeContext);
   
-  const take = (id) => {  
+  useEffect(() => {
+    async function update() {
+      const newTakes = await getTakes();
+      setTakes(newTakes);
+      console.log('ИЗМЕНЯЕМ ПРИЕМЫ ДЛЯ ОТОБРАЖЕНИЯ В РАСПИСАНИИ', newTakes);
+    }
+    update();
+  }, [courses]);
+
+  const take = (id) => {
     const updatedTakes = [...takes];  // Создаем копию массива
     const index = updatedTakes.findIndex(m => m.id === id);
     if (index !== -1) {
@@ -129,10 +139,9 @@ export default function Schedule() {
       {/* Список приёмов */}
       <Text className="text-white text-center my-2">{`Расписание на ${selectedDate}`}</Text>
       <ScrollView className="flex-1">
-        {getTakesByDate(selectedDate).map((takem, index) => (
+        {getTakesByDate(selectedDate, takes, courses, medicaments).map((takem, index) => (
           <View
             key={index}
-            style={takem.state ? styles.medicationItemTaked : styles.medicationItemUntaked}
           >
             <Text className="">
               {`${new Date(takem.datetime).toLocaleTimeString()} ${takem.title}`}

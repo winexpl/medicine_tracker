@@ -5,8 +5,8 @@ import RouterButton from '../../../../components/RouterButton'
 import { router } from 'expo-router'
 import { AuthContext } from '../../../../contexts/AuthContext'
 import { removeToken } from '../../../../contexts/Secure'
-import { clearCourses } from '../../../../contexts/CoursesContext'
-import { clearTakes } from '../../../../contexts/TakesContext'
+import { clearCourses, clearDeletedCourses } from '../../../../contexts/CoursesContext'
+import { clearDeletedTakes, clearTakes } from '../../../../contexts/TakesContext'
 import { clearMedicaments } from '../../../../contexts/MedicamentContext'
 
 const SettingLayout = () => {
@@ -22,6 +22,8 @@ const SettingLayout = () => {
                               removeToken();
                               clearCourses();
                               clearTakes();
+                              clearDeletedCourses();
+                              clearDeletedTakes();
                               clearMedicaments();
                               setUserInfo({role:null, isLoggedIn:false});
                               router.replace('../../..');}}

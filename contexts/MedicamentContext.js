@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_URL_GET_MEDICAMENTS, API_URL_POST_MEDICAMENTS } from '../constants/constants';
+import { API_URL_GET_MEDICAMENT, API_URL_POST_MEDICAMENTS } from '../constants/constants';
 import axios from 'axios';
 import { getToken } from './Secure';
 import { CourseContext } from './CoursesContext';
@@ -51,22 +51,14 @@ export const clearMedicaments = async (data) => {
 
 export const MedicamentProvider = ({ children }) => {
     const [medicaments, setMedicaments] = useState([]);
-    const { courses } = useContext(CourseContext);
-
-    useEffect(() => {
-        async function fetchFromLocal() {
-            const localMedicaments = await getMedicaments();
-            setMedicaments(localMedicaments);
-        }
-        fetchFromLocal();
-    }, []);
+    const { courses, setCourses } = useContext(CourseContext);
 
     useEffect(() => {
         async function fetchFromDB() {
             try {
                 let newMedicaments = [];
                 for(let index in courses ) {
-                    const response = await axios.get(API_URL_GET_MEDICAMENTS + '/id=' + courses[index].medicamentId, {
+                    const response = await axios.get(API_URL_GET_MEDICAMENT + courses[index].medicamentId, {
                         headers: {
                             'Authorization': `Bearer ${await getToken()}`,
                         },
@@ -83,12 +75,14 @@ export const MedicamentProvider = ({ children }) => {
             catch (error) {
                 // Попробуем получить курсы из локального хранилища, если ошибка сети
                 console.error('Невозможно получить медикаменты с сервера: ', error);
+                const localMedicaments = await getMedicaments();
+                setMedicaments(localMedicaments);
             }
         }
         fetchFromDB();
     }, [courses]);
 
-    console.log('МЕДИКАМЕНТЫ',medicaments);
+    console.log('МЕДИКАМЕНТЫ', medicaments);
     return (
         <MedicamentContext.Provider value={{medicaments, setMedicaments}}>
             {children}

@@ -5,9 +5,8 @@ import { useLocalSearchParams } from 'expo-router'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
 import { CourseContext, saveCourses } from '../../contexts/CoursesContext';
-import { updateTakes } from '../../components/Models';
-import { saveTakes, TakeContext } from '../../contexts/TakesContext';
-import axios from 'axios';
+import { dosageFormTo, updateTakes } from '../../components/Models';
+import { addDeletedTakes, saveTakes, TakeContext } from '../../contexts/TakesContext';
 
 const ActiveCourseInfo = () => {
   let course = useLocalSearchParams();
@@ -20,19 +19,22 @@ const ActiveCourseInfo = () => {
 
   useEffect(() => {
     async function set() {
+      console.log('newTakes1', takes);
       let newCourses = [...courses];
       const index = newCourses.findIndex(c => c.id === course.id);
       newCourses[index].endDate = endDate;
       setCourses(newCourses);
       saveCourses(newCourses);
-      setOldDate(newCourses[index].endDate);
       const newTakes = await updateTakes(course, oldDate, endDate, takes);
-      console.log('newTakes',newTakes);
-      setTakes(newTakes);
-      saveTakes(newTakes);
+      setOldDate(newCourses[index].endDate);
+      console.log('newTakes2', takes);
+      saveTakes([...takes, ...newTakes]);
+      setTakes([...takes, ...newTakes]);
+      console.log('newTakes3', takes);
     }
     set();
   }, [endDate])
+
   let weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   let n = course.weekday;
   weekdays = weekdays.filter((e, i) => (n & (1 << i) == 1));
@@ -40,6 +42,7 @@ const ActiveCourseInfo = () => {
     <SafeAreaView className='bg-primary-back h-full'>
 
       <Text className='bg-primary-text text-3xl text-primary-back font-serif'>{course.medicament}</Text>
+      <Text>Доза: {course.dose} {dosageFormTo(course.dosageForm)}</Text>
       <Text className='bg-primary-text text-2xl text-primary-back font-serif'>
           Начало: {new Date(course.startDate).toLocaleDateString()}
       </Text>
@@ -49,6 +52,7 @@ const ActiveCourseInfo = () => {
           setShowDatePicker(true);
         }}
       >
+
       {showDatePicker && (
       <DateTimePicker
         mode="date"
@@ -62,10 +66,7 @@ const ActiveCourseInfo = () => {
         }
       />)}
       <Text className='row-1 bg-primary-text text-2xl text-primary-back font-serif'>
-        Окончание:{' '}
-        <Text className='bg-primary-back text-2xl text-primary-text font-serif'>
-          {' '+endDate.toLocaleDateString()+' '}
-        </Text>
+        Окончание: {endDate.toLocaleDateString()}
       </Text>
     </TouchableOpacity>
 
@@ -85,7 +86,35 @@ const ActiveCourseInfo = () => {
       <TouchableOpacity className='bg-primary-text rounded-xl items-center justify-center' onPress={ () => {
         router.back();
         }}>
-        <Text className='items-center justify-center'>Сохранить изменения</Text>
+        <Text className='items-center justify-center text-2xl'>Сохранить изменения</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity className='bg-primary-text rounded-xl items-center justify-center' onPress={ () => {
+        // просто поменять состояение курса
+        // удалить все его приемы которые дальше текущей даты
+
+        // находим приемы курса которые надо удалить
+        let deletedTakes = [];
+        let newTakes = [];
+        for(let i in takes) {
+          if(takes[i].courseId === course.id && new Date(takes[i].datetime) > new Date()) {
+            deletedTakes.push(takes[i]);
+          } else {
+            newTakes.push(takes[i])
+          }
+        }
+        setTakes(newTakes);
+        saveTakes(newTakes);
+        console.log('deletedTakes', deletedTakes);
+        // удаляем
+        addDeletedTakes(deletedTakes);
+        let newCourses = [...courses];
+        newCourses[newCourses.findIndex(c => c.id === course.id)].state = "Завершенный";
+        setCourses(newCourses);
+        saveCourses(newCourses);
+        router.back();
+        }}>
+        <Text className='items-center justify-center text-2xl'>Завершить курс</Text>
       </TouchableOpacity>
     </SafeAreaView>
     

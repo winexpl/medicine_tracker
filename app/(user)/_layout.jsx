@@ -7,10 +7,10 @@ import { MedicamentProvider } from '../../contexts/MedicamentContext'
 
 const MainUserLayout = () => {
     return (
-    <CoursesProvider>
-    <MedicamentProvider>
-    <TakeProvider>
     
+    <CoursesProvider>
+    <TakeProvider>
+    <MedicamentProvider>
         <Stack>
         <Stack.Screen name="(tabsuser)" options={{
             headerShown: false
@@ -26,10 +26,9 @@ const MainUserLayout = () => {
         }}/>
         </Stack>
     
-    </TakeProvider>
     </MedicamentProvider>
+    </TakeProvider>
     </CoursesProvider>
-    
     )
 }
 
