@@ -22,7 +22,7 @@ const MainUserLayout = () => {
             headerShown: false
         }}/>
         <Stack.Screen name="activeCourseInfo" options={{
-            title:"Информация о курсе"
+            title:"Информацмия о курсе"
         }}/>
         </Stack>
     

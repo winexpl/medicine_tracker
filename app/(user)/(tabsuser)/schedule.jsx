@@ -87,7 +87,7 @@ export default function Schedule() {
         {daysOfWeek.map((day, index) => (
           <TouchableOpacity
             key={index}
-            className={`p-3 rounded bg-primary-text ${selectedDayIndex === index + 1 ? 'bg-white' : ''}`}
+            className={`p-4 rounded bg-primary-text ${selectedDayIndex === index + 1 ? 'bg-white' : ''}`}
             onPress={() => handleDaySelect(index + 1)}
           >
             <Text className={` ${selectedDayIndex === index + 1 ? 'text-black' : 'text-black'}`}>
@@ -142,8 +142,9 @@ export default function Schedule() {
         {getTakesByDate(selectedDate, takes, courses, medicaments).map((takem, index) => (
           <View
             key={index}
+            className="flex-row items-center bg-white p-3 rounded mb-2"
           >
-            <Text className="">
+            <Text className="flex-1 text-black">
               {`${new Date(takem.datetime).toLocaleTimeString()} ${takem.title}`}
             </Text>
 

@@ -40,9 +40,9 @@ const ActiveCourseInfo = () => {
   weekdays = weekdays.filter((e, i) => (n & (1 << i) == 1));
   return (
     <SafeAreaView className='bg-primary-back h-full'>
-
+      <Text className='text-white'>Лекарство:</Text>
       <Text className='bg-primary-text text-3xl text-primary-back font-serif'>{course.medicament}</Text>
-      <Text>Доза: {course.dose} {dosageFormTo(course.dosageForm)}</Text>
+      <Text className="text-white">Доза: {course.dose} {dosageFormTo(course.dosageForm)}</Text>
       <Text className='bg-primary-text text-2xl text-primary-back font-serif'>
           Начало: {new Date(course.startDate).toLocaleDateString()}
       </Text>
@@ -74,7 +74,7 @@ const ActiveCourseInfo = () => {
       <View className='max-h-fit'>
         <ScrollView className='max-h-10:'>
         {course.schedule.split(',').map(((time, index) => (
-          <Text key={index}>
+          <Text className="text-white" key={index}>
             {time}
           </Text>
         )))}

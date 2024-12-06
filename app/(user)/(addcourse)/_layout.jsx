@@ -10,6 +10,7 @@ const AddCourseLayout = () => {
         <Stack.Screen name="addCourse" options={{title:'Добавить курс'}}/>
         <Stack.Screen name="changeMedicament" options={{title:'Выбор препарата'}}/>
         <Stack.Screen name="addCourseWithPeriod" options={{headerShown:false}}/>
+        <Stack.Screen name="addCourseForAWeek" options={{headerShown:false}}/>
       </Stack>
   )
 }

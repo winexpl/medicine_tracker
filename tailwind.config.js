@@ -15,7 +15,7 @@ module.exports = {
             DEFAULT: '#161622',
           },
           text: "#FFD5AA",
-          white: "FFFFFF"
+          lololoshka: '#804030',
         }
       },
       fontFamily: {

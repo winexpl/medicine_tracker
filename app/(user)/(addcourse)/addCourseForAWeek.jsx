@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, FlatList, ScrollView} from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { dosageFormTo } from '../../../components/Models';
 import { addCourses, CourseContext, saveCourses } from '../../../contexts/CoursesContext';
@@ -12,7 +13,10 @@ const AddCourseForAWeek = () => {
     const { courses, setCourses } = useContext(CourseContext);
     const { takes, setTakes } = useContext(TakeContext);
     const localParams = useLocalSearchParams();
-    const [course, setCourse] = useState(JSON.parse(localParams.course));
+    const [course, setCourse] = useState({
+        ...JSON.parse(localParams.course), // сохраняем данные из localParams
+        regimen: 'Независимо от приема пищи', // устанавливаем значение по умолчанию
+      });
     const [medicament] = useState(JSON.parse(localParams.medicament));
     console.debug(course, medicament);
 
@@ -87,39 +91,39 @@ const AddCourseForAWeek = () => {
     };
 
     return (
-        <View style={styles.container}>
-        <Text style={styles.header}>Добавление курса</Text>
+        <SafeAreaView className="flex-1 p-4 bg-primary-back">
+        <Text className="text-lg font-bold text-center mb-4 text-white">Добавление курса</Text>
         
-        <View style={styles.row}>
-            <TouchableOpacity
-            style={styles.dateButton}
-            onPress={() => {
-                setSelectedDateType('start');
-                setSelectedDate(new Date(course.startDate));
-                setShowDatePicker(true);
-            }}>
-            <Text style={styles.dateText}>Начало: {new Date(course.startDate).toLocaleDateString()}</Text>
-            </TouchableOpacity>
-        </View>
+        <View className="flex-row justify-between mb-4">
+        <TouchableOpacity
+          className="p-3 bg-gray-200 rounded-lg"
+          onPress={() => {
+            setSelectedDateType('start');
+            setSelectedDate(new Date(course.startDate));
+            setShowDatePicker(true);
+          }}>
+          <Text className="text-base text-gray-800">Начало: {new Date(course.startDate).toLocaleDateString()}</Text>
+        </TouchableOpacity>
+      </View>
 
-        <View>
-            <TouchableOpacity
-            style={styles.dateButton}
-            onPress={() => {
-                setSelectedDateType('end');
-                setSelectedDate(new Date(course.endDate));
-                setShowDatePicker(true);
-            }}>
-            <Text style={styles.dateText}>Окончание: {new Date(course.endDate).toLocaleDateString()}</Text>
-            </TouchableOpacity>
-        </View>
+      <View>
+        <TouchableOpacity
+          className="p-3 bg-gray-200 rounded-lg mb-4"
+          onPress={() => {
+            setSelectedDateType('end');
+            setSelectedDate(new Date(course.endDate));
+            setShowDatePicker(true);
+          }}>
+          <Text className="text-base text-gray-800">Окончание: {new Date(course.endDate).toLocaleDateString()}</Text>
+        </TouchableOpacity>
+      </View>
 
-        <View style={styles.container}>
-        <Text>Выберите дни недели:</Text>
-            <ScrollView>
+        <View  className="mt-4">
+        <Text className="text-white">Выберите дни недели:</Text>
+            <ScrollView style={{ height: 150 }}>
                 <View>
                 {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday','sunday'].map((day, index) => (
-                    <View key={day}>
+                    <View key={day} className="flex-row items-center mb-2">
                     <Checkbox
                         status={(weekday & (1 << 6-index)) > 0 ? 'checked' : 'unchecked'}
                         onPress={() => {
@@ -135,55 +139,56 @@ const AddCourseForAWeek = () => {
                             setWeekday(newWeekday);
                         }}
                     />
-                    <Text>{day.charAt(0).toUpperCase() + day.slice(1)}</Text> {/* Отображаем день недели */}
+                    <Text className="text-white">{day.charAt(0).toUpperCase() + day.slice(1)}</Text> {/* Отображаем день недели */}
                     </View>
                 ))}
                 </View>
             </ScrollView>
         </View>
-        <Text style={styles.totalAppointments}>Всего приемов: {course.numberMedicine}</Text>
+        <Text className="text-white">Всего приемов: {course.numberMedicine}</Text>
 
         <View>
             <TouchableOpacity
-            style={styles.dateButton}
+            className="p-3 bg-gray-200 rounded-lg mb-4"
             onPress={() => setShowDoseModal(true)}>
-            <Text style={styles.periodicityText}>Доза: {course.dose} {dosageFormTo(medicament.dosageForm)}</Text>
+            <Text className="text-center">Доза: {course.dose} {dosageFormTo(medicament.dosageForm)}</Text>
             </TouchableOpacity>
         </View>
 
         <FlatList
             data={course.schedule}
+            style={{ height: 120 }}
             keyExtractor={(item, index) => index.toString()}
             renderItem={({item, index}) => {
             return(
-            <View style={styles.appointmentRow}>
-                <Text style={styles.appointmentText}>{index+1}</Text>
+            <View className="flex-row justify-between p-2 bg-white rounded-lg mb-2 items-center">
+                <Text className="">{index+1}</Text>
                 <TouchableOpacity
-                style={styles.timeButton}
+                className="p-2 bg-gray-200 rounded-lg"
                 onPress={() => {
                     setSelectIndexInSchedule(index);
                     setShowTimePicker(true);
                 }}>
 
-                <Text style={styles.timeText}>{item}</Text>
+                <Text className="">{item}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                style={styles.timeButton}
+                className="p-2 bg-gray-300 rounded-lg"
                 onPress={() => {
                     const newSchedule = [...schedule];
                     newSchedule.splice(index, 1);
                     setSchedule(newSchedule);
                 }}>
-                    <Text>Удалить</Text>
+                    <Text className="text-red-500">Удалить</Text>
                 </TouchableOpacity>
             </View>)
             }}
-            style={styles.list}
+            className="flex-grow-0"
         />
 
-        <TouchableOpacity style={styles.addButton} onPress={addTake}>
-            <Text style={styles.addButtonText}>+ Добавить прием</Text>
+        <TouchableOpacity className="p-4 bg-primary-text rounded-lg text-center mb-4" onPress={addTake}>
+            <Text className="text-black text-center">+ Добавить прием</Text>
         </TouchableOpacity>
 
         {showTimePicker && (
@@ -220,145 +225,48 @@ const AddCourseForAWeek = () => {
         )}
 
         <Modal visible={showDoseModal} transparent>
-            <View style={styles.modal}>
+            <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
             <TextInput
-                style={styles.input}
+                className="w-48 p-3 bg-white rounded-lg mb-4"
                 keyboardType="number-pad"
                 placeholder="Введите размер дозы"
                 onChangeText={(text) => setCourse(prevState => ({...prevState, dose: Number(text)}))}
             />
             <TouchableOpacity
-                style={styles.modalButton}
+                className="p-3 bg-blue-500 rounded-lg"
                 onPress={() => setShowDoseModal(false)}
             >
-                <Text style={styles.modalButtonText}>OK</Text>
+                <Text className="text-white text-lg">OK</Text>
             </TouchableOpacity>
             </View>
         </Modal>
-        <Text>{`Доза: ${course.dose} `}</Text>
-        <View style={styles.modes}>
-            {['До еды', 'После еды', 'Во время еды', 'Независимо от приема пищи'].map((item) => (
-            <TouchableOpacity
-                key={item}
-                style={[
-                styles.modeButton,
-                { backgroundColor: course.regimen === item ? '#000' : '#FFF' },
-                ]}
-                onPress={() => setCourse(prevState => ({...prevState, regimen: item}))}>
-                <Text>{item}</Text>
-            </TouchableOpacity>
-            ))}
-        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="my-4 flex-row space-x-4">
+        {['До еды', 'После еды', 'Во время еды', 'Независимо от приема пищи'].map((item) => (
+          <TouchableOpacity
+            key={item}
+            className={`rounded-lg flex justify-center items-center  ${
+              course.regimen === item ? 'bg-white' : 'bg-primary-text'
+            }`}
+            style={{ height: 40, paddingHorizontal: 1 }}
+            onPress={() => setCourse(prevState => ({...prevState, regimen: item}))}>
+            <Text className="text-bg-black">{item}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
 
         <TouchableOpacity
-            style={styles.modalButton}
+            className="p-3 bg-primary-text rounded-lg mt-4"
             onPress={async () => {
                 // вся логика в addCourses
                 setCourses([...courses, course]);
                 setTakes([...takes, ...await addCourses(course, takes)]);
                 router.push('coursesActive');
             }}>
-            <Text style={styles.modalButtonText}>OK</Text>
+            <Text className="text-black text-center">OK</Text>
             </TouchableOpacity>
-        </View>
+        </SafeAreaView>
         
     );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#f5f5f5',
-  },
-  header: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  dateButton: {
-    padding: 12,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 8,
-  },
-  dateText: {
-    fontSize: 16,
-  },
-  periodicityButton: {
-    padding: 12,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  periodicityText: {
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  totalAppointments: {
-    fontSize: 16,
-    marginBottom: 16,
-  },
-  list: {
-    flexGrow: 0,
-  },
-  appointmentRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 10,
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    marginBottom: 8,
-    alignItems: 'center',
-  },
-  appointmentText: {
-    fontSize: 16,
-  },
-  timeButton: {
-    padding: 8,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 8,
-  },
-  timeText: {
-    fontSize: 16,
-  },
-  addButton: {
-    padding: 16,
-    backgroundColor: '#007BFF',
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  addButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-  },
-  modal: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  input: {
-    width: 200,
-    padding: 12,
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  modalButton: {
-    padding: 12,
-    backgroundColor: '#007BFF',
-    borderRadius: 8,
-  },
-  modalButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-  },
-});
 
 export default AddCourseForAWeek;

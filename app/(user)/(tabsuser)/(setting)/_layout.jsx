@@ -12,7 +12,7 @@ import { clearMedicaments } from '../../../../contexts/MedicamentContext'
 const SettingLayout = () => {
   const { userInfo, setUserInfo } = useContext(AuthContext);
   return (
-    <SafeAreaView>
+    <SafeAreaView className="bg-primary-back">
       <RouterButton title="О разработчиках"
                             handlePress={() => router.push('/about')}
                             containerStyle="w-full"
