@@ -8,9 +8,21 @@ import { deleteTakesFromCourse } from './TakesContext';
 
 export const CourseContext = createContext();
 
-export const saveCourses = async ({...data}) => {
+export const saveCourses = async (data) => {
     try {
         await AsyncStorage.setItem('courses', JSON.stringify(data));
+        for(let i in data) {
+            try {
+                const response = await axios.put(API_URL_PUT_COURSES, data[i], {
+                    headers: {
+                        'Authorization': `Bearer ${await getToken()}`,
+                        'Content-Type': 'application/json'
+                    },
+                });
+            } catch (error) {
+                console.error("Ошибка отправки нового курса на сервер: ", error);
+            }
+        }
         console.log('Courses saved!');
     } catch (error) {
         console.error('Error saving courses: ', error);
@@ -53,16 +65,13 @@ export const deleteCourses = async (data) => {
     // удаляет переданный курс
     let courses = [];
     try {
-        const coursesJson = await AsyncStorage.getItem('courses');
-        const coursesObj = JSON.parse(coursesJson);
-        courses = Object.values(coursesObj);
+        courses = await getCourses();
     } catch (error) {
         courses = [];
-        console.error('Error receiving courses: ', error);
     }
     await deleteTakesFromCourse(data.id);
     courses = courses.filter(item => item != data);
-    await AsyncStorage.setItem('courses', JSON.stringify({...courses}));
+    saveCourses(courses);
     try {
         const response = await axios.delete(
             `${API_URL_DELETE_COURSE}${data.id}`,
@@ -76,14 +85,13 @@ export const deleteCourses = async (data) => {
         console.error('Ошибка удаления курса: ', error.response, data.id);
         let deletedCourses = [];
         try {
-            deletedCourses = JSON.parse(await AsyncStorage.getItem('deletedCourses'));
+            deletedCourses = await getDeletedCourses();
         } catch (error) {
             console.error('Удаленные курсы пусты: ', error);
         }
         deletedCourses.push(data);
         saveDeletedCourses(deletedCourses);
     }
-    saveCourses(courses);
 }
 
 export const clearDeletedCourses = async () => {
@@ -110,35 +118,29 @@ export const getCourses = async () => {
     try {
         const coursesJson = await AsyncStorage.getItem('courses');
         const coursesObj = JSON.parse(coursesJson);
-        return Object.values(coursesObj);
+        return coursesObj ? coursesObj : [];
     } catch (error) {
         console.error('Error receiving courses: ', error);
         return [];
     }
 };
 
-export const addCourses = async (data, takes) => {
+export const addCourses = async (data) => {
     // добавляем курс в AsyncStorage, отправляем на сервер, генерим для него приемы и отправляем на сервер
     try {
-        const coursesJson = await AsyncStorage.getItem('courses');
-        const courses = coursesJson ? Object.values(JSON.parse(coursesJson)) : [];
+        const courses = await getCourses();
         courses.push(data);
-        console.debug('added', data, courses);
-        saveCourses(courses);
-        console.log('Courses added!');
         try {
-            const response = await axios.put(API_URL_PUT_COURSES, data, {
-                headers: {
-                    'Authorization': `Bearer ${await getToken()}`,
-                    'Content-Type': 'application/json'
-                },
-            });
+            saveCourses(courses);
         } catch (error) {
-            console.error("Ошибка отправки нового курса на сервер: ", error);
+            console.error('Ошибка добавления курса:', error);
+            return [];
         }
-        return await updateTakes(data, new Date(new Date(data.startDate).getTime() - 1000*3600*24), new Date(data.endDate), takes);
+        console.log('Courses added!');
+        return await updateTakes(data, new Date(new Date(data.startDate).getTime() - 1000*3600*24), new Date(data.endDate), []);
     } catch (error) {
-        console.error('Error adding courses: ', error);
+        console.error('Неизвестная ошибка при добавлении курса:', error);
+        return [];
     }
 };
 
@@ -159,9 +161,9 @@ export const CoursesProvider = ({ children }) => {
         async function fetch() {
             deleteDeletedCourses();
             const localCourses = await getCourses();
-            setCourses(localCourses);
             console.log(localCourses);
             if(localCourses.length > 0) {
+                setCourses(localCourses);
                 for(let i = 0; i < localCourses.length; i++) {
                     try {
                         const response = await axios.put(API_URL_POST_COURSES , localCourses[i], {
@@ -188,11 +190,12 @@ export const CoursesProvider = ({ children }) => {
                         const deletedCourses = await getDeletedCourses();
                         coursesSaved = coursesSaved.filter(item => {
                             for(let i in deletedCourses) {
-                                if(deletedCourses[i].id === item.id) return true;
+                                if(deletedCourses[i].id != item.id) return false;
                             }
-                            return false;
+                            return true;
                         });
-                        await saveCourses(coursesSaved);
+                        console.log('СОХРАНЯЕМ КУРСЫ', coursesSaved);
+                        saveCourses(coursesSaved);
                         setCourses(coursesSaved);
                         console.log('Courses fetched and saved!');
                     } else {

@@ -5,6 +5,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { dosageFormTo } from '../../../components/Models';
 import { addCourses, CourseContext, saveCourses } from '../../../contexts/CoursesContext';
 import { TakeContext } from '../../../contexts/TakesContext';
+import { saveTakes } from '../../../contexts/TakesContext';
 
 const AddCourseWithPeriod = () => {
   const { courses, setCourses } = useContext(CourseContext);
@@ -26,6 +27,19 @@ const AddCourseWithPeriod = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [period, setPeriod] = useState(1);
 
+  async function setAll() {
+    let newCourses = [course];
+    if(courses.length > 0) {
+      console.log(3)
+      newCourses = [...courses, ...newCourses];
+    }
+    setCourses(newCourses);
+    const newTakes = [...takes, ...await addCourses(course)];
+    setTakes(newTakes);
+    saveTakes(newTakes);
+    router.push('coursesActive');
+  }
+
   const addTake = () => {
     setSchedule(["00:00:00", ...schedule]);
   };
@@ -43,7 +57,7 @@ const AddCourseWithPeriod = () => {
   const calculateTotalTakes = () => {
     console.log(course.schedule.length );
     const days = Math.ceil(
-        (new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)) + 1; // +1 чтобы включить начальную дату
+        (new Date(endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) + 1; // +1 чтобы включить начальную дату
     const result = (days / period) * schedule.length;
     return Math.ceil(result);
   };
@@ -211,11 +225,9 @@ const AddCourseWithPeriod = () => {
 
       <TouchableOpacity
           style={styles.modalButton}
-          onPress={async () => {
+          onPress={ () => {
             // вся логика в addCourses
-            setCourses([...courses, course]);
-            setTakes([...takes, ...await addCourses(course, takes)]);
-            router.push('coursesActive');
+            setAll();
           }}>
           <Text style={styles.modalButtonText}>OK</Text>
         </TouchableOpacity>

@@ -68,6 +68,7 @@ export const deleteDeletedTakes = async () => {
 export const addDeletedTakes = async (data) => {
     try {
         const deletedTakes = await getDeletedTakes();
+        
         deletedTakes.push(...data);
         console.log('deletedTakes', deletedTakes);
         let newDeletedTakes = [];
@@ -93,18 +94,19 @@ export const getDeletedTakes = async () => {
     try {
         const deletedTakesJson = await AsyncStorage.getItem('deletedTakes');
         const deletedTakes = JSON.parse(deletedTakesJson);
-        return deletedTakes;
+        if(deletedTakes) return deletedTakes;
+        return [];
     } catch (error) {
         console.error('Error receiving deleted takes:', error);
         return [];
     }
 };
 
-export const saveTakes = async ({...data}) => {
+export const saveTakes = async ([...data]) => {
     try {
         await AsyncStorage.setItem('takes', JSON.stringify(data));
-        const takes = Object.values(data);
-        console.log('Take saved!');
+        const takes = data;
+        console.log('Takes saved!');
         for(let i in takes) {
             try {
                 const response = await axios.put(API_URL_POST_TAKES, takes[i], {
@@ -127,7 +129,8 @@ export const getTakes = async () => {
     try {
         const takesJson = await AsyncStorage.getItem('takes');
         const takesObj = JSON.parse(takesJson);
-        return Object.values(takesObj);
+        if(takesObj) return takesObj;
+        else return [];
     } catch (error) {
         console.error('Error receiving takes: ', error);
         return [];
@@ -218,7 +221,7 @@ export const TakeProvider = ({ children }) => {
             setTakes(await getTakes());
         }
         update();
-    }, [courses]);
+    }, []);
 
     console.log('ПРИЕМЫ', takes);
     

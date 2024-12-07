@@ -4,7 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { dosageFormTo } from '../../../components/Models';
 import { addCourses, CourseContext, saveCourses } from '../../../contexts/CoursesContext';
-import { TakeContext } from '../../../contexts/TakesContext';
+import { saveTakes, TakeContext } from '../../../contexts/TakesContext';
 import { Checkbox } from 'react-native-paper';
 
 
@@ -37,6 +37,19 @@ const AddCourseForAWeek = () => {
         friday: false,
         saturday: false,
     });
+
+
+    async function setAll() {
+        let newCourses = [course];
+        if(courses.length > 0) {
+            newCourses = [...courses, ...newCourses];
+        }
+        setCourses(newCourses);
+        const newTakes = [...takes, ...await addCourses(course, takes)];
+        setTakes(newTakes);
+        saveTakes(newTakes);
+        router.push('coursesActive');
+    }
 
     const toggleDay = (day) => {
         setSelectedDays((prevState) => ({
@@ -71,7 +84,7 @@ const AddCourseForAWeek = () => {
             }
         }
         
-        for (let currentDate = new Date(startDate.getTime()); currentDate < tempEndDate; currentDate.setDate(currentDate.getDate() + 1)) {
+        for (let currentDate = new Date(); currentDate < tempEndDate; currentDate.setDate(currentDate.getDate() + 1)) {
             // Получаем день недели (0 - воскресенье, 1 - понедельник, ..., 6 - суббота)
             const dayOfWeek = currentDate.getDay();
             // Проверяем, есть ли этот день недели в маске
@@ -252,11 +265,8 @@ const AddCourseForAWeek = () => {
 
         <TouchableOpacity
             style={styles.modalButton}
-            onPress={async () => {
-                // вся логика в addCourses
-                setCourses([...courses, course]);
-                setTakes([...takes, ...await addCourses(course, takes)]);
-                router.push('coursesActive');
+            onPress={ () => {
+                setAll();
             }}>
             <Text style={styles.modalButtonText}>OK</Text>
             </TouchableOpacity>

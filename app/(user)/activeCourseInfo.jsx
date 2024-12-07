@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View, ScrollView } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View, ScrollView, Button } from 'react-native'
 import React, { useContext, useEffect, useState} from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useLocalSearchParams } from 'expo-router'
@@ -7,37 +7,33 @@ import { router } from 'expo-router';
 import { CourseContext, saveCourses } from '../../contexts/CoursesContext';
 import { dosageFormTo, updateTakes } from '../../components/Models';
 import { addDeletedTakes, saveTakes, TakeContext } from '../../contexts/TakesContext';
+import { collapseTextChangeRangesAcrossMultipleVersions } from 'typescript';
 
 const ActiveCourseInfo = () => {
   let course = useLocalSearchParams();
   const { courses, setCourses } = useContext(CourseContext);
   const { takes, setTakes } = useContext(TakeContext);
-  const [endDate, setEndDate] = useState(new Date(course.endDate));
-  const [oldDate, setOldDate] = useState(new Date(course.endDate));
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [ endDate, setEndDate ] = useState(new Date(course.endDate));
+  const [ oldDate, setOldDate ] = useState(new Date(course.endDate));
+  const [ showDatePicker, setShowDatePicker] = useState(false);
+  const [ state, setState ] = useState(true);
   
-
-  useEffect(() => {
-    async function set() {
-      console.log('newTakes1', takes);
-      let newCourses = [...courses];
-      const index = newCourses.findIndex(c => c.id === course.id);
-      newCourses[index].endDate = endDate;
-      setCourses(newCourses);
-      saveCourses(newCourses);
-      const newTakes = await updateTakes(course, oldDate, endDate, takes);
-      setOldDate(newCourses[index].endDate);
-      console.log('newTakes2', takes);
-      saveTakes([...takes, ...newTakes]);
-      setTakes([...takes, ...newTakes]);
-      console.log('newTakes3', takes);
-    }
-    set();
-  }, [endDate])
+  async function setAll() {
+    let newCourses = [...courses];
+    const index = newCourses.findIndex(c => c.id === course.id);
+    newCourses[index].endDate = endDate;
+    setCourses(newCourses);
+    saveCourses(newCourses);
+    const newTakes = await updateTakes(course, oldDate, endDate, takes);
+    setOldDate(newCourses[index].endDate);
+    saveTakes([...newTakes]);
+    setTakes([...newTakes]);
+    router.push('schedule');
+  }
 
   let weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   let n = course.weekday;
-  weekdays = weekdays.filter((e, i) => (n & (1 << i) == 1));
+  weekdays = weekdays.filter((e, i) => (n & (1 << 6-i) == 1));
   return (
     <SafeAreaView className='bg-primary-back h-full'>
 
@@ -53,22 +49,22 @@ const ActiveCourseInfo = () => {
         }}
       >
 
-      {showDatePicker && (
-      <DateTimePicker
-        mode="date"
-        value={endDate}
-        onChange={(event, selectedDate) => {
-          setShowDatePicker(false);
-          if (selectedDate) {
-              setEndDate(selectedDate);
+        {showDatePicker && (
+          <DateTimePicker
+            mode="date"
+            value={endDate}
+            onChange={(event, selectedDate) => {
+              setShowDatePicker(false);
+              if (selectedDate) {
+                  setEndDate(selectedDate);
+                }
+              }
             }
-          }
-        }
-      />)}
-      <Text className='row-1 bg-primary-text text-2xl text-primary-back font-serif'>
-        Окончание: {endDate.toLocaleDateString()}
-      </Text>
-    </TouchableOpacity>
+        />)}
+        <Text className='row-1 bg-primary-text text-2xl text-primary-back font-serif'>
+          Окончание: {endDate.toLocaleDateString()}
+        </Text>
+      </TouchableOpacity>
 
       <Text className='bg-primary-text text-2xl text-primary-back font-serif'>{weekdays.join(' ')}</Text>
       <View className='max-h-fit'>
@@ -80,11 +76,9 @@ const ActiveCourseInfo = () => {
         )))}
       </ScrollView>
       </View>
-      
-      
-      
-      <TouchableOpacity className='bg-primary-text rounded-xl items-center justify-center' onPress={ () => {
-        router.back();
+      <TouchableOpacity className='bg-primary-text rounded-xl items-center justify-center' onPress={ async () => {
+          console.log('НАЖАТА')
+          setAll();
         }}>
         <Text className='items-center justify-center text-2xl'>Сохранить изменения</Text>
       </TouchableOpacity>
@@ -109,7 +103,9 @@ const ActiveCourseInfo = () => {
         // удаляем
         addDeletedTakes(deletedTakes);
         let newCourses = [...courses];
-        newCourses[newCourses.findIndex(c => c.id === course.id)].state = "Завершенный";
+        let index = newCourses.findIndex(c => c.id === course.id);
+        newCourses[index].state = "Завершенный";
+        newCourses[index].endDate = new Date().toLocaleDateString("en-CA"),
         setCourses(newCourses);
         saveCourses(newCourses);
         router.back();
