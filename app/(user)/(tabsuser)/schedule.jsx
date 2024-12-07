@@ -1,134 +1,178 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList } from 'react-native';
+import React, { useState, useContext, useEffect } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { Calendar } from 'react-native-calendars';
+import { CourseContext } from '../../../contexts/CoursesContext';
+import { getTakesByDate } from '../../../components/Models';
+import { Ionicons } from '@expo/vector-icons'; // Импортируем иконки
+import { getTakes, saveTakes, TakeContext } from '../../../contexts/TakesContext';
+import { router } from 'expo-router';
+import { MedicamentContext } from '../../../contexts/MedicamentContext';
 
-const AddMedicineForm = () => {
-  const [name, setName] = useState('Аспирин Экспресс');
-  const [form, setForm] = useState('Таблетка');
-  const [manufacturer, setManufacturer] = useState('Bayer');
-  const [method, setMethod] = useState('Внутрь');
-  const [activeSubstance, setActiveSubstance] = useState('');
-  const [dosage, setDosage] = useState('');
-  const [activeSubstances, setActiveSubstances] = useState([
-    { name: 'Аспирин', dosage: '2' }, // Изначально добавленная строка
-  ]);
-
-  const handleAddSubstance = () => {
-    if (activeSubstance.trim() === '' || dosage.trim() === '') {
-      alert('Введите активное вещество и дозировку!');
-      return;
+export default function Schedule() {
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Выбранная дата
+  const [selectedDayIndex, setSelectedDayIndex] = useState(new Date().getDay() || 7); // Индекс выбранного дня недели
+  const [showCalendar, setShowCalendar] = useState(false); // Состояние для показа календаря
+  const { courses, setCourses } = useContext(CourseContext);
+  const { medicaments } = useContext(MedicamentContext);
+  const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+  const { takes, setTakes } = useContext(TakeContext);
+  
+  useEffect(() => {
+    async function update() {
+      const newTakes = await getTakes();
+      setTakes(newTakes);
+      console.log('ИЗМЕНЯЕМ ПРИЕМЫ ДЛЯ ОТОБРАЖЕНИЯ В РАСПИСАНИИ', newTakes);
     }
+    update();
+  }, [courses]);
 
-    setActiveSubstances([...activeSubstances, { name: activeSubstance, dosage }]);
-    setActiveSubstance(''); // Очищаем поле ввода
-    setDosage('');
+  const take = (id) => {
+    const updatedTakes = [...takes];  // Создаем копию массива
+    const index = updatedTakes.findIndex(m => m.id === id);
+    if (index !== -1) {
+      updatedTakes[index] = { ...updatedTakes[index], state: true }; // Обновляем элемент
+    }
+    setTakes(updatedTakes); // Обновляем состояние с новым массивом
+    saveTakes(takes);
   };
 
-  const handleRemoveSubstance = (index) => {
-    const updatedSubstances = activeSubstances.filter((_, i) => i !== index);
-    setActiveSubstances(updatedSubstances);
+  const donttake = (id) => {
+    const updatedTakes = [...takes]; // Создаем копию массива
+    const index = updatedTakes.findIndex(m => m.id === id);
+    if (index !== -1) {
+      updatedTakes[index] = { ...updatedTakes[index], state: false }; // Обновляем элемент
+    }
+    setTakes(updatedTakes); // Обновляем состояние с новым массивом
+    saveTakes(takes);
   };
 
-  const handleSubmit = () => {
-    console.log({
-      name,
-      form,
-      manufacturer,
-      method,
-      activeSubstances,
-    });
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    setSelectedDayIndex(new Date(date).getDay() || 7);
+    setShowCalendar(false); // Скрыть календарь после выбора даты
+  };
+
+  const handleWeekChange = (direction) => {
+    const current = new Date(selectedDate);
+    current.setDate(current.getDate() + direction * 7); // Изменение недели
+    const updatedDate = current.toISOString().split('T')[0];
+    setSelectedDate(updatedDate);
+  };
+
+  const handleDaySelect = (dayIndex) => {
+    const current = new Date(selectedDate);
+    const currentDay = current.getDay() || 7; // Текущий день недели
+    const diff = dayIndex - currentDay;
+    current.setDate(current.getDate() + diff);
+    setSelectedDate(current.toISOString().split('T')[0]);
+    setSelectedDayIndex(dayIndex);
   };
 
   return (
-    <View className="flex-1 bg-gray-100 p-4">
-      <Text className="text-xl font-bold mb-4">Добавление лекарства</Text>
+    <SafeAreaView className="flex-1 p-2 bg-primary-back">
+      {/* Кнопки для переключения недель */}
+      <SafeAreaView className="flex-row justify-between items-center mb-2">
+        <TouchableOpacity className="bg-primary-text p-3 rounded" onPress={() => handleWeekChange(-1)}>
+          <Text className="text-black">←</Text>
+        </TouchableOpacity>
+        <Text className="text-white ">Выбрать неделю</Text>
+        <TouchableOpacity className="bg-primary-text p-3 rounded" onPress={() => handleWeekChange(1)}>
+          <Text className="text-black">→</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
 
-      {/* Название */}
-      <Text className="text-base mb-2">Название</Text>
-      <TextInput
-        className="bg-gray-200 p-2 rounded mb-4"
-        value={name}
-        onChangeText={setName}
-        placeholder="Введите название"
-      />
-
-      {/* Форма выпуска */}
-      <Text className="text-base mb-2">Форма выпуска</Text>
-      <TextInput
-        className="bg-gray-200 p-2 rounded mb-4"
-        value={form}
-        onChangeText={setForm}
-        placeholder="Введите форму выпуска"
-      />
-
-      {/* Список активных веществ */}
-      <Text className="text-base mb-2">Активное вещество</Text>
-      {activeSubstances.map((substance, index) => (
-        <View
-          key={index}
-          className="flex-row items-center justify-between bg-gray-200 p-2 rounded mb-2"
-        >
-          <Text className="text-base">{`${substance.name} ${substance.dosage} мг`}</Text>
+      {/* Дни недели */}
+      <SafeAreaView className="flex-row justify-around mt-[-26px] mb-2">
+        {daysOfWeek.map((day, index) => (
           <TouchableOpacity
-            className="bg-red-400 px-2 py-1 rounded"
-            onPress={() => handleRemoveSubstance(index)}
+            key={index}
+            className={`p-4 rounded bg-primary-text ${selectedDayIndex === index + 1 ? 'bg-white' : ''}`}
+            onPress={() => handleDaySelect(index + 1)}
           >
-            <Text className="text-white">Удалить</Text>
+            <Text className={` ${selectedDayIndex === index + 1 ? 'text-black' : 'text-black'}`}>
+              {day}
+            </Text>
           </TouchableOpacity>
-        </View>
-      ))}
+        ))}
+      </SafeAreaView>
 
-      {/* Поля для добавления нового вещества */}
-      <View className="flex-row items-center space-x-2 mb-4">
-        <TextInput
-          className="flex-1 bg-gray-200 p-2 rounded"
-          value={activeSubstance}
-          onChangeText={setActiveSubstance}
-          placeholder="Введите вещество"
+      {/* Кнопка для календаря */}
+      <SafeAreaView className="flex-row justify-center mb-2">
+        <TouchableOpacity
+          className="bg-primary-text px-5 mt-[-26px] py-3 rounded items-center justify-center"
+          onPress={() => setShowCalendar(!showCalendar)}
+        >
+          <Text className="text-black">
+            {showCalendar ? 'Скрыть календарь' : 'Выбрать дату'}
+          </Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+
+      {/* Календарь */}
+      {showCalendar && (
+        <Calendar
+          onDayPress={(day) => handleDateChange(day.dateString)}
+          markedDates={{
+            [selectedDate]: { selected: true, selectedColor: '#FF8F00' },
+          }}
+          theme={{
+            backgroundColor: '#1C1C2B',
+            calendarBackground: '#FF8F00',
+            textSectionTitleColor: '#fff',
+            selectedDayBackgroundColor: '#000',
+            selectedDayTextColor: '#fff',
+            todayTextColor: '#000',
+            dayTextColor: '#000',
+            arrowColor: '#fff',
+            monthTextColor: '#FFF',
+            textDayFontWeight: '300',
+            textMonthFontWeight: 'bold',
+            textDayHeaderFontWeight: '300',
+            textDayFontSize: 16,
+            textMonthFontSize: 16,
+            textDayHeaderFontSize: 16,
+          }}
         />
-        <TextInput
-          className="w-16 bg-gray-200 p-2 rounded text-center"
-          value={dosage}
-          onChangeText={setDosage}
-          keyboardType="numeric"
-          placeholder="мг"
-        />
-        <Text className="text-base">мг</Text>
-      </View>
+      )}
 
-      <TouchableOpacity
-        className="bg-gray-300 p-2 rounded items-center mb-4"
-        onPress={handleAddSubstance}
-      >
-        <Text className="text-base text-gray-700">Добавить действующее вещество</Text>
+      {/* Список приёмов */}
+      <Text className="text-white text-center my-2">{`Расписание на ${selectedDate}`}</Text>
+      <ScrollView className="flex-1">
+        {getTakesByDate(selectedDate, takes, courses, medicaments).map((takem, index) => (
+          <View
+            key={index}
+            className="flex-row items-center bg-white p-3 rounded mb-2"
+          >
+            <Text className="flex-1 text-black">
+              {`${new Date(takem.datetime).toLocaleTimeString()} ${takem.title}`}
+            </Text>
+
+            <TouchableOpacity
+              className="ml-3"
+              onPress={() => {
+                take(takem.id);
+              }}
+            >
+              <Ionicons name="thumbs-up" size={24} color="green" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              className="ml-3"
+              onPress={() => {
+                donttake(takem.id);
+              }}
+            >
+              <Ionicons name="thumbs-down" size={24} color="red" />
+            </TouchableOpacity>
+          </View>
+        ))}
+      </ScrollView>
+
+      {/* Кнопка добавить */}
+      <TouchableOpacity className="bg-primary-text px-5 py-3 rounded items-center mt-3" onPress={() => { router.push('addTake'); }}>
+        <Text className="text-black">Добавить приём</Text>
       </TouchableOpacity>
-
-      {/* Производитель */}
-      <Text className="text-base mb-2">Производитель</Text>
-      <TextInput
-        className="bg-gray-200 p-2 rounded mb-4"
-        value={manufacturer}
-        onChangeText={setManufacturer}
-        placeholder="Введите производителя"
-      />
-
-      {/* Способ применения */}
-      <Text className="text-base mb-2">Способ применения</Text>
-      <TextInput
-        className="bg-gray-200 p-2 rounded mb-4"
-        value={method}
-        onChangeText={setMethod}
-        placeholder="Введите способ применения"
-      />
-
-      {/* Кнопка Добавить */}
-      <TouchableOpacity
-        className="bg-gray-400 p-4 rounded items-center"
-        onPress={handleSubmit}
-      >
-        <Text className="text-base text-white">Добавить</Text>
-      </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
-};
-
-export default AddMedicineForm;
+}
