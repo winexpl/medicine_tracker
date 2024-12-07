@@ -35,15 +35,13 @@ const ActiveCourseInfo = () => {
   let n = course.weekday;
   weekdays = weekdays.filter((e, i) => (n & (1 << 6-i) == 1));
   return (
-    <SafeAreaView className='bg-primary-back h-full'>
-
-      <Text className='bg-primary-text text-3xl text-primary-back font-serif'>{course.medicament}</Text>
-      <Text>Доза: {course.dose} {dosageFormTo(course.dosageForm)}</Text>
-      <Text className='bg-primary-text text-2xl text-primary-back font-serif'>
-          Начало: {new Date(course.startDate).toLocaleDateString()}
-      </Text>
+    <View className='bg-primary-back h-full'>
+      <Text className='text-white text-2xl'>Лекарство:</Text>
+      <Text className='bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center'>   {course.medicament}</Text>
+      <Text className="bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center">   Доза: {course.dose} {dosageFormTo(course.dosageForm)}</Text>
+      <Text className='bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center'>   Начало: {new Date(course.startDate).toLocaleDateString()}</Text>
       <TouchableOpacity
-        style={styles.dateButton}
+        className="bg-primary-text py-1 px-4 rounded-md my-2 justify-center"
         onPress={() => {
           setShowDatePicker(true);
         }}
@@ -60,19 +58,16 @@ const ActiveCourseInfo = () => {
                 }
               }
             }
-        />)}
-        <Text className='row-1 bg-primary-text text-2xl text-primary-back font-serif'>
-          Окончание: {endDate.toLocaleDateString()}
-        </Text>
-      </TouchableOpacity>
+      />)}
+      <Text className='bg-primary-text py-1 px-4 rounded-md my-2 items-center justify-center'>
+        Окончание: {endDate.toLocaleDateString()}
+      </Text>
+    </TouchableOpacity>
 
-      <Text className='bg-primary-text text-2xl text-primary-back font-serif'>{weekdays.join(' ')}</Text>
-      <View className='max-h-fit'>
+      <View className='bg-primary-text py-4 px-4 rounded-md my-2 justify-center'>
         <ScrollView className='max-h-10:'>
         {course.schedule.split(',').map(((time, index) => (
-          <Text key={index}>
-            {time}
-          </Text>
+          <Text className="text-black" key={index}>   {index+1} прием {time}</Text>
         )))}
       </ScrollView>
       </View>
@@ -80,10 +75,10 @@ const ActiveCourseInfo = () => {
           console.log('НАЖАТА')
           setAll();
         }}>
-        <Text className='items-center justify-center text-2xl'>Сохранить изменения</Text>
+        <Text className='bg-primary-text py-4 px-4 rounded-md my-2 justify-center'>Сохранить изменения</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity className='bg-primary-text rounded-xl items-center justify-center' onPress={ () => {
+      <TouchableOpacity className='bg-primary-text rounded-xl items-center my-2 justify-center' onPress={ () => {
         // просто поменять состояение курса
         // удалить все его приемы которые дальше текущей даты
 
@@ -110,9 +105,9 @@ const ActiveCourseInfo = () => {
         saveCourses(newCourses);
         router.back();
         }}>
-        <Text className='items-center justify-center text-2xl'>Завершить курс</Text>
+        <Text className='bg-primary-text py-4 px-4 rounded-md my-2 text-center justify-center'>Завершить курс</Text>
       </TouchableOpacity>
-    </SafeAreaView>
+    </View>
     
   )
 }

@@ -30,7 +30,7 @@ const CoursesInactive = () => {
             params: course,  // передаем объект курса в параметры
           });
         }}>
-        <View key={index} className="p-4 bg-white mb-4 rounded-lg border border-gray-300">
+        <View key={index} className="p-4 bg-primary-text mb-4 rounded-lg border border-gray-300">
           <Text className="font-bold">{course.medicament}</Text>
           <Text className="font-bold">{course.id}</Text>
           <Text className="text-sm mt-2">

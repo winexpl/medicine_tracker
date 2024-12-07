@@ -30,7 +30,7 @@ export default function CoursesActive () {
           params: course  // передаем объект курса в параметры
           });
         }}>
-          <View className="p-4 bg-white mb-3 rounded-lg border border-gray-300">
+          <View className="p-4 bg-primary-text mb-3 rounded-lg border border-gray-300">
             <Text className="font-bold">{course.medicament}</Text>
             <Text className="text-sm mt-2">
               Осталось приемов: {course.numberMedicine} {'\n'}

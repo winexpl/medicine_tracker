@@ -24,6 +24,9 @@ const MainUserLayout = () => {
         <Stack.Screen name="activeCourseInfo" options={{
             title:"Информация о курсе"
         }}/>
+        <Stack.Screen name="inactiveCourseInfo" options={{
+            title:"Информация о курсе"
+        }}/>
         </Stack>
     
     </MedicamentProvider>
