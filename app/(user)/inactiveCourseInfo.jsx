@@ -16,17 +16,17 @@ const InactiveCourseInfo = () => {
     let n = course.weekday;
     weekdays = weekdays.filter((e, i) => (n & (1 << i) == 1));
     return (
-        <SafeAreaView className='bg-primary-back h-full'>
-
-        <Text className='bg-primary-text text-3xl text-primary-back font-serif'>{course.medicament}</Text>
-        <Text className='bg-primary-text text-2xl text-primary-back font-serif'>
+        <View className='bg-primary-back h-full'>
+        <Text className='text-white text-2xl'>Лекарство:</Text>
+        <Text className='bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center'>{course.medicament}</Text>
+        <Text className='bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center'>
             Начало: {new Date(course.startDate).toLocaleDateString()}
         </Text>
-        <Text className='bg-primary-text text-2xl text-primary-back font-serif'>
+        <Text className='bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center'>
             Завершение: {new Date(course.endDate).toLocaleDateString()}
         </Text>
 
-        <Text className='bg-primary-text text-2xl text-primary-back font-serif'>{weekdays.join(' ')}</Text>
+        {/*ТУТ НИЧЕГО НЕ ВЫВОДИТ Я НЕ ПОНИМАЮ ЧТО ЭТО <Text className='bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center'>{weekdays.join(' ')}</Text> */}
         <View className='max-h-fit'>
             <ScrollView className='max-h-10:'>
             {course.schedule.split(',').map(((time, index) => (
@@ -45,9 +45,9 @@ const InactiveCourseInfo = () => {
             deleteCourses(course);
             router.back();
             }}>
-            <Text className='text-2xl items-center justify-center'>Удалить курс</Text>
+            <Text className='bg-primary-text py-4 px-4 rounded-md my-2 justify-center'>Удалить курс</Text>
         </TouchableOpacity>
-        </SafeAreaView>
+        </View>
         
     )
 }
