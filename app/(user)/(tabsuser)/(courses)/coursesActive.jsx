@@ -20,7 +20,7 @@ export default function CoursesActive () {
     update();
   },[courses, medicaments]);
     return (
-    <SafeAreaView className="flex-1 bg-primary-back p-4">
+    <SafeAreaView className="flex-1 bg-primary-back p-1">
       <ScrollView className="flex-1 mb-12">
       {activeCourses.active.length > 0 ? (
         activeCourses.active.map((course, index) => (
@@ -47,7 +47,7 @@ export default function CoursesActive () {
         )}
       </ScrollView>
 
-      <TouchableOpacity className="absolute bottom-5 left-5 right-5 bg-primary-text p-4 rounded-lg items-center" onPress={async () => {
+      <TouchableOpacity className="bg-primary-text px-5 py-3 rounded items-center absolute bottom-0 left-0 right-0" onPress={async () => {
         router.push('(addcourse)/addCourse');}}>
         <Text className="text-black">Добавить курс</Text>
       </TouchableOpacity>
