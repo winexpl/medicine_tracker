@@ -37,113 +37,93 @@ export const dosageFormTo = (dosageForm) => {
 export const updateTakes = async (course, oldEndDate, newEndDate, takes) => {
     oldEndDate = new Date(oldEndDate);
     newEndDate = new Date(newEndDate);
-    if(newEndDate === oldEndDate) return [];
+    if(newEndDate === oldEndDate || course.typeCourse === '3') return [...takes];
     console.debug('newDate',newEndDate.toUTCString());
     console.debug('oldDate',oldEndDate.toUTCString());
     const type = course.typeCourse;
     let daysOfWeek = [];
     let newTakes = [...takes];
-    const schedule = course.schedule;
+    const schedule = course.schedule.split(',');
+    if(oldEndDate.getTime() >= newEndDate.getTime()) {
+        const deletedTakes = [];
+        for(let i = 0; i < takes.length; ++i) {
+            console.debug(new Date(takes[i].datetime));
+            if( (new Date(takes[i].datetime).getTime() > newEndDate.getTime() + 1000 * 3600 * 24 ) &&
+                takes[i].courseId === course.id) {
+                    let tId = takes[i].id;
+                    newTakes.splice(newTakes.findIndex(m => m.id === tId), 1);
+                    deletedTakes.push(takes[i]);
+            }
+        }
+        addDeletedTakes(deletedTakes);
+        return newTakes;
+    }
     switch (type) {
         case '1':  // курс по дня недели
             const weekdays = course.weekday;
-            if(oldEndDate.getTime() < newEndDate.getTime()) {
-                if(weekdays & 1) daysOfWeek.push(0);
-                for(let i = 1; i < 7; ++i) {
-                    let d = weekdays & (1 << i);
-                    if(d === 1) daysOfWeek.push(7 - i);
-                }
-                for(let i = new Date(oldEndDate.getTime() + 1000 * 3600 * 24).getTime();
-                        i < new Date(newEndDate.getTime() + 1000 * 3600 * 24).getTime();
-                        i += 1000 * 3600 * 24) {
-                    if(daysOfWeek.findIndex(u => u === new Date(i).getDay()) != -1) {
-                        for(let j = 0; j < schedule.length; ++j) {
-                            const [hours, minutes, seconds] = schedule[j].split(':');
-                            let dateForTake = new Date(i);
-                            dateForTake.setHours(hours);
-                            dateForTake.setMinutes(minutes);
-                            dateForTake.setSeconds(seconds);
-                            console.debug("СОЗДАЕМ");
-                            const uniqueId = uuid.v4();  // Генерация UUID
-                            console.debug(uniqueId);
-                            let take = {id: uniqueId, courseId: course.id, datetime:dateForTake.toISOString(), state:false};
-                            newTakes.push(take);
-                            try {
-                                const response = await axios.put(API_URL_POST_TAKES, take, {
-                                    headers: {
-                                        'Authorization': `Bearer ${await getToken()}`,
-                                        'Content-Type': 'application/json'
-                                    },
-                                });
-                            } catch (error) {
-                                console.error('Невозможно отправить приемы: ', error);
-                            }
-                        };
-                        console.log(newTakes);
-                        saveTakes(newTakes);
-                    }
-                }
-            } else {
-                const deletedTakes = [];
-                for(let i = 0; i < takes.length; ++i) {
-                    console.debug(new Date(takes[i].datetime));
-                    if( (new Date(takes[i].datetime).getTime() > newEndDate.getTime() + 1000 * 3600 * 24 ) &&
-                        takes[i].courseId === course.id) {
-                            let tId = takes[i].id;
-                            newTakes.splice(newTakes.findIndex(m => m.id === tId), 1);
-                            deletedTakes.push(takes[i]);
-                    }
-                }
-                addDeletedTakes(deletedTakes);
+            if(weekdays & 1) daysOfWeek.push(0);
+            for(let i = 1; i < 7; ++i) {
+                let d = weekdays & (1 << i);
+                if(d === 1) daysOfWeek.push(7 - i);
             }
-            break;
-        case '2':
-            if(oldEndDate.getTime() < newEndDate.getTime()) {
-                for(let i = new Date(oldEndDate.getTime() + 1000 * 3600 * 24).getTime();
-                        i < new Date(newEndDate.getTime() + 1000 * 3600 * 24).getTime();
-                        i += course.period * 1000 * 3600 * 24) {
+            for(let i = new Date(oldEndDate.getTime() + 1000 * 3600 * 24).getTime();
+                    i < new Date(newEndDate.getTime() + 1000 * 3600 * 24).getTime();
+                    i += 1000 * 3600 * 24) {
+                console.log(schedule, typeof schedule);
+                if(daysOfWeek.findIndex(u => u === new Date(i).getDay()) != -1) {
                     for(let j = 0; j < schedule.length; ++j) {
                         const [hours, minutes, seconds] = schedule[j].split(':');
+                        console.log(schedule[j], typeof schedule[j]);
                         let dateForTake = new Date(i);
+                        console.log('ДАТА',new Date(i));
                         dateForTake.setHours(hours);
                         dateForTake.setMinutes(minutes);
                         dateForTake.setSeconds(seconds);
-                        console.debug("СОЗДАЕМ");
+                        console.debug("СОЗДАЕМ", dateForTake);
                         const uniqueId = uuid.v4();  // Генерация UUID
                         console.debug(uniqueId);
-                        let take = {id: uniqueId, courseId: course.id, datetime:dateForTake.toISOString(), state:false};
-                        newTakes.push(take);
+                        let newTake = {};
                         try {
-                            const response = await axios.put(API_URL_POST_TAKES, take, {
-                                headers: {
-                                    'Authorization': `Bearer ${await getToken()}`,
-                                    'Content-Type': 'application/json'
-                                },
-                            });
+                            newTake = {id: uniqueId, courseId: course.id, datetime:dateForTake.toISOString(), state:false};
                         } catch (error) {
-                            console.error('Невозможно отправить приемы: ', error);
+                            console.log('ОШИБКА СОЗДАНИЯ GHBTVF???', error);
                         }
+                        
+                        console.log('НОВЫЙ ПРИЕМ', newTake);
+                        newTakes.push(take);
                     };
-                    console.log(newTakes);
-                    saveTakes(newTakes);
                 }
-            } else {
-                const deletedTakes = [];
-                for(let i = 0; i < takes.length; ++i) {
-                    console.debug(new Date(takes[i].datetime));
-                    if( (new Date(takes[i].datetime).getTime() > newEndDate.getTime() + 1000 * 3600 * 24 ) &&
-                        takes[i].courseId === course.id) {
-                            let tId = takes[i].id;
-                            newTakes.splice(newTakes.findIndex(m => m.id === tId), 1);
-                            deletedTakes.push(takes[i]);
-                    }
-                }
-                addDeletedTakes(deletedTakes);
             }
-
             break;
-
+        case '2':
+            for(let i = new Date(oldEndDate.getTime() + 1000 * 3600 * 24).getTime();
+                    i < new Date(newEndDate.getTime() + 1000 * 3600 * 24).getTime();
+                    i += course.period * 1000 * 3600 * 24) {
+                console.log(schedule, typeof schedule);
+                for(let j = 0; j < schedule.length; ++j) {
+                    const [hours, minutes, seconds] = schedule[j].split(':');
+                    console.log(schedule[j], typeof schedule[j]);
+                    console.log('ДАТА',new Date(i));
+                    let dateForTake = new Date(i);
+                    dateForTake.setHours(hours);
+                    dateForTake.setMinutes(minutes);
+                    dateForTake.setSeconds(seconds);
+                    console.debug("СОЗДАЕМ", dateForTake);
+                    const uniqueId = uuid.v4();  // Генерация UUID
+                    console.debug(uniqueId);
+                    let newTake = {};
+                    try {
+                        newTake = {id: uniqueId, courseId: course.id, datetime:dateForTake.toISOString(), state:false};
+                    } catch (error) {
+                        console.log('ОШИБКА СОЗДАНИЯ GHBTVF???', error);
+                    } 
+                    console.log('НОВЫЙ ПРИЕМ', newTake);
+                    newTakes.push(newTake);
+                }
+            }
+            break;
     }
+    console.log(newTakes);
     return newTakes;
 }
 
