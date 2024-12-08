@@ -9,6 +9,7 @@ module.exports = {
             DEFAULT: '#1C1C2B',
           },
           text: "#FF8F00",
+          text1: "#FFF",
         }, 
         secondary: {
           back: {

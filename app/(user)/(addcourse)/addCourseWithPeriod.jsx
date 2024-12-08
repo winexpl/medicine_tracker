@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Modal, FlatList} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Modal, FlatList } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,21 +7,20 @@ import { dosageFormTo } from '../../../components/Models';
 import { addCourses, CourseContext, saveCourses } from '../../../contexts/CoursesContext';
 import { TakeContext } from '../../../contexts/TakesContext';
 import { saveTakes } from '../../../contexts/TakesContext';
+import ErrorModal from '../../../components/ErrorModal'; // Import the error modal
 
 const AddCourseWithPeriod = () => {
   const { courses, setCourses } = useContext(CourseContext);
   const { takes, setTakes } = useContext(TakeContext);
   const localParams = useLocalSearchParams();
   const [course, setCourse] = useState({
-    ...JSON.parse(localParams.course), // сохраняем данные из localParams
-    regimen: 'Независимо от приема пищи', // устанавливаем значение по умолчанию
+    ...JSON.parse(localParams.course), 
+    regimen: 'Независимо от приема пищи',
   });
   const [medicament] = useState(JSON.parse(localParams.medicament));
-  console.debug(course, medicament);
-
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedDateType, setSelectedDateType] = useState(null); // 'start' или 'end'
+  const [selectedDateType, setSelectedDateType] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectIndexInSchedule, setSelectIndexInSchedule] = useState(0);
   const [showPeriodicityModal, setShowPeriodicityModal] = useState(false);
@@ -30,55 +29,74 @@ const AddCourseWithPeriod = () => {
   const [endDate, setEndDate] = useState(new Date());
   const [startDate, setStartDate] = useState(new Date());
   const [period, setPeriod] = useState(1);
-  
+
+  // State for error modal
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showErrorModal, setShowErrorModal] = useState(false);
+
+  // Function to show error messages in the modal
+  const showError = (message) => {
+    setErrorMessage(message);
+    setShowErrorModal(true);
+  };
+
+  // Function to close the error modal
+  const closeErrorModal = () => {
+    setShowErrorModal(false);
+    setErrorMessage('');
+  };
 
   async function setAll() {
     let newCourses = [course];
-    if(courses.length > 0) {
+    if (courses.length > 0) {
       newCourses = [...courses, ...newCourses];
     }
-    if(course.period<=0){
-      alert('Периодичность должна быть больше нуля!');
+    if (course.period <= 0) {
+      showError('Периодичность должна быть больше нуля!');
       return;
     }
-    if(course.startDate > course.endDate){
-      alert('Начало приема не должно превышать окончание приема!');
+    if (course.dose < 0) {
+      showError('Доза должна быть положительной!');
+      return;
+    }
+    if (course.startDate > course.endDate) {
+      showError('Начало приема не должно превышать окончание приема!');
       return;
     }
 
-    for(let i=0; course.schedule.length>i; i++){
-      for(let j=0; course.schedule.length>j; j++){
-        if(course.schedule[i]==course.schedule[j] && i!=j){
-          alert('Время приема не должно совпадать!');
+    for (let i = 0; i < course.schedule.length; i++) {
+      for (let j = 0; j < course.schedule.length; j++) {
+        if (course.schedule[i] === course.schedule[j] && i !== j) {
+          showError('Время приема не должно совпадать!');
           return;
         }
       }
     }
+
     setCourses(newCourses);
     const newTakes = [...takes, ...await addCourses(course)];
     setTakes(newTakes);
     saveTakes(newTakes);
     router.back();
   }
+
   const addTake = () => {
     setSchedule(["00:00:00", ...schedule]);
   };
-  
 
   useEffect(() => {
     setCourse(prevState => ({ ...prevState,
-          startDate: startDate.toLocaleDateString("en-CA"),
-          endDate: endDate.toLocaleDateString("en-CA"),
-          schedule: schedule,
-          period: period,
-          numberMedicine: calculateTotalTakes()}));
-  }, [endDate, startDate, schedule, period])
+      startDate: startDate.toLocaleDateString("en-CA"),
+      endDate: endDate.toLocaleDateString("en-CA"),
+      schedule: schedule,
+      period: period,
+      numberMedicine: calculateTotalTakes()}));
+  }, [endDate, startDate, schedule, period]);
 
   // Расчет общего количества приемов
   const calculateTotalTakes = () => {
-    console.log(course.schedule.length );
     const days = Math.ceil(
-        (new Date(endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) + 1; // +1 чтобы включить начальную дату
+        (new Date(endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) + 1;
     const result = (days / period) * schedule.length;
     return Math.ceil(result);
   };
@@ -86,6 +104,14 @@ const AddCourseWithPeriod = () => {
   return (
     <SafeAreaView className="flex-1 p-4 bg-primary-back">
       <ScrollView>
+        <Text className="text-lg font-bold text-center mb-4 text-white">Добавление курса</Text>
+        {/* Your existing JSX here... */}
+
+        <ErrorModal
+          isVisible={showErrorModal}
+          message={errorMessage}
+          onClose={closeErrorModal}
+        />
         <Text className="text-lg font-bold text-center mb-4 text-white">Добавление курса</Text>
         
         <View className="flex-row justify-between mb-4">
@@ -256,7 +282,6 @@ const AddCourseWithPeriod = () => {
           </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
-    
   );
 };
 

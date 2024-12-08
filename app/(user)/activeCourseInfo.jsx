@@ -30,10 +30,10 @@ const ActiveCourseInfo = () => {
     setTakes([...newTakes]);
     router.push('schedule');
   }
-
   let weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-  let n = course.weekday;
-  weekdays = weekdays.filter((e, i) => (n & (1 << 6-i) == 1));
+  let selectedWeekdays = weekdays.filter((_, i) => (course.weekday & (1 << (6 - i))) !== 0);
+  let per = course.period;
+
   return (
     <View className='bg-primary-back h-full'>
       <ScrollView>
@@ -71,8 +71,9 @@ const ActiveCourseInfo = () => {
         Окончание: {endDate.toLocaleDateString()}
       </Text>
     </TouchableOpacity>
-      
-      <Text className='bg-primary-text py-4 px-4 rounded-md my-2 text items-center justify-center'>{weekdays.join(' ')}</Text> 
+      {/* ИНУЖНО ДОБАВИТЬ ЛОГИКУ ЧТОБЫ В ЗАВИСИМОСТИ ОТ КУРСА ВЫБИРАЛОСЬ ВЫВОДИТЬ ДНИ НЕДЕЛИ ИЛИ ПЕРИОД */}
+      <Text className='bg-primary-text py-4 px-4 rounded-md my-2 text items-center justify-center'>{/*Выбранные дни недели: */}{selectedWeekdays.join(' ')}</Text>
+      {/*<Text className='bg-primary-text py-4 px-4 rounded-md my-2 text items-center justify-center'>Выбранный период: {per} д.</Text> */} 
       
         
         {course.schedule.split(',').map(((time, index) => (

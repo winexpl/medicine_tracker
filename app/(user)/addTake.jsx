@@ -77,10 +77,10 @@ const AddTake = () => {
     };
 
     return (
-        <SafeAreaView className="flex-1 p-4 bg-primary-back">
+        <View className="flex-1 p-4 bg-primary-back">
             <View>
                 <Text style={styles.label}>Выберите курс:</Text>
-                <View className="bg-primary-text">
+                <View className="bg-white mb-3">
                     <RNPickerSelect
                         onValueChange={handleValueChange}
                         items={course3}
@@ -142,7 +142,7 @@ const AddTake = () => {
                     />
             )}
             </View>
-        </SafeAreaView>
+        </View>
     );
 };
 

@@ -7,7 +7,7 @@ import { dosageFormTo } from '../../../components/Models';
 import { addCourses, CourseContext, saveCourses } from '../../../contexts/CoursesContext';
 import { saveTakes, TakeContext } from '../../../contexts/TakesContext';
 import { Checkbox } from 'react-native-paper';
-
+import ErrorModal from '../../../components/ErrorModalTwo'; // Import the error modal
 
 const AddCourseForAWeek = () => {
     const { courses, setCourses } = useContext(CourseContext);
@@ -41,22 +41,35 @@ const AddCourseForAWeek = () => {
         friday: false,
         saturday: false,
     });
+  // Стейт для ошибки
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const showError = (message) => {
+    setErrorMessage(message);
+    setErrorModalVisible(true);
+};
 
-
+const hideError = () => {
+    setErrorModalVisible(false);
+};
     async function setAll() {
         let newCourses = [course];
         if(courses.length > 0) {
             newCourses = [...courses, ...newCourses];
         }
+        if (course.dose < 0) {
+            showError('Доза должна быть положительной!');
+            return;
+          }
         if(course.startDate > course.endDate){
-            alert('Начало приема не должно превышать окончание приема!');
+            showError('Начало приема не должно превышать окончание приема!');
             return;
           }
       
           for(let i=0; course.schedule.length>i; i++){
             for(let j=0; course.schedule.length>j; j++){
               if(course.schedule[i]==course.schedule[j] && i!=j){
-                alert('Время приема не должно совпадать!');
+                showError('Время приема не должно совпадать!');
                 return;
               }
             }
@@ -214,7 +227,11 @@ const AddCourseForAWeek = () => {
                     <TouchableOpacity className="p-4 bg-primary-text rounded-lg text-center mb-4" onPress={addTake}>
                         <Text className="text-black text-center">+ Добавить прием</Text>
                     </TouchableOpacity>
-
+                    <ErrorModal
+                        visible={errorModalVisible}
+                        message={errorMessage}
+                        onClose={hideError}
+                    />
                     {showTimePicker && (
                         <DateTimePicker
                         mode="time"
@@ -274,7 +291,6 @@ const AddCourseForAWeek = () => {
                         <Text className="text-bg-black">{item}</Text>
                     </TouchableOpacity>
                     ))}
-
                     <TouchableOpacity
                         className="p-4 bg-primary-text rounded-lg text-center mb-4"
                         onPress={ () => {
