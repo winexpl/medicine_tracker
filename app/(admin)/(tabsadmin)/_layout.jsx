@@ -1,3 +1,4 @@
+'use client'
 import { StyleSheet, Text, View } from 'react-native';
 import { Tabs, Redirect } from 'expo-router' ;
 import Ionicons from '@expo/vector-icons/Ionicons';
