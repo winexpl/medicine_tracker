@@ -1,24 +1,30 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { getMedicaments, MedicamentContext, saveMedicaments } from '../../contexts/MedicamentContext';
+import uuid from 'react-native-uuid';
 
 const AddMedicineForm = () => {
-  const [name, setName] = useState('Аспирин Экспресс');
-  const [form, setForm] = useState('Таблетка');
-  const [manufacturer, setManufacturer] = useState('Bayer');
-  const [method, setMethod] = useState('Внутрь');
+  const { medicaments, setMedicaments } = useContext(MedicamentContext);
+
+  const localParams = useLocalSearchParams();
+
+  const [medicament, setMedicament] = useState(JSON.parse(localParams.medicament));
+
+  const [name, setName] = useState(medicament.title);
+  const [form, setForm] = useState(medicament.dosageForm);
+  const [manufacturer, setManufacturer] = useState(medicament.sponsorName);
   const [activeSubstance, setActiveSubstance] = useState('');
   const [dosage, setDosage] = useState('');
-  const [activeSubstances, setActiveSubstances] = useState([
-    { name: 'Аспирин', dosage: '2' }, // Изначально добавленная строка
-  ]);
+  const [activeSubstances, setActiveSubstances] = useState(medicament.activeIngredients);
 
   const handleAddSubstance = () => {
     if (activeSubstance.trim() === '' || dosage.trim() === '') {
       alert('Введите активное вещество и дозировку!');
       return;
     }
-
-    setActiveSubstances([...activeSubstances, { name: activeSubstance, dosage }]);
+    setActiveSubstances([...activeSubstances, { title: activeSubstance, amount: dosage }]);
     setActiveSubstance(''); // Очищаем поле ввода
     setDosage('');
   };
@@ -28,48 +34,61 @@ const AddMedicineForm = () => {
     setActiveSubstances(updatedSubstances);
   };
 
-  const handleSubmit = () => {
-    console.log({
-      name,
-      form,
-      manufacturer,
-      method,
-      activeSubstances,
-    });
+  const handleSubmit = async () => {
+    if (activeSubstance.trim() === '' || dosage.trim() === ''|| manufacturer.trim() === ''|| form.trim() === ''|| name.trim() === '') {
+      alert('Заполните все поля!');
+      return;
+    }
+    if(dosage<=0){
+      alert('Дозировка активного вещества должна быть больше 0!');
+      return;
+    }
+    console.log(1);
+    let newMedicament = { id: medicament.id, activeIngredients: activeSubstances,
+      dosageForm: form, title: name, sponsorName: manufacturer};
+    console.log(2);
+    const oldMedicaments = await getMedicaments();
+    console.log(newMedicament);
+    saveMedicaments([...oldMedicaments, newMedicament]);
+    router.back();
   };
 
   return (
-    <View className="flex-1 bg-gray-100 p-4">
-      <Text className="text-xl font-bold mb-4">Добавление лекарства</Text>
+    <SafeAreaView className="flex-1 bg-primary-back p-4">
+      <Text className="text-xl text-white mb-4">Добавление лекарства</Text>
 
       {/* Название */}
-      <Text className="text-base mb-2">Название</Text>
+      <Text className="text-white mb-2">Название</Text>
       <TextInput
         className="bg-gray-200 p-2 rounded mb-4"
         value={name}
-        onChangeText={setName}
+        onChangeText={(name) => {
+          setName(name);
+        }}
         placeholder="Введите название"
       />
 
       {/* Форма выпуска */}
-      <Text className="text-base mb-2">Форма выпуска</Text>
+      <Text className="text-white mb-2">Форма выпуска</Text>
       <TextInput
         className="bg-gray-200 p-2 rounded mb-4"
         value={form}
-        onChangeText={setForm}
+        onChangeText={(form) => {
+          setForm(form);
+        }}
         placeholder="Введите форму выпуска"
       />
 
       {/* Список активных веществ */}
-      <Text className="text-base mb-2">Активное вещество</Text>
+      <Text className="text-white mb-2">Активное вещество</Text>
       {activeSubstances.map((substance, index) => (
         <View
           key={index}
           className="flex-row items-center justify-between bg-gray-200 p-2 rounded mb-2"
         >
-          <Text className="text-base">{`${substance.name} ${substance.dosage} мг`}</Text>
+          <Text className="text-base">{`${substance.title} ${substance.amount} мг`}</Text>
           <TouchableOpacity
-            className="bg-red-400 px-2 py-1 rounded"
+            className="bg-red-400 px-2 py-1 absolute left- right-1 rounded"
             onPress={() => handleRemoveSubstance(index)}
           >
             <Text className="text-white">Удалить</Text>
@@ -92,7 +111,7 @@ const AddMedicineForm = () => {
           keyboardType="numeric"
           placeholder="мг"
         />
-        <Text className="text-base">мг</Text>
+        <Text className="text-white">мг</Text>
       </View>
 
       <TouchableOpacity
@@ -103,7 +122,7 @@ const AddMedicineForm = () => {
       </TouchableOpacity>
 
       {/* Производитель */}
-      <Text className="text-base mb-2">Производитель</Text>
+      <Text className="text-white mb-2">Производитель</Text>
       <TextInput
         className="bg-gray-200 p-2 rounded mb-4"
         value={manufacturer}
@@ -111,23 +130,14 @@ const AddMedicineForm = () => {
         placeholder="Введите производителя"
       />
 
-      {/* Способ применения */}
-      <Text className="text-base mb-2">Способ применения</Text>
-      <TextInput
-        className="bg-gray-200 p-2 rounded mb-4"
-        value={method}
-        onChangeText={setMethod}
-        placeholder="Введите способ применения"
-      />
-
       {/* Кнопка Добавить */}
       <TouchableOpacity
-        className="bg-gray-400 p-4 rounded items-center"
+        className="bg-primary-text p-4 rounded items-center"
         onPress={handleSubmit}
       >
-        <Text className="text-base text-white">Добавить</Text>
+        <Text className="text-base text-black">Добавить</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 

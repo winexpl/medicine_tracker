@@ -48,6 +48,19 @@ const AddCourseForAWeek = () => {
         if(courses.length > 0) {
             newCourses = [...courses, ...newCourses];
         }
+        if(course.startDate > course.endDate){
+            alert('Начало приема не должно превышать окончание приема!');
+            return;
+          }
+      
+          for(let i=0; course.schedule.length>i; i++){
+            for(let j=0; course.schedule.length>j; j++){
+              if(course.schedule[i]==course.schedule[j] && i!=j){
+                alert('Время приема не должно совпадать!');
+                return;
+              }
+            }
+          }
         setCourses(newCourses);
         const newTakes = [...takes, ...await addCourses(course, takes)];
         setTakes(newTakes);
@@ -105,175 +118,171 @@ const AddCourseForAWeek = () => {
 
     return (
         <SafeAreaView className="flex-1 p-4 bg-primary-back">
-        <Text className="text-lg font-bold text-center mb-4 text-white">Добавление курса</Text>
-        
-        <View className="flex-row justify-between mb-4">
-        <TouchableOpacity
-          className="p-3 bg-gray-200 rounded-lg"
-          onPress={() => {
-            setSelectedDateType('start');
-            setSelectedDate(new Date(course.startDate));
-            setShowDatePicker(true);
-          }}>
-          <Text className="text-base text-gray-800">Начало: {new Date(course.startDate).toLocaleDateString()}</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View>
-        <TouchableOpacity
-          className="p-3 bg-gray-200 rounded-lg mb-4"
-          onPress={() => {
-            setSelectedDateType('end');
-            setSelectedDate(new Date(course.endDate));
-            setShowDatePicker(true);
-          }}>
-          <Text className="text-base text-gray-800">Окончание: {new Date(course.endDate).toLocaleDateString()}</Text>
-        </TouchableOpacity>
-      </View>
-
-        <View  className="mt-4">
-        <Text className="text-white">Выберите дни недели:</Text>
-            <ScrollView style={{ height: 150 }}>
-                <View>
-                {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday','sunday'].map((day, index) => (
-                    <View key={day} className="flex-row items-center mb-2">
-                    <Checkbox
-                        status={(weekday & (1 << 6-index)) > 0 ? 'checked' : 'unchecked'}
-                        onPress={() => {
-                            let i = 6-index;
-                            let newWeekday = weekday;
-                            let bit = (newWeekday & (1 << i)) >> i;
-                            if(bit === 0) {
-                                newWeekday |= (1 << i);
-                            }
-                            else {
-                                newWeekday &= ~(1 << i);
-                            }
-                            setWeekday(newWeekday);
-                        }}
-                    />
-                    <Text className="text-white">{day.charAt(0).toUpperCase() + day.slice(1)}</Text> {/* Отображаем день недели */}
-                    </View>
-                ))}
+            <ScrollView>
+                    <Text className="text-lg font-bold text-center mb-4 text-white">Добавление курса</Text>
+                    
+                    <View className="flex-row justify-between mb-4">
+                    <TouchableOpacity
+                    className="p-3 bg-gray-200 rounded-lg"
+                    onPress={() => {
+                        setSelectedDateType('start');
+                        setSelectedDate(new Date(course.startDate));
+                        setShowDatePicker(true);
+                    }}>
+                    <Text className="text-base text-gray-800">Начало: {new Date(course.startDate).toLocaleDateString()}</Text>
+                    </TouchableOpacity>
                 </View>
+
+                <View>
+                    <TouchableOpacity
+                    className="p-3 bg-gray-200 rounded-lg mb-4"
+                    onPress={() => {
+                        setSelectedDateType('end');
+                        setSelectedDate(new Date(course.endDate));
+                        setShowDatePicker(true);
+                    }}>
+                    <Text className="text-base text-gray-800">Окончание: {new Date(course.endDate).toLocaleDateString()}</Text>
+                    </TouchableOpacity>
+                </View>
+
+                    <View  className="mt-4">
+                    <Text className="text-white">Выберите дни недели:</Text>
+                            <View>
+                            {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday','sunday'].map((day, index) => (
+                                <View key={day} className="flex-row items-center mb-2">
+                                <Checkbox
+                                    status={(weekday & (1 << 6-index)) > 0 ? 'checked' : 'unchecked'}
+                                    onPress={() => {
+                                        let i = 6-index;
+                                        let newWeekday = weekday;
+                                        let bit = (newWeekday & (1 << i)) >> i;
+                                        if(bit === 0) {
+                                            newWeekday |= (1 << i);
+                                        }
+                                        else {
+                                            newWeekday &= ~(1 << i);
+                                        }
+                                        setWeekday(newWeekday);
+                                    }}
+                                />
+                                <Text className="text-white">{day.charAt(0).toUpperCase() + day.slice(1)}</Text> {/* Отображаем день недели */}
+                                </View>
+                            ))}
+                            </View>
+                    </View>
+                    <Text className="text-white">Всего приемов: {course.numberMedicine}</Text>
+
+                    <View>
+                        <TouchableOpacity
+                        className="p-3 bg-gray-200 rounded-lg mb-4"
+                        onPress={() => setShowDoseModal(true)}>
+                        <Text className="text-center">Доза: {course.dose} {dosageFormTo(medicament.dosageForm)}</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <FlatList
+                        data={course.schedule}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({item, index}) => {
+                        return(
+                        <View className="flex-row justify-between p-2 bg-white rounded-lg mb-2 items-center">
+                            <Text className="">{index+1}</Text>
+                            <TouchableOpacity
+                            className="p-2 bg-gray-200 rounded-lg"
+                            onPress={() => {
+                                setSelectIndexInSchedule(index);
+                                setShowTimePicker(true);
+                            }}>
+
+                            <Text className="">{item}</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                            className="p-2 bg-gray-300 rounded-lg"
+                            onPress={() => {
+                                const newSchedule = [...schedule];
+                                newSchedule.splice(index, 1);
+                                setSchedule(newSchedule);
+                            }}>
+                                <Text className="text-red-500">Удалить</Text>
+                            </TouchableOpacity>
+                        </View>)
+                        }}
+                        className="flex-grow-0"
+                    />
+
+                    <TouchableOpacity className="p-4 bg-primary-text rounded-lg text-center mb-4" onPress={addTake}>
+                        <Text className="text-black text-center">+ Добавить прием</Text>
+                    </TouchableOpacity>
+
+                    {showTimePicker && (
+                        <DateTimePicker
+                        mode="time"
+                        value={new Date()}
+                        onChange={(event, selectedTime) => {
+                            setShowTimePicker(false);
+                            if (selectedTime) {
+                            const newSchedule = [...schedule];
+                            newSchedule[selectIndexInSchedule] = selectedTime.toLocaleTimeString();
+                            newSchedule.sort();
+                            setSchedule(newSchedule);
+                            }
+                        }}
+                        />
+                    )}
+
+                    {showDatePicker && (
+                        <DateTimePicker
+                        mode="date"
+                        value={selectedDate}
+                        onChange={(event, selectedDate) => {
+                            setShowDatePicker(false);
+                            if (selectedDate) {
+                            if (selectedDateType === 'start') {
+                                setStartDate(selectedDate);
+                            } else {
+                                setEndDate(selectedDate);
+                            }
+                            }
+                        }}
+                        />
+                    )}
+
+                    <Modal visible={showDoseModal} transparent>
+                        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+                        <TextInput
+                            className="w-48 p-3 bg-white rounded-lg mb-4"
+                            keyboardType="number-pad"
+                            placeholder="Введите размер дозы"
+                            onChangeText={(text) => setCourse(prevState => ({...prevState, dose: Number(text)}))}
+                        />
+                        <TouchableOpacity
+                            className="p-3 bg-blue-500 rounded-lg"
+                            onPress={() => setShowDoseModal(false)}
+                        >
+                            <Text className="text-white text-lg">OK</Text>
+                        </TouchableOpacity>
+                        </View>
+                    </Modal>
+                    {['До еды', 'После еды', 'Во время еды', 'Независимо от приема пищи'].map((item) => (
+                    <TouchableOpacity
+                        key={item}
+                        className={`p-3 bg-gray-200 rounded-lg mb-4  ${
+                        course.regimen === item ? 'bg-white' : 'bg-primary-text'
+                        }`}
+                        onPress={() => setCourse(prevState => ({...prevState, regimen: item}))}>
+                        <Text className="text-bg-black">{item}</Text>
+                    </TouchableOpacity>
+                    ))}
+
+                    <TouchableOpacity
+                        className="p-4 bg-primary-text rounded-lg text-center mb-4"
+                        onPress={ () => {
+                            setAll();
+                        }}>
+                        <Text className="text-black text-center">OK</Text>
+                    </TouchableOpacity>
             </ScrollView>
-        </View>
-        <Text className="text-white">Всего приемов: {course.numberMedicine}</Text>
-
-        <View>
-            <TouchableOpacity
-            className="p-3 bg-gray-200 rounded-lg mb-4"
-            onPress={() => setShowDoseModal(true)}>
-            <Text className="text-center">Доза: {course.dose} {dosageFormTo(medicament.dosageForm)}</Text>
-            </TouchableOpacity>
-        </View>
-
-        <FlatList
-            data={course.schedule}
-            style={{ height: 120 }}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({item, index}) => {
-            return(
-            <View className="flex-row justify-between p-2 bg-white rounded-lg mb-2 items-center">
-                <Text className="">{index+1}</Text>
-                <TouchableOpacity
-                className="p-2 bg-gray-200 rounded-lg"
-                onPress={() => {
-                    setSelectIndexInSchedule(index);
-                    setShowTimePicker(true);
-                }}>
-
-                <Text className="">{item}</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                className="p-2 bg-gray-300 rounded-lg"
-                onPress={() => {
-                    const newSchedule = [...schedule];
-                    newSchedule.splice(index, 1);
-                    setSchedule(newSchedule);
-                }}>
-                    <Text className="text-red-500">Удалить</Text>
-                </TouchableOpacity>
-            </View>)
-            }}
-            className="flex-grow-0"
-        />
-
-        <TouchableOpacity className="p-4 bg-primary-text rounded-lg text-center mb-4" onPress={addTake}>
-            <Text className="text-black text-center">+ Добавить прием</Text>
-        </TouchableOpacity>
-
-        {showTimePicker && (
-            <DateTimePicker
-            mode="time"
-            value={new Date()}
-            onChange={(event, selectedTime) => {
-                setShowTimePicker(false);
-                if (selectedTime) {
-                const newSchedule = [...schedule];
-                newSchedule[selectIndexInSchedule] = selectedTime.toLocaleTimeString();
-                newSchedule.sort();
-                setSchedule(newSchedule);
-                }
-            }}
-            />
-        )}
-
-        {showDatePicker && (
-            <DateTimePicker
-            mode="date"
-            value={selectedDate}
-            onChange={(event, selectedDate) => {
-                setShowDatePicker(false);
-                if (selectedDate) {
-                if (selectedDateType === 'start') {
-                    setStartDate(selectedDate);
-                } else {
-                    setEndDate(selectedDate);
-                }
-                }
-            }}
-            />
-        )}
-
-        <Modal visible={showDoseModal} transparent>
-            <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-            <TextInput
-                className="w-48 p-3 bg-white rounded-lg mb-4"
-                keyboardType="number-pad"
-                placeholder="Введите размер дозы"
-                onChangeText={(text) => setCourse(prevState => ({...prevState, dose: Number(text)}))}
-            />
-            <TouchableOpacity
-                className="p-3 bg-blue-500 rounded-lg"
-                onPress={() => setShowDoseModal(false)}
-            >
-                <Text className="text-white text-lg">OK</Text>
-            </TouchableOpacity>
-            </View>
-        </Modal>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="my-4 flex-row space-x-4">
-        {['До еды', 'После еды', 'Во время еды', 'Независимо от приема пищи'].map((item) => (
-          <TouchableOpacity
-            key={item}
-            className={`rounded-lg flex justify-center items-center  ${
-              course.regimen === item ? 'bg-white' : 'bg-primary-text'
-            }`}
-            style={{ height: 40, paddingHorizontal: 1 }}
-            onPress={() => setCourse(prevState => ({...prevState, regimen: item}))}>
-            <Text className="text-bg-black">{item}</Text>
-          </TouchableOpacity>
-        ))}
-        </ScrollView>
-
-        <TouchableOpacity
-            style={styles.modalButton}
-            onPress={ () => {
-                setAll();
-            }}>
-            <Text className="text-black text-center">OK</Text>
-            </TouchableOpacity>
         </SafeAreaView>
         
     );

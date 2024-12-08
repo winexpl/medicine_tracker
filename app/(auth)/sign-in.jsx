@@ -31,8 +31,9 @@ const SignIn = () => {
 
         form.username = form.username.trim();
         form.password = form.password.trim();
+        
         if(form.username === '' || form.password === '') {
-            console.error('Заполните все поля');
+            alert('Заполните все поля!');
         } else {
             try {
                 // Отправляем запрос на сервер
@@ -51,7 +52,7 @@ const SignIn = () => {
                 }
             } catch (err) {
                 // Обработка ошибки запроса
-                console.log(err);
+                alert('Неправильно введены Логин или Пароль!');
                 setError('Произошла ошибка при отправке данных.');
             } finally {
                 setLoading(false); // Выключаем индикатор загрузки

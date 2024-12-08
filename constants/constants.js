@@ -23,3 +23,7 @@ export const API_URL_DELETE_MEDICAMENT = API_URL_MEDICAMENTS + '/id=';
 export const API_URL_GET_TAKES = API_URL_TAKES;
 export const API_URL_POST_TAKES = API_URL_TAKES;
 export const API_URL_DELETE_TAKES = API_URL_TAKES + '/id=';
+
+
+export const EXTEND_API_URL = 'https://rxnav.nlm.nih.gov/REST/drugs.json?'
+export const EXTEND_API_URL_GET_BY_NAME = EXTEND_API_URL + 'name=';

@@ -32,7 +32,7 @@ const SignUp = () => {
         form.name = form.name.trim();
         form.password = form.password.trim();
         if(form.login === '' || form.name === '' || form.password === '') {
-          console.error('Заполните все поля');
+          ('Заполните все поля!');
         }
         else {
         const response = await axios.post(API_URL_REGISTRATION, form, {

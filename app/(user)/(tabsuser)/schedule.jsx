@@ -17,7 +17,14 @@ export default function Schedule() {
   const { medicaments } = useContext(MedicamentContext);
   const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   const { takes, setTakes } = useContext(TakeContext);
-  
+    const [selectedBackgrounds, setSelectedBackgrounds] = useState({}); // Состояние для хранения фонов
+
+  const updateBackground = (id, color) => {
+    setSelectedBackgrounds((prev) => ({
+      ...prev,
+      [id]: color, // Обновляем цвет для определенного элемента
+    }));
+  };
   useEffect(() => {
     async function update() {
       const newTakes = await getTakes();
@@ -142,6 +149,9 @@ export default function Schedule() {
         {getTakesByDate(selectedDate, takes, courses, medicaments).map((takem, index) => (
           <View
             key={index}
+            style={{
+              backgroundColor: selectedBackgrounds[takem.id] || 'white', 
+            }}
             className="flex-row items-center bg-white p-3 rounded mb-2"
           >
             <Text className="flex-1 text-black">
@@ -152,6 +162,7 @@ export default function Schedule() {
               className="ml-3"
               onPress={() => {
                 take(takem.id);
+                updateBackground(takem.id, '#7cfc00'); // Меняем фон на зеленый
               }}
             >
               <Ionicons name="thumbs-up" size={24} color="green" />
@@ -161,6 +172,7 @@ export default function Schedule() {
               className="ml-3"
               onPress={() => {
                 donttake(takem.id);
+                updateBackground(takem.id, '#ff4c5b'); // Меняем фон на красный
               }}
             >
               <Ionicons name="thumbs-down" size={24} color="red" />
