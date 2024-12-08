@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons'; // Используется иконка лупы
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { MedicamentContext } from '../../../contexts/MedicamentContext';
 import axios from 'axios';
 import { API_URL_GET_MEDICAMENTS_SEARCH, EXTEND_API_URL_GET_BY_NAME } from '../../../constants/constants';
@@ -86,9 +87,9 @@ const Search = () => {
   );
 
   return (
-    <View className="flex-1 bg-gray-100 p-4">
+    <SafeAreaView className="flex-1 bg-primary-back p-4">
       {/* Заголовок экрана */}
-      <Text className="text-xl font-bold mb-4 text-gray-800">Выбор лекарства</Text>
+      <Text className="text-xl font-bold mb-4 text-white">Выбор лекарства</Text>
 
       {/* Поле поиска */}
       <View className="flex-row items-center bg-white border border-gray-300 rounded-lg px-3 py-2 mb-4">
@@ -113,7 +114,7 @@ const Search = () => {
           ) : null
         }
       />
-      <TouchableOpacity className="bg-blue-500 rounded-lg py-3 px-6 items-center" onPress={() => {
+      <TouchableOpacity className="bg-primary-text rounded-lg py-3 px-6 items-center" onPress={() => {
         router.push({
           pathname: '/medicamentInfoDb',
           params: {medicament:JSON.stringify({id:uuid.v4(),
@@ -124,9 +125,9 @@ const Search = () => {
           )}  // передаем объект курса в параметры
         });
       }}>
-        <Text className="text-white text-lg font-semibold">Добавить новое лекарство</Text>
+        <Text className="text-black font-semibold">Добавить новое лекарство</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 

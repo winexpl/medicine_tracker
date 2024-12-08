@@ -17,8 +17,9 @@ const SettingLayout = () => {
   const { userInfo, setUserInfo } = useContext(AuthContext);
 
   return (
-    <SafeAreaView>
-      <RouterButton title="О разработчиках"
+    <SafeAreaView className="flex-1 bg-primary-back p-4">
+      <Text className="text-xl font-bold mb-4 text-white">Настройки</Text>
+      <RouterButton title="О разработчиках" 
                             handlePress={() => router.push('/about')}
                             containerStyle="w-full"
       />
@@ -45,6 +46,7 @@ const SettingLayout = () => {
                                     },
                                   });
                                 } catch (error) {
+                                  alert('НЕВОЗМОЖНО ОТПРАВИТЬ НА СЕРВЕР НОВЫЙ МЕДИКАМЕНТ', error, medicaments[i]);
                                   console.error('НЕВОЗМОЖНО ОТПРАВИТЬ НА СЕРВЕР НОВЫЙ МЕДИКАМЕНТ', error, medicaments[i]);
                                 }
                               }

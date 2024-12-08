@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { getMedicaments, MedicamentContext, saveMedicaments } from '../../contexts/MedicamentContext';
 import uuid from 'react-native-uuid';
 
@@ -34,6 +35,14 @@ const AddMedicineForm = () => {
   };
 
   const handleSubmit = async () => {
+    if (activeSubstance.trim() === '' || dosage.trim() === ''|| manufacturer.trim() === ''|| form.trim() === ''|| name.trim() === '') {
+      alert('Заполните все поля!');
+      return;
+    }
+    if(dosage<=0){
+      alert('Дозировка активного вещества должна быть больше 0!');
+      return;
+    }
     console.log(1);
     let newMedicament = { id: medicament.id, activeIngredients: activeSubstances,
       dosageForm: form, title: name, sponsorName: manufacturer};
@@ -45,11 +54,11 @@ const AddMedicineForm = () => {
   };
 
   return (
-    <View className="flex-1 bg-gray-100 p-4">
-      <Text className="text-xl font-bold mb-4">Добавление лекарства</Text>
+    <SafeAreaView className="flex-1 bg-primary-back p-4">
+      <Text className="text-xl text-white mb-4">Добавление лекарства</Text>
 
       {/* Название */}
-      <Text className="text-base mb-2">Название</Text>
+      <Text className="text-white mb-2">Название</Text>
       <TextInput
         className="bg-gray-200 p-2 rounded mb-4"
         value={name}
@@ -60,7 +69,7 @@ const AddMedicineForm = () => {
       />
 
       {/* Форма выпуска */}
-      <Text className="text-base mb-2">Форма выпуска</Text>
+      <Text className="text-white mb-2">Форма выпуска</Text>
       <TextInput
         className="bg-gray-200 p-2 rounded mb-4"
         value={form}
@@ -71,7 +80,7 @@ const AddMedicineForm = () => {
       />
 
       {/* Список активных веществ */}
-      <Text className="text-base mb-2">Активное вещество</Text>
+      <Text className="text-white mb-2">Активное вещество</Text>
       {activeSubstances.map((substance, index) => (
         <View
           key={index}
@@ -79,7 +88,7 @@ const AddMedicineForm = () => {
         >
           <Text className="text-base">{`${substance.title} ${substance.amount} мг`}</Text>
           <TouchableOpacity
-            className="bg-red-400 px-2 py-1 rounded"
+            className="bg-red-400 px-2 py-1 absolute left- right-1 rounded"
             onPress={() => handleRemoveSubstance(index)}
           >
             <Text className="text-white">Удалить</Text>
@@ -102,7 +111,7 @@ const AddMedicineForm = () => {
           keyboardType="numeric"
           placeholder="мг"
         />
-        <Text className="text-base">мг</Text>
+        <Text className="text-white">мг</Text>
       </View>
 
       <TouchableOpacity
@@ -113,7 +122,7 @@ const AddMedicineForm = () => {
       </TouchableOpacity>
 
       {/* Производитель */}
-      <Text className="text-base mb-2">Производитель</Text>
+      <Text className="text-white mb-2">Производитель</Text>
       <TextInput
         className="bg-gray-200 p-2 rounded mb-4"
         value={manufacturer}
@@ -123,12 +132,12 @@ const AddMedicineForm = () => {
 
       {/* Кнопка Добавить */}
       <TouchableOpacity
-        className="bg-gray-400 p-4 rounded items-center"
+        className="bg-primary-text p-4 rounded items-center"
         onPress={handleSubmit}
       >
-        <Text className="text-base text-white">Добавить</Text>
+        <Text className="text-base text-black">Добавить</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 

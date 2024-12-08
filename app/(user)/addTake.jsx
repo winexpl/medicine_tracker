@@ -77,17 +77,19 @@ const AddTake = () => {
     };
 
     return (
-        <SafeAreaView>
+        <SafeAreaView className="flex-1 p-4 bg-primary-back">
             <View>
                 <Text style={styles.label}>Выберите курс:</Text>
-                <RNPickerSelect
-                    onValueChange={handleValueChange}
-                    items={course3}
-                    placeholder={{
-                        label: 'Выберите курс',
-                        value: null,
-                    }}
-                />
+                <View className="bg-primary-text">
+                    <RNPickerSelect
+                        onValueChange={handleValueChange}
+                        items={course3}
+                        placeholder={{
+                            label: 'Выберите курс',
+                            value: null,
+                        }}
+                    />
+                </View>
                 <View>
                     {selectedCourse && (
                     <View>
@@ -152,16 +154,17 @@ const styles = StyleSheet.create({
     },
     label: {
         marginBottom: 10,
+        color: '#FFF',
         fontSize: 18,
     },
     button: {
         padding: 10,
-        backgroundColor: '#3498db',
+        backgroundColor: '#FF8F00',
         borderRadius: 5,
         marginBottom: 10,
     },
     text: {
-        color: '#fff',
+        color: '#000',
         fontSize: 16,
     },
 });

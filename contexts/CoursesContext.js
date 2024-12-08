@@ -131,6 +131,7 @@ export const addCourses = async (data) => {
     // добавляем курс в AsyncStorage, отправляем на сервер, генерим для него приемы и отправляем на сервер
     try {
         const courses = await getCourses();
+        //ДОБАВИТЬ СРАВНЕНИЕ КУРСОВ(ОДИНАКОВЫЕ КУРСЫ НЕЛЬЗЯ)
         courses.push(data);
         try {
             saveCourses(courses);

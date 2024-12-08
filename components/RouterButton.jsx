@@ -14,9 +14,9 @@ const RouterButton = ({
     <TouchableOpacity
         activeOpacity={0.4}
         onPress={handlePress}
-        className={`bg-primary-text min-h-[60px]
+        className={`bg-primary-text rounded-lg mb-4 min-h-[60px]
         min-w-[285px] items-center justify-center ${containerStyle}`}>
-        <Text className={`text-3xl text-primary-back font-pbold ${textStyle}`}>{title}</Text>
+        <Text className={`text-3xl text-primary-back ${textStyle}`}>{title}</Text>
         {isLoading && (
         <ActivityIndicator
             animating={isLoading}

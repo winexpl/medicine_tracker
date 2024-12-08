@@ -36,9 +36,17 @@ const ActiveCourseInfo = () => {
   weekdays = weekdays.filter((e, i) => (n & (1 << 6-i) == 1));
   return (
     <View className='bg-primary-back h-full'>
+      <ScrollView>
       <Text className='text-white text-2xl'>Лекарство:</Text>
       <Text className='bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center'>   {course.medicament}</Text>
-      <Text className="bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center">   Доза: {course.dose} {dosageFormTo(course.dosageForm)}</Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 8 }}>
+        <Text style={{ fontSize: 26, color: 'white' }}>Доза:</Text>
+        <View style={{ backgroundColor: '#FF8F00', borderRadius: 8, paddingVertical: 5, paddingHorizontal: 10, marginRight: 200 }}>
+          <Text style={{ fontSize: 18, color: 'black' }}>
+            {course.dose} {dosageFormTo(course.dosageForm)}
+          </Text>
+        </View>
+      </View>
       <Text className='bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center'>   Начало: {new Date(course.startDate).toLocaleDateString()}</Text>
       <TouchableOpacity
         className="bg-primary-text py-1 px-4 rounded-md my-2 justify-center"
@@ -64,15 +72,16 @@ const ActiveCourseInfo = () => {
       </Text>
     </TouchableOpacity>
       
-      <Text className='bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center'>{weekdays.join(' ')}</Text> 
-      <View className='bg-primary-text py-4 px-4 rounded-md my-2 justify-center'>
-        <ScrollView className='max-h-10:'>
+      <Text className='bg-primary-text py-4 px-4 rounded-md my-2 text items-center justify-center'>{weekdays.join(' ')}</Text> 
+      
+        
         {course.schedule.split(',').map(((time, index) => (
-          <Text className="text-black" key={index}>   {index+1} прием {time}</Text>
+          <View className='bg-white py-2 px-4 rounded-md my-1 justify-center'>
+            <Text className="text-black" key={index}>   {index+1} прием {time}</Text>
+          </View>
         )))}
-      </ScrollView>
-      </View>
-      <TouchableOpacity className='bg-primary-text rounded-xl items-center justify-center' onPress={ async () => {
+      
+      <TouchableOpacity className='bg-primary-text rounded-xl items-center my-2 justify-center' onPress={ async () => {
           console.log('НАЖАТА')
           setAll();
         }}>
@@ -108,6 +117,7 @@ const ActiveCourseInfo = () => {
         }}>
         <Text className='bg-primary-text py-4 px-4 rounded-md my-2 text-center justify-center'>Завершить курс</Text>
       </TouchableOpacity>
+      </ScrollView>
     </View>
     
   )
