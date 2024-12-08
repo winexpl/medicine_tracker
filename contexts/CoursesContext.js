@@ -1,10 +1,12 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { API_URL_DELETE_COURSE, API_URL_GET_COURSES, API_URL_POST_COURSES, API_URL_PUT_COURSES } from '../constants/constants';
+import { API_URL_DELETE_COURSE, API_URL_GET_COURSES,
+        API_URL_POST_COURSES, API_URL_PUT_COURSES, API_URL_GET_MEDICAMENT } from '../constants/constants';
 import { getToken } from './Secure';
 import { updateTakes } from '../components/Models';
 import { deleteTakesFromCourse } from './TakesContext';
+import { MedicamentContext, saveMedicaments, getMedicaments } from './MedicamentContext';
 
 export const CourseContext = createContext();
 
@@ -156,6 +158,7 @@ export const clearCourses = async () => {
 export const CoursesProvider = ({ children }) => {
 
     const [courses, setCourses] = useState([]);
+    const { medicaments, setMedicaments } = useContext(MedicamentContext)
     
     useEffect(() => {
         async function fetch() {
@@ -204,12 +207,45 @@ export const CoursesProvider = ({ children }) => {
                 } catch (err) {
                     console.error('Нет связи с сервером, ошибка получения курсов: ', err);
                 }
+                console.log('УДАЛЕННЫЕ КУРСЫ', await getDeletedCourses());
             }
-            console.log('УДАЛЕННЫЕ КУРСЫ', await getDeletedCourses());
         }
         fetch();
     },[]);
 
+    useEffect(() => {
+        async function fetch() {
+            try {
+                let newMedicaments = [];
+                
+                for(let index in courses ) {
+                    const response = await axios.get(API_URL_GET_MEDICAMENT + courses[index].medicamentId, {
+                        headers: {
+                            'Authorization': `Bearer ${await getToken()}`,
+                        },
+                    });
+                    const medicament = response.data;
+                    console.log(medicament);
+                    newMedicaments.push(medicament);
+                }
+                if(newMedicaments.length > 0) {
+                    setMedicaments(newMedicaments);
+                    saveMedicaments(newMedicaments);
+                } else {
+                    const localMedicaments = await getMedicaments();
+                    setMedicaments(localMedicaments);
+                }
+            }
+            catch (error) {
+                // Попробуем получить курсы из локального хранилища, если ошибка сети
+                console.error('Невозможно получить медикаменты с сервера: ', error);
+                const localMedicaments = await getMedicaments();
+                setMedicaments(localMedicaments);
+            }
+            console.log('МЕДИКАМЕНТЫ', medicaments);
+        }
+        fetch();
+    }, [courses])
     console.log('КУРСЫ', courses);
     
     return (

@@ -1,4 +1,4 @@
-export const API_URL = 'http://192.168.1.134:7634';//'http://172.20.10.9:7634';
+export const API_URL = 'http:/192.168.210.134:7634';
 export const API_URL_LOGIN = API_URL + '/login';
 export const API_URL_REGISTRATION = API_URL + '/registration';
 export const API_URL_COURSES = API_URL + '/courses';
@@ -23,3 +23,7 @@ export const API_URL_DELETE_MEDICAMENT = API_URL_MEDICAMENTS + '/id=';
 export const API_URL_GET_TAKES = API_URL_TAKES;
 export const API_URL_POST_TAKES = API_URL_TAKES;
 export const API_URL_DELETE_TAKES = API_URL_TAKES + '/id=';
+
+
+export const EXTEND_API_URL = 'https://rxnav.nlm.nih.gov/REST/drugs.json?'
+export const EXTEND_API_URL_GET_BY_NAME = EXTEND_API_URL + 'name=';

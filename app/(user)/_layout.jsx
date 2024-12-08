@@ -4,13 +4,28 @@ import { Stack } from 'expo-router'
 import { CoursesProvider } from '../../contexts/CoursesContext'
 import { TakeProvider } from '../../contexts/TakesContext'
 import { MedicamentProvider } from '../../contexts/MedicamentContext'
+import PushNotification from 'react-native-push-notification';
 
+// PushNotification.configure({
+//     onNotification: function(notification) {
+//         console.log('Получено уведомление:', notification);
+//     },
+//     requestPermissions: true,  // Запрашиваем разрешения на iOS
+// });
 const MainUserLayout = () => {
+    // const notificationTime = new Date();
+    // notificationTime.setSeconds(notificationTime.getSeconds() + 10);  // Уведомление через 10 секунд
+
+    // PushNotification.localNotificationSchedule({
+    //     title: 'Время принимать лекарства!',
+    //     message: 'Не забудьте принять свой препарат.',
+    //     date: notificationTime,  // Время отправки уведомления
+    // });
     return (
-    
+    <MedicamentProvider>
     <CoursesProvider>
     <TakeProvider>
-    <MedicamentProvider>
+    
         <Stack>
         <Stack.Screen name="(tabsuser)" options={{
             headerShown: false
@@ -29,9 +44,10 @@ const MainUserLayout = () => {
         }}/>
         </Stack>
     
-    </MedicamentProvider>
+    
     </TakeProvider>
     </CoursesProvider>
+    </MedicamentProvider>
     )
 }
 

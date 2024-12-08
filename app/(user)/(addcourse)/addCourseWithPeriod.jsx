@@ -190,7 +190,7 @@ const AddCourseWithPeriod = () => {
             onChangeText={(text) => setPeriod(Number(text))}
           />
           <TouchableOpacity
-             className="p-3 bg-primary-text rounded-lg"
+            className="p-3 bg-primary-text rounded-lg"
             onPress={() => setShowPeriodicityModal(false)}
           >
             <Text className="text-base text-black">OK</Text>

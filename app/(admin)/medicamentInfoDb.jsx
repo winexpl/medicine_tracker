@@ -1,24 +1,29 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList } from 'react-native';
+import { router, useLocalSearchParams } from 'expo-router';
+import { getMedicaments, MedicamentContext, saveMedicaments } from '../../contexts/MedicamentContext';
+import uuid from 'react-native-uuid';
 
 const AddMedicineForm = () => {
-  const [name, setName] = useState('Аспирин Экспресс');
-  const [form, setForm] = useState('Таблетка');
-  const [manufacturer, setManufacturer] = useState('Bayer');
-  const [method, setMethod] = useState('Внутрь');
+  const { medicaments, setMedicaments } = useContext(MedicamentContext);
+
+  const localParams = useLocalSearchParams();
+
+  const [medicament, setMedicament] = useState(JSON.parse(localParams.medicament));
+
+  const [name, setName] = useState(medicament.title);
+  const [form, setForm] = useState(medicament.dosageForm);
+  const [manufacturer, setManufacturer] = useState(medicament.sponsorName);
   const [activeSubstance, setActiveSubstance] = useState('');
   const [dosage, setDosage] = useState('');
-  const [activeSubstances, setActiveSubstances] = useState([
-    { name: 'Аспирин', dosage: '2' }, // Изначально добавленная строка
-  ]);
+  const [activeSubstances, setActiveSubstances] = useState(medicament.activeIngredients);
 
   const handleAddSubstance = () => {
     if (activeSubstance.trim() === '' || dosage.trim() === '') {
       alert('Введите активное вещество и дозировку!');
       return;
     }
-
-    setActiveSubstances([...activeSubstances, { name: activeSubstance, dosage }]);
+    setActiveSubstances([...activeSubstances, { title: activeSubstance, amount: dosage }]);
     setActiveSubstance(''); // Очищаем поле ввода
     setDosage('');
   };
@@ -28,14 +33,15 @@ const AddMedicineForm = () => {
     setActiveSubstances(updatedSubstances);
   };
 
-  const handleSubmit = () => {
-    console.log({
-      name,
-      form,
-      manufacturer,
-      method,
-      activeSubstances,
-    });
+  const handleSubmit = async () => {
+    console.log(1);
+    let newMedicament = { id: medicament.id, activeIngredients: activeSubstances,
+      dosageForm: form, title: name, sponsorName: manufacturer};
+    console.log(2);
+    const oldMedicaments = await getMedicaments();
+    console.log(newMedicament);
+    saveMedicaments([...oldMedicaments, newMedicament]);
+    router.back();
   };
 
   return (
@@ -47,7 +53,9 @@ const AddMedicineForm = () => {
       <TextInput
         className="bg-gray-200 p-2 rounded mb-4"
         value={name}
-        onChangeText={setName}
+        onChangeText={(name) => {
+          setName(name);
+        }}
         placeholder="Введите название"
       />
 
@@ -56,7 +64,9 @@ const AddMedicineForm = () => {
       <TextInput
         className="bg-gray-200 p-2 rounded mb-4"
         value={form}
-        onChangeText={setForm}
+        onChangeText={(form) => {
+          setForm(form);
+        }}
         placeholder="Введите форму выпуска"
       />
 
@@ -67,7 +77,7 @@ const AddMedicineForm = () => {
           key={index}
           className="flex-row items-center justify-between bg-gray-200 p-2 rounded mb-2"
         >
-          <Text className="text-base">{`${substance.name} ${substance.dosage} мг`}</Text>
+          <Text className="text-base">{`${substance.title} ${substance.amount} мг`}</Text>
           <TouchableOpacity
             className="bg-red-400 px-2 py-1 rounded"
             onPress={() => handleRemoveSubstance(index)}
@@ -109,15 +119,6 @@ const AddMedicineForm = () => {
         value={manufacturer}
         onChangeText={setManufacturer}
         placeholder="Введите производителя"
-      />
-
-      {/* Способ применения */}
-      <Text className="text-base mb-2">Способ применения</Text>
-      <TextInput
-        className="bg-gray-200 p-2 rounded mb-4"
-        value={method}
-        onChangeText={setMethod}
-        placeholder="Введите способ применения"
       />
 
       {/* Кнопка Добавить */}
