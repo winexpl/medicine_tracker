@@ -77,7 +77,7 @@ const AddCourseWithPeriod = () => {
     const newTakes = [...takes, ...await addCourses(course)];
     setTakes(newTakes);
     saveTakes(newTakes);
-    router.back();
+    router.push('coursesActive');
   }
 
   const addTake = () => {
@@ -105,15 +105,12 @@ const AddCourseWithPeriod = () => {
     <SafeAreaView className="flex-1 p-4 bg-primary-back">
       <ScrollView>
         <Text className="text-lg font-bold text-center mb-4 text-white">Добавление курса</Text>
-        {/* Your existing JSX here... */}
-
         <ErrorModal
           isVisible={showErrorModal}
           message={errorMessage}
           onClose={closeErrorModal}
         />
-        <Text className="text-lg font-bold text-center mb-4 text-white">Добавление курса</Text>
-        
+    
         <View className="flex-row justify-between mb-4">
           <TouchableOpacity
             className="p-3 bg-gray-200 rounded-lg"

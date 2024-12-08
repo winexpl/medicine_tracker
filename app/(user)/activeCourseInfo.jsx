@@ -72,7 +72,13 @@ const ActiveCourseInfo = () => {
       </Text>
     </TouchableOpacity>
       {/* ИНУЖНО ДОБАВИТЬ ЛОГИКУ ЧТОБЫ В ЗАВИСИМОСТИ ОТ КУРСА ВЫБИРАЛОСЬ ВЫВОДИТЬ ДНИ НЕДЕЛИ ИЛИ ПЕРИОД */}
-      <Text className='bg-primary-text py-4 px-4 rounded-md my-2 text items-center justify-center'>{/*Выбранные дни недели: */}{selectedWeekdays.join(' ')}</Text>
+      <Text className='bg-primary-text py-4 px-4 rounded-md my-2 text items-center justify-center'>
+        {course.typeCourse === '1' 
+          ? `Выбранные дни недели: ${selectedWeekdays.join(' ')}`
+          : course.typeCourse === '2'
+          ? `Выбранная периодичность: ${per} д.`
+          : ''}
+      </Text>
       {/*<Text className='bg-primary-text py-4 px-4 rounded-md my-2 text items-center justify-center'>Выбранный период: {per} д.</Text> */} 
       
         
