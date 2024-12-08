@@ -63,7 +63,8 @@ const ActiveCourseInfo = () => {
         Окончание: {endDate.toLocaleDateString()}
       </Text>
     </TouchableOpacity>
-
+      
+      <Text className='bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center'>{weekdays.join(' ')}</Text> 
       <View className='bg-primary-text py-4 px-4 rounded-md my-2 justify-center'>
         <ScrollView className='max-h-10:'>
         {course.schedule.split(',').map(((time, index) => (
