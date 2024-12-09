@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+//import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStorage from 'expo-secure-store';
 import { API_URL_GET_MEDICAMENT, API_URL_POST_MEDICAMENTS } from '../constants/constants';
 import axios from 'axios';
 import { getToken } from './Secure';
@@ -11,7 +12,7 @@ export const MedicamentContext = createContext();
 
 export const saveMedicaments = async ([...data]) => {
     try {
-        await AsyncStorage.setItem('medicaments', JSON.stringify(data));
+        await SecureStorage.setItem('medicaments', JSON.stringify(data));
         console.log('Medicaments saved!');
     } catch (error) {
         console.error('Error saving takes medicaments: ', error);
@@ -20,7 +21,7 @@ export const saveMedicaments = async ([...data]) => {
 
 export const getMedicaments = async () => {
     try {
-        const medicamentsJson = await AsyncStorage.getItem('medicaments');
+        const medicamentsJson = await SecureStorage.getItem('medicaments');
         const medicamentsObj = JSON.parse(medicamentsJson);
         return medicamentsObj ? medicamentsObj : [];
     } catch (error) {
@@ -33,7 +34,7 @@ export const addMedicaments = async (data) => {
     try {
         const medicaments = await getMedicaments();
         medicaments.push(data);
-        await AsyncStorage.setItem('medicaments', JSON.stringify(medicaments));
+        await SecureStorage.setItem('medicaments', JSON.stringify(medicaments));
         console.log('Medicaments added!');
     } catch (error) {
         console.error('Error adding medicaments: ', error);
@@ -42,7 +43,7 @@ export const addMedicaments = async (data) => {
 
 export const clearMedicaments = async () => {
     try {
-        await AsyncStorage.removeItem('medicaments');
+        await SecureStorage.removeItem('medicaments');
         console.log('Medicaments removed!');
     } catch (error) {
         console.error('Error removing medicaments: ', error);
@@ -54,7 +55,7 @@ export const MedicamentProvider = ({ children }) => {
 
     useEffect(() => {
         async function fetchFromDB() {
-            
+
         }
         fetchFromDB();
     }, []);

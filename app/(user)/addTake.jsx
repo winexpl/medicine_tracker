@@ -1,15 +1,16 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { CourseContext } from '../../contexts/CoursesContext';
 import { MedicamentContext } from '../../contexts/MedicamentContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DatePicker from 'react-native-date-picker';
+import TimerPickerModal from "react-native-timer-picker";
 import { saveTakes, TakeContext } from '../../contexts/TakesContext';
 import uuid from 'react-native-uuid';
 import { router } from 'expo-router';
 
-const AddTake = () => {
+export default AddTake = () => {
     const { courses, setCourses } = useContext(CourseContext);
     const { medicaments, setMedicaments } = useContext(MedicamentContext);
     const { takes, setTakes } = useContext(TakeContext);
@@ -77,7 +78,7 @@ const AddTake = () => {
     };
 
     return (
-        <SafeAreaView className="flex-1 p-4 bg-primary-back">
+        <View className="flex-1 p-4 bg-primary-back">
             <View>
                 <Text style={styles.label}>Выберите курс:</Text>
                 <View className="bg-primary-text">
@@ -93,56 +94,65 @@ const AddTake = () => {
                 <View>
                     {selectedCourse && (
                     <View>
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => {
-                                setShowDatePicker(true);
-                            }}
-                        >
-                            <Text style={styles.text}>Выберите дату приема {selectedDate.toLocaleDateString()}</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => {
-                                setShowTimePicker(true);
-                            }}
-                        >
-                            <Text style={styles.text}>Выберите время приема {selectedTime.toLocaleTimeString()}</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => {
-                                let newTake = take;
-                                newTake.datetime = newTake.datetime.toISOString();
-                                setTake(newTake);
-                                setTakes([...takes, newTake]);
-                                saveTakes([...takes, newTake]);
-                                router.back();
-                            }}>
+                            <TouchableOpacity
+                                style={styles.button}
+                                onPress={() => {
+                                    setShowDatePicker(true);
+                                } }
+                            >
+                                <Text style={styles.text}>Выберите дату приема {selectedDate.toLocaleDateString()}</Text>
+                            </TouchableOpacity>
+                            <DatePicker
+                                modal
+                                open={showDatePicker}
+                                date={date}
+                                onConfirm={(selectedDate) => {
+                                    setShowDatePicker(false);
+                                    if (selectedDate) {
+                                        handleDateChange(selectedDate);
+                                    }
+                                } }
+                                onCancel={() => {
+                                    setShowDatePicker(false);
+                                } } />
+                            <TouchableOpacity
+                                style={styles.button}
+                                onPress={() => {
+                                    setShowTimePicker(true);
+                                } }
+                            >
+                                <Text style={styles.text}>Выберите время приема {selectedTime.toLocaleTimeString()}</Text>
+                            
+                            </TouchableOpacity>
+                            <TimerPickerModal
+                                visible={showTimePicker}
+                                setIsVisible={setShowTimePicker}
+                                onConfirm={(selectedTime) => {
+                                    setShowTimePicker(false);
+                                    if (selectedTime) {
+                                        handleTimeChange(selectedTime);
+                                    }
+                                } }
+                                modalTitle="Выберите время"
+                                onCancel={() => setShowTimePicker(false)} />
+                                
+                            <TouchableOpacity
+                                style={styles.button}
+                                onPress={() => {
+                                    let newTake = take;
+                                    newTake.datetime = newTake.datetime.toISOString();
+                                    setTake(newTake);
+                                    setTakes([...takes, newTake]);
+                                    saveTakes([...takes, newTake]);
+                                    router.back();
+                                } }>
                             <Text style={styles.text}>Сохранить прием</Text>
                         </TouchableOpacity>
                     </View>
                     )}
                 </View>
-            
-            {showTimePicker && (
-                <DateTimePicker
-                    mode="time"
-                    value={selectedTime}
-                    onChange={handleTimeChange}
-                />
-            )}
-
-            {showDatePicker && (
-                    <DateTimePicker
-                        mode="date"
-                        value={selectedDate}
-                        onChange={handleDateChange}
-                    />
-            )}
             </View>
-        </SafeAreaView>
+        </View>
     );
 };
 
@@ -168,5 +178,3 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
 });
-
-export default AddTake;

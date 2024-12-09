@@ -8,8 +8,29 @@ import { Ionicons } from '@expo/vector-icons'; // Импортируем ико�
 import { getTakes, saveTakes, TakeContext } from '../../../contexts/TakesContext';
 import { router } from 'expo-router';
 import { MedicamentContext } from '../../../contexts/MedicamentContext';
+import * as Notifications from 'expo-notifications';
+
+// First, set the handler that will cause the notification
+// to show the alert
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+// Second, call scheduleNotificationAsync()
+Notifications.scheduleNotificationAsync({
+  content: {
+    title: 'Look at that notification',
+    body: "I'm so proud of myself!q2eqweqwe",
+  },
+  trigger: null,
+});
 
 export default function Schedule() {
+
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Выбранная дата
   const [selectedDayIndex, setSelectedDayIndex] = useState(new Date().getDay() || 7); // Индекс выбранного дня недели
   const [showCalendar, setShowCalendar] = useState(false); // Состояние для показа календаря
@@ -17,14 +38,7 @@ export default function Schedule() {
   const { medicaments } = useContext(MedicamentContext);
   const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   const { takes, setTakes } = useContext(TakeContext);
-    const [selectedBackgrounds, setSelectedBackgrounds] = useState({}); // Состояние для хранения фонов
 
-  const updateBackground = (id, color) => {
-    setSelectedBackgrounds((prev) => ({
-      ...prev,
-      [id]: color, // Обновляем цвет для определенного элемента
-    }));
-  };
   useEffect(() => {
     async function update() {
       const newTakes = await getTakes();
@@ -77,9 +91,9 @@ export default function Schedule() {
   };
 
   return (
-    <SafeAreaView className="flex-1 p-2 bg-primary-back">
+    <SafeAreaView className="min-h-full flex-1 p-2 bg-primary-back">
       {/* Кнопки для переключения недель */}
-      <SafeAreaView className="flex-row justify-between items-center mb-2">
+      <View className="flex-row justify-between items-center mb-10">
         <TouchableOpacity className="bg-primary-text p-3 rounded" onPress={() => handleWeekChange(-1)}>
           <Text className="text-black">←</Text>
         </TouchableOpacity>
@@ -87,10 +101,10 @@ export default function Schedule() {
         <TouchableOpacity className="bg-primary-text p-3 rounded" onPress={() => handleWeekChange(1)}>
           <Text className="text-black">→</Text>
         </TouchableOpacity>
-      </SafeAreaView>
+      </View>
 
       {/* Дни недели */}
-      <SafeAreaView className="flex-row justify-around mt-[-26px] mb-2">
+      <View className="flex-row justify-around mt-[-26px] mb-10">
         {daysOfWeek.map((day, index) => (
           <TouchableOpacity
             key={index}
@@ -102,10 +116,10 @@ export default function Schedule() {
             </Text>
           </TouchableOpacity>
         ))}
-      </SafeAreaView>
+      </View>
 
       {/* Кнопка для календаря */}
-      <SafeAreaView className="flex-row justify-center mb-2">
+      <View className="flex-row justify-center mb-5">
         <TouchableOpacity
           className="bg-primary-text px-5 mt-[-26px] py-3 rounded items-center justify-center"
           onPress={() => setShowCalendar(!showCalendar)}
@@ -114,7 +128,7 @@ export default function Schedule() {
             {showCalendar ? 'Скрыть календарь' : 'Выбрать дату'}
           </Text>
         </TouchableOpacity>
-      </SafeAreaView>
+      </View>
 
       {/* Календарь */}
       {showCalendar && (
@@ -150,7 +164,7 @@ export default function Schedule() {
           <View
             key={index}
             style={{
-              backgroundColor: selectedBackgrounds[takem.id] || 'white', 
+              backgroundColor: takem.state ? '#7cfc00' : '#ff4c5b',
             }}
             className="flex-row items-center bg-white p-3 rounded mb-2"
           >
@@ -162,7 +176,6 @@ export default function Schedule() {
               className="ml-3"
               onPress={() => {
                 take(takem.id);
-                updateBackground(takem.id, '#7cfc00'); // Меняем фон на зеленый
               }}
             >
               <Ionicons name="thumbs-up" size={24} color="green" />
@@ -172,7 +185,6 @@ export default function Schedule() {
               className="ml-3"
               onPress={() => {
                 donttake(takem.id);
-                updateBackground(takem.id, '#ff4c5b'); // Меняем фон на красный
               }}
             >
               <Ionicons name="thumbs-down" size={24} color="red" />
@@ -182,7 +194,7 @@ export default function Schedule() {
       </ScrollView>
 
       {/* Кнопка добавить */}
-      <TouchableOpacity className="bg-primary-text px-5 py-3 rounded items-center mt-3" onPress={() => { router.push('addTake'); }}>
+      <TouchableOpacity className="bg-primary-text px-5 py-3 rounded items-center mt-10" onPress={() => { router.push('addTake'); }}>
         <Text className="text-black">Добавить приём</Text>
       </TouchableOpacity>
     </SafeAreaView>

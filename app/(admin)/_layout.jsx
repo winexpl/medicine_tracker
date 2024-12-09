@@ -1,4 +1,3 @@
-'use client'
 import { SplashScreen, Stack } from 'expo-router';
 import { useFonts  } from 'expo-font';
 import { useEffect, useState } from 'react';

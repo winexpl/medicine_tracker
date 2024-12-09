@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, FlatList, ScrollView} from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { TimerPickerModal } from "react-native-timer-picker";
+
 import { SafeAreaView } from 'react-native-safe-area-context';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DatePicker  from 'react-native-date-picker';
 import { dosageFormTo } from '../../../components/Models';
 import { addCourses, CourseContext, saveCourses } from '../../../contexts/CoursesContext';
 import { saveTakes, TakeContext } from '../../../contexts/TakesContext';
@@ -215,38 +217,39 @@ const AddCourseForAWeek = () => {
                         <Text className="text-black text-center">+ Добавить прием</Text>
                     </TouchableOpacity>
 
-                    {showTimePicker && (
-                        <DateTimePicker
-                        mode="time"
-                        value={new Date()}
-                        onChange={(event, selectedTime) => {
-                            setShowTimePicker(false);
-                            if (selectedTime) {
-                            const newSchedule = [...schedule];
-                            newSchedule[selectIndexInSchedule] = selectedTime.toLocaleTimeString();
-                            newSchedule.sort();
-                            setSchedule(newSchedule);
-                            }
-                        }}
-                        />
-                    )}
-
-                    {showDatePicker && (
-                        <DateTimePicker
-                        mode="date"
-                        value={selectedDate}
-                        onChange={(event, selectedDate) => {
-                            setShowDatePicker(false);
+                    <DatePicker
+                        modal
+                        open={setShowDatePicker}
+                        date={new Date()}
+                        onConfirm={(selectedDate) => {
+                        if (selectedDate) {
                             if (selectedDate) {
-                            if (selectedDateType === 'start') {
-                                setStartDate(selectedDate);
-                            } else {
-                                setEndDate(selectedDate);
-                            }
-                            }
+                                if (selectedDateType === 'start') {
+                                    setStartDate(selectedDate);
+                                } else {
+                                    setEndDate(selectedDate);
+                                }
+                                }
+                        }
                         }}
-                        />
-                    )}
+                        onCancel={() => {
+                            setShowDatePicker(false)
+                        }}
+                    />
+
+                    <TimerPickerModal
+                        visible={showTimePicker}
+                        setIsVisible={setShowTimePicker}
+                        onConfirm={(selectedTime) => {
+                            if (selectedTime) {
+                                const newSchedule = [...schedule];
+                                newSchedule[selectIndexInSchedule] = selectedTime.toLocaleTimeString();
+                                newSchedule.sort();
+                                setSchedule(newSchedule);
+                                }
+                        } }
+                        modalTitle="Выберите время"
+                        onCancel={() => setShowTimePicker(false)} />
 
                     <Modal visible={showDoseModal} transparent>
                         <View className="flex-1 justify-center items-center bg-black bg-opacity-50">

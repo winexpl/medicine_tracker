@@ -5,11 +5,11 @@ import { saveToken, getToken, removeToken } from "../contexts/Secure";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Text } from "react-native";
 
+
 export default function App() {
     
     const { userInfo, setUserInfo } = useContext(AuthContext);
-    
-    
+
     useEffect(() => {
         async function name() {
             if(userInfo.role === "ADMIN") {

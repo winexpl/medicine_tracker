@@ -4,7 +4,6 @@ import { Stack } from 'expo-router'
 import { CoursesProvider } from '../../contexts/CoursesContext'
 import { TakeProvider } from '../../contexts/TakesContext'
 import { MedicamentProvider } from '../../contexts/MedicamentContext'
-import PushNotification from 'react-native-push-notification';
 
 // PushNotification.configure({
 //     onNotification: function(notification) {

@@ -2,12 +2,11 @@ import { StyleSheet, Text, TouchableOpacity, View, ScrollView, Button } from 're
 import React, { useContext, useEffect, useState} from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useLocalSearchParams } from 'expo-router'
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DatePicker  from 'react-native-date-picker';
 import { router } from 'expo-router';
 import { CourseContext, saveCourses } from '../../contexts/CoursesContext';
 import { dosageFormTo, updateTakes } from '../../components/Models';
 import { addDeletedTakes, saveTakes, TakeContext } from '../../contexts/TakesContext';
-import { collapseTextChangeRangesAcrossMultipleVersions } from 'typescript';
 
 const ActiveCourseInfo = () => {
   let course = useLocalSearchParams();
@@ -47,30 +46,30 @@ const ActiveCourseInfo = () => {
           </Text>
         </View>
       </View>
-      <Text className='bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center'>   Начало: {new Date(course.startDate).toLocaleDateString()}</Text>
-      <TouchableOpacity
-        className="bg-primary-text py-1 px-4 rounded-md my-2 justify-center"
-        onPress={() => {
-          setShowDatePicker(true);
+      <TouchableOpacity onPress={() => {setShowDatePicker(true)}}>
+        <Text className='bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center'>
+          Начало: {new Date(course.startDate).toLocaleDateString()}
+        </Text>
+      </TouchableOpacity>
+      <DatePicker
+        modal
+        openPicker={showDatePicker}
+        open={showDatePicker}
+        
+        date={endDate}
+        onConfirm={(selectedDate) => {
+          if (selectedDate) {
+            setEndDate(selectedDate);
+          }
         }}
-      >
+        onCancel={() => {
+          setShowDatePicker(false);
+        }}
+      />
 
-        {showDatePicker && (
-          <DateTimePicker
-            mode="date"
-            value={endDate}
-            onChange={(event, selectedDate) => {
-              setShowDatePicker(false);
-              if (selectedDate) {
-                  setEndDate(selectedDate);
-                }
-              }
-            }
-      />)}
       <Text className='bg-primary-text py-1 px-4 rounded-md my-2 items-center justify-center'>
         Окончание: {endDate.toLocaleDateString()}
       </Text>
-    </TouchableOpacity>
       
       <Text className='bg-primary-text py-4 px-4 rounded-md my-2 text items-center justify-center'>{weekdays.join(' ')}</Text> 
       

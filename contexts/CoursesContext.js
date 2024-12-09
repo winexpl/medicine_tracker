@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+//import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStorage from 'expo-secure-store';
 import axios from 'axios';
 import { API_URL_DELETE_COURSE, API_URL_GET_COURSES,
         API_URL_POST_COURSES, API_URL_PUT_COURSES, API_URL_GET_MEDICAMENT } from '../constants/constants';
@@ -12,7 +13,7 @@ export const CourseContext = createContext();
 
 export const saveCourses = async (data) => {
     try {
-        await AsyncStorage.setItem('courses', JSON.stringify(data));
+        await SecureStorage.setItem('courses', JSON.stringify(data));
         for(let i in data) {
             try {
                 const response = await axios.put(API_URL_PUT_COURSES, data[i], {
@@ -33,7 +34,7 @@ export const saveCourses = async (data) => {
 
 export const saveDeletedCourses = async (data) => {
     try {
-        await AsyncStorage.setItem('deletedCourses', JSON.stringify(data));
+        await SecureStorage.setItem('deletedCourses', JSON.stringify(data));
         console.log('Deleted courses saved!');
     } catch (error) {
         console.error('Error saving deleted courses: ', error);
@@ -98,7 +99,7 @@ export const deleteCourses = async (data) => {
 
 export const clearDeletedCourses = async () => {
     try {
-        await AsyncStorage.removeItem('deletedCourses');
+        await SecureStorage.removeItem('deletedCourses');
         console.log('Deleted courses removed!');
     } catch (error) {
         console.error('Error removing deleted courses: ', error);
@@ -107,7 +108,7 @@ export const clearDeletedCourses = async () => {
 
 export const getDeletedCourses = async () => {
     try {
-        const coursesJson = await AsyncStorage.getItem('deletedCourses');
+        const coursesJson = await SecureStorage.getItem('deletedCourses');
         const coursesObj = JSON.parse(coursesJson);
         return coursesObj;
     } catch (error) {
@@ -118,7 +119,7 @@ export const getDeletedCourses = async () => {
 
 export const getCourses = async () => {
     try {
-        const coursesJson = await AsyncStorage.getItem('courses');
+        const coursesJson = await SecureStorage.getItem('courses');
         const coursesObj = JSON.parse(coursesJson);
         return coursesObj ? coursesObj : [];
     } catch (error) {
@@ -149,7 +150,7 @@ export const addCourses = async (data) => {
 
 export const clearCourses = async () => {
     try {
-        await AsyncStorage.removeItem('courses');
+        await SecureStorage.removeItem('courses');
         console.log('Courses removed!', await getCourses());
     } catch (error) {
         console.error('Error removing courses: ', error);

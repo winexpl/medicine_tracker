@@ -1,16 +1,17 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+//import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL_DELETE_COURSE, API_URL_GET_TAKES, API_URL_POST_TAKES, API_URL_DELETE_TAKES } from '../constants/constants';
 import axios from 'axios';
 import { getToken } from './Secure';
 import { CourseContext } from './CoursesContext';
+import * as SecureStorage from 'expo-secure-store';
 
 export const TakeContext = createContext();
 
 
 export const saveDeletedTakes = async (data) => {
     try {
-        await AsyncStorage.setItem('deletedTakes', JSON.stringify(data));
+        await SecureStorage.setItem('deletedTakes', JSON.stringify(data));
         console.log('Deleted take saved!');
     } catch (error) {
         console.error('Error saving deleted takes: ', error);
@@ -92,7 +93,7 @@ export const addDeletedTakes = async (data) => {
 
 export const getDeletedTakes = async () => {
     try {
-        const deletedTakesJson = await AsyncStorage.getItem('deletedTakes');
+        const deletedTakesJson = await SecureStorage.getItem('deletedTakes');
         const deletedTakes = JSON.parse(deletedTakesJson);
         if(deletedTakes) return deletedTakes;
         return [];
@@ -104,7 +105,7 @@ export const getDeletedTakes = async () => {
 
 export const saveTakes = async ([...data]) => {
     try {
-        await AsyncStorage.setItem('takes', JSON.stringify(data));
+        await SecureStorage.setItem('takes', JSON.stringify(data));
         const takes = data;
         console.log('Takes saved!');
         for(let i in takes) {
@@ -127,7 +128,7 @@ export const saveTakes = async ([...data]) => {
 
 export const getTakes = async () => {
     try {
-        const takesJson = await AsyncStorage.getItem('takes');
+        const takesJson = await SecureStorage.getItem('takes');
         const takesObj = JSON.parse(takesJson);
         if(takesObj) return takesObj;
         else return [];
@@ -139,10 +140,10 @@ export const getTakes = async () => {
 
 export const addTakes = async (data) => {
     try {
-        const takesJson = await AsyncStorage.getItem('takes');
+        const takesJson = await SecureStorage.getItem('takes');
         const takes = takesJson ? JSON.parse(takesJson) : [];
         takes.push(data);
-        await AsyncStorage.setItem('takes', JSON.stringify(takes));
+        await SecureStorage.setItem('takes', JSON.stringify(takes));
         console.log('Takes added!');
     } catch (error) {
         console.error('Error adding takes: ', error);
@@ -151,7 +152,7 @@ export const addTakes = async (data) => {
 
 export const clearTakes = async (data) => {
     try {
-        await AsyncStorage.removeItem('takes');
+        await SecureStorage.removeItem('takes');
         console.log('Takes removed!');
     } catch (error) {
         console.error('Error removing takes: ', error);
@@ -160,7 +161,7 @@ export const clearTakes = async (data) => {
 
 export const clearDeletedTakes = async () => {
     try {
-        await AsyncStorage.removeItem('deletedTakes');
+        await SecureStorage.removeItem('deletedTakes');
         console.log('Deleted takes removed!');
     } catch (error) {
         console.error('Error removing deleted takes: ', error);
