@@ -12,6 +12,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { MedicamentContext, saveMedicaments } from '../../../contexts/MedicamentContext';
 import { addCourses, CourseContext, saveCourses } from '../../../contexts/CoursesContext';
 import { TakeContext } from '../../../contexts/TakesContext';
+import ErrorModal from '../../../components/ErrorModal';
 
 const MedicineSelectionScreen = () => {
   const [searchQuery, setSearchQuery] = useState(''); // Состояние для строки поиска
@@ -21,6 +22,21 @@ const MedicineSelectionScreen = () => {
   const { courses, setCourses } = useContext(CourseContext);
   const { takes, setTakes } = useContext(TakeContext);
 
+    // State for error modal
+    const [errorMessage, setErrorMessage] = useState('');
+    const [showErrorModal, setShowErrorModal] = useState(false);
+  
+    // Function to show error messages in the modal
+    const showError = (message) => {
+      setErrorMessage(message);
+      setShowErrorModal(true);
+    };
+  
+    // Function to close the error modal
+    const closeErrorModal = () => {
+      setShowErrorModal(false);
+      setErrorMessage('');
+    };
 
   useEffect(() => {
     async function fetchMedicaments() {
@@ -52,9 +68,14 @@ const MedicineSelectionScreen = () => {
     <TouchableOpacity className="p-4 border-b border-gray-200 bg-white" onPress={() => {
       console.log('item',item);
       course.medicamentId = item.id;
+      if(courses.findIndex((e) => e.medicamentId === item.id) != -1) {
+        showError('Курс с этим препаратом уже существует');
+        return;
+      }
       console.log(course);
       setMedicaments([...medicaments, item]);
       saveMedicaments([...medicaments, item]);
+      
       if(Number(course.typeCourse) === 2) {
         router.push({
           pathname: '/addCourseWithPeriod',
@@ -92,6 +113,11 @@ const MedicineSelectionScreen = () => {
 
   return (
     <View className="flex-1 bg-primary-back p-4">
+      <ErrorModal
+          isVisible={showErrorModal}
+          message={errorMessage}
+          onClose={closeErrorModal}
+        />
       {/* Заголовок экрана */}
       <Text className="font-bold mb-4 text-white">Выбор лекарства</Text>
 

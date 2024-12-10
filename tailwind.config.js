@@ -8,13 +8,14 @@ module.exports = {
           back: {
             DEFAULT: '#1C1C2B',
           },
-          text: "#FF8F00",
+          text: "blue",
+          text1: "#FFF",
         }, 
         secondary: {
           back: {
             DEFAULT: '#161622',
           },
-          text: "#FFD5AA",
+          text: "white",
         }
       },
       fontFamily: {

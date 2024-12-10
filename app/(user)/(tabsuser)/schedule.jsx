@@ -12,25 +12,26 @@ import * as Notifications from 'expo-notifications';
 
 // First, set the handler that will cause the notification
 // to show the alert
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
+// Notifications.setNotificationHandler({
+//   handleNotification: async () => ({
+//     shouldShowAlert: true,
+//     shouldPlaySound: false,
+//     shouldSetBadge: false,
+//   }),
+// });
 
-// Second, call scheduleNotificationAsync()
-Notifications.scheduleNotificationAsync({
-  content: {
-    title: 'Look at that notification',
-    body: "I'm so proud of myself!q2eqweqwe",
-  },
-  trigger: null,
-});
+// // Second, call scheduleNotificationAsync()
+// Notifications.scheduleNotificationAsync({
+//   content: {
+//     title: 'Look at that notification',
+//     body: "I'm so proud of myself!q2eqweqwe",
+//   },
+//   trigger: null,
+// });
 
 export default function Schedule() {
 
+  const [notificationId, setNotificationId] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Выбранная дата
   const [selectedDayIndex, setSelectedDayIndex] = useState(new Date().getDay() || 7); // Индекс выбранного дня недели
   const [showCalendar, setShowCalendar] = useState(false); // Состояние для показа календаря
@@ -38,6 +39,75 @@ export default function Schedule() {
   const { medicaments } = useContext(MedicamentContext);
   const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   const { takes, setTakes } = useContext(TakeContext);
+  const [takesToday, setTakesToday] = useState([...getTakesByDate(selectedDate, takes, courses, medicaments)] );
+  // Функция для настройки уведомления
+  const scheduleNotification = async () => {
+    let ts = takesToday;
+    if(ts.length > 0) {
+      ts = ts.sort((a, b) => {
+        return new Date(a.datetime) - new Date(b.datetime);
+      });
+      let temp = ts;
+      ts = [];
+      temp.forEach(e => {if(e.datetime > new Date().toISOString() && e.state === false) ts.push(e)});
+    setTakesToday(ts);
+    const triggerTime = new Date(takesToday[0].datetime);
+    const notificationId = await Notifications.scheduleNotificationAsync({
+      content: {
+        title: ts[0].title,
+        body: "Примите лекарство!",
+      },
+      trigger: triggerTime,
+    });
+    setNotificationId(notificationId);
+    }
+  };
+
+  // Обработчик уведомлений
+  useEffect(() => {
+    if(takesToday.length > 0) {
+      Notifications.setNotificationHandler({
+      handleNotification: async (notification) => {
+        // Когда уведомление срабатывает, переназначаем следующее уведомление
+        console.log('Notification received:', notification);
+        let newCourses = [];
+        courses.forEach(c => {
+          if(c.title != ts[0].title) {
+            let cc = c;
+            cc.numberMedicine = cc.numberMedicine - 1;
+            if(cc.numberMedicine != 0) {
+              newCourses.push(cc);
+            }
+          }
+        });
+        setCourses(newCourses);
+        let ts = takesToday;
+        ts.shift();
+        setTakesToday(ts);
+        const nextTrigger = new Date(ts[0].datetime);
+
+        // Планируем следующее уведомление
+        await Notifications.scheduleNotificationAsync({
+          content: {
+            title: ts[0].title,
+            body: "Примите лекарство!",
+          },
+          trigger: nextTrigger,
+        });
+
+        return {
+          shouldShowAlert: true,
+          shouldPlaySound: true,
+          shouldSetBadge: false,
+        };
+      },
+      });
+    }
+    // Запланируем первое уведомление при монтировании
+    scheduleNotification();
+
+  }, []); // Пустой массив зависимостей, чтобы выполнить только при первом рендере
+  
 
   useEffect(() => {
     async function update() {

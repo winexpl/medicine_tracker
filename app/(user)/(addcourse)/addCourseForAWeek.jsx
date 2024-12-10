@@ -1,15 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, FlatList, ScrollView} from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { TimerPickerModal } from "react-native-timer-picker";
-
 import { SafeAreaView } from 'react-native-safe-area-context';
-import DatePicker  from 'react-native-date-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { dosageFormTo } from '../../../components/Models';
 import { addCourses, CourseContext, saveCourses } from '../../../contexts/CoursesContext';
 import { saveTakes, TakeContext } from '../../../contexts/TakesContext';
 import { Checkbox } from 'react-native-paper';
-
+import ErrorModal from '../../../components/ErrorModalTwo'; // Import the error modal
 
 const AddCourseForAWeek = () => {
     const { courses, setCourses } = useContext(CourseContext);
@@ -43,26 +41,22 @@ const AddCourseForAWeek = () => {
         friday: false,
         saturday: false,
     });
+  // Стейт для ошибки
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const showError = (message) => {
+    setErrorMessage(message);
+    setErrorModalVisible(true);
+};
 
-
+const hideError = () => {
+    setErrorModalVisible(false);
+};
     async function setAll() {
         let newCourses = [course];
         if(courses.length > 0) {
             newCourses = [...courses, ...newCourses];
         }
-        if(course.startDate > course.endDate){
-            alert('Начало приема не должно превышать окончание приема!');
-            return;
-          }
-      
-          for(let i=0; course.schedule.length>i; i++){
-            for(let j=0; course.schedule.length>j; j++){
-              if(course.schedule[i]==course.schedule[j] && i!=j){
-                alert('Время приема не должно совпадать!');
-                return;
-              }
-            }
-          }
         setCourses(newCourses);
         const newTakes = [...takes, ...await addCourses(course, takes)];
         setTakes(newTakes);
@@ -150,7 +144,7 @@ const AddCourseForAWeek = () => {
                     <View  className="mt-4">
                     <Text className="text-white">Выберите дни недели:</Text>
                             <View>
-                            {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday','sunday'].map((day, index) => (
+                            {['понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота','воскресенье'].map((day, index) => (
                                 <View key={day} className="flex-row items-center mb-2">
                                 <Checkbox
                                     status={(weekday & (1 << 6-index)) > 0 ? 'checked' : 'unchecked'}
@@ -167,7 +161,7 @@ const AddCourseForAWeek = () => {
                                         setWeekday(newWeekday);
                                     }}
                                 />
-                                <Text className="text-white">{day.charAt(0).toUpperCase() + day.slice(1)}</Text> {/* Отображаем день недели */}
+                                <Text className="text-white">{day.charAt(0).toUpperCase() + day.slice(1)}</Text>
                                 </View>
                             ))}
                             </View>
@@ -216,40 +210,43 @@ const AddCourseForAWeek = () => {
                     <TouchableOpacity className="p-4 bg-primary-text rounded-lg text-center mb-4" onPress={addTake}>
                         <Text className="text-black text-center">+ Добавить прием</Text>
                     </TouchableOpacity>
-
-                    <DatePicker
-                        modal
-                        open={setShowDatePicker}
-                        date={new Date()}
-                        onConfirm={(selectedDate) => {
-                        if (selectedDate) {
-                            if (selectedDate) {
-                                if (selectedDateType === 'start') {
-                                    setStartDate(selectedDate);
-                                } else {
-                                    setEndDate(selectedDate);
-                                }
-                                }
-                        }
-                        }}
-                        onCancel={() => {
-                            setShowDatePicker(false)
-                        }}
+                    <ErrorModal
+                        visible={errorModalVisible}
+                        message={errorMessage}
+                        onClose={hideError}
                     />
-
-                    <TimerPickerModal
-                        visible={showTimePicker}
-                        setIsVisible={setShowTimePicker}
-                        onConfirm={(selectedTime) => {
+                    {showTimePicker && (
+                        <DateTimePicker
+                        mode="time"
+                        value={new Date()}
+                        onChange={(event, selectedTime) => {
+                            setShowTimePicker(false);
                             if (selectedTime) {
-                                const newSchedule = [...schedule];
-                                newSchedule[selectIndexInSchedule] = selectedTime.toLocaleTimeString();
-                                newSchedule.sort();
-                                setSchedule(newSchedule);
-                                }
-                        } }
-                        modalTitle="Выберите время"
-                        onCancel={() => setShowTimePicker(false)} />
+                            const newSchedule = [...schedule];
+                            newSchedule[selectIndexInSchedule] = selectedTime.toLocaleTimeString();
+                            newSchedule.sort();
+                            setSchedule(newSchedule);
+                            }
+                        }}
+                        />
+                    )}
+
+                    {showDatePicker && (
+                        <DateTimePicker
+                        mode="date"
+                        value={selectedDate}
+                        onChange={(event, selectedDate) => {
+                            setShowDatePicker(false);
+                            if (selectedDate) {
+                            if (selectedDateType === 'start') {
+                                setStartDate(selectedDate);
+                            } else {
+                                setEndDate(selectedDate);
+                            }
+                            }
+                        }}
+                        />
+                    )}
 
                     <Modal visible={showDoseModal} transparent>
                         <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
@@ -277,7 +274,6 @@ const AddCourseForAWeek = () => {
                         <Text className="text-bg-black">{item}</Text>
                     </TouchableOpacity>
                     ))}
-
                     <TouchableOpacity
                         className="p-4 bg-primary-text rounded-lg text-center mb-4"
                         onPress={ () => {

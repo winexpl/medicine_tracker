@@ -43,7 +43,13 @@ export const updateTakes = async (course, oldEndDate, newEndDate, takes) => {
     const type = course.typeCourse;
     let daysOfWeek = [];
     let newTakes = [...takes];
-    const schedule = course.schedule.split(',');
+    let schedule = [];
+    try {
+        schedule = course.schedule.split(',');
+    } catch (error) {
+        schedule = course.schedule;
+    }
+    
     if(oldEndDate.getTime() >= newEndDate.getTime()) {
         const deletedTakes = [];
         for(let i = 0; i < takes.length; ++i) {
@@ -64,12 +70,14 @@ export const updateTakes = async (course, oldEndDate, newEndDate, takes) => {
             if(weekdays & 1) daysOfWeek.push(0);
             for(let i = 1; i < 7; ++i) {
                 let d = weekdays & (1 << i);
-                if(d === 1) daysOfWeek.push(7 - i);
+                if(d > 0) daysOfWeek.push(7 - i);
             }
+            console.log(weekdays, daysOfWeek);
             for(let i = new Date(oldEndDate.getTime() + 1000 * 3600 * 24).getTime();
                     i < new Date(newEndDate.getTime() + 1000 * 3600 * 24).getTime();
                     i += 1000 * 3600 * 24) {
                 console.log(schedule, typeof schedule);
+                console.log(daysOfWeek);
                 if(daysOfWeek.findIndex(u => u === new Date(i).getDay()) != -1) {
                     for(let j = 0; j < schedule.length; ++j) {
                         const [hours, minutes, seconds] = schedule[j].split(':');
@@ -90,7 +98,7 @@ export const updateTakes = async (course, oldEndDate, newEndDate, takes) => {
                         }
                         
                         console.log('НОВЫЙ ПРИЕМ', newTake);
-                        newTakes.push(take);
+                        newTakes.push(newTake);
                     };
                 }
             }
@@ -116,7 +124,7 @@ export const updateTakes = async (course, oldEndDate, newEndDate, takes) => {
                         newTake = {id: uniqueId, courseId: course.id, datetime:dateForTake.toISOString(), state:false};
                     } catch (error) {
                         console.log('ОШИБКА СОЗДАНИЯ GHBTVF???', error);
-                    } 
+                    }
                     console.log('НОВЫЙ ПРИЕМ', newTake);
                     newTakes.push(newTake);
                 }
@@ -128,9 +136,9 @@ export const updateTakes = async (course, oldEndDate, newEndDate, takes) => {
 }
 
 export const getTakesByDate = (date, takes, courses, medicaments) => {
-
     const takesForDate = [];
-    for(let index in takes) {
+    try {
+        for(let index in takes) {
         let take = takes[index];
         if(new Date(take.datetime).toLocaleDateString() === new Date(date).toLocaleDateString()) {
             let indexCourse = courses.findIndex(m => m.id === take.courseId);
@@ -147,6 +155,9 @@ export const getTakesByDate = (date, takes, courses, medicaments) => {
         }
     }
     return takesForDate;
+    } finally {
+        return takesForDate;
+    }
 }
 
 export const updateCourseState = (id) => {

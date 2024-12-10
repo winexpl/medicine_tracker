@@ -99,7 +99,7 @@ export const deleteCourses = async (data) => {
 
 export const clearDeletedCourses = async () => {
     try {
-        await SecureStorage.removeItem('deletedCourses');
+        await SecureStorage.deleteItemAsync('deletedCourses');
         console.log('Deleted courses removed!');
     } catch (error) {
         console.error('Error removing deleted courses: ', error);
@@ -132,7 +132,7 @@ export const addCourses = async (data) => {
     // добавляем курс в AsyncStorage, отправляем на сервер, генерим для него приемы и отправляем на сервер
     try {
         const courses = await getCourses();
-        //ДОБАВИТЬ СРАВНЕНИЕ КУРСОВ(ОДИНАКОВЫЕ КУРСЫ НЕЛЬЗЯ)
+        
         courses.push(data);
         try {
             saveCourses(courses);
@@ -150,7 +150,7 @@ export const addCourses = async (data) => {
 
 export const clearCourses = async () => {
     try {
-        await SecureStorage.removeItem('courses');
+        await SecureStorage.deleteItemAsync('courses');
         console.log('Courses removed!', await getCourses());
     } catch (error) {
         console.error('Error removing courses: ', error);

@@ -43,7 +43,7 @@ export const addMedicaments = async (data) => {
 
 export const clearMedicaments = async () => {
     try {
-        await SecureStorage.removeItem('medicaments');
+        await SecureStorage.deleteItemAsync('medicaments');
         console.log('Medicaments removed!');
     } catch (error) {
         console.error('Error removing medicaments: ', error);

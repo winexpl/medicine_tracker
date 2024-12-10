@@ -27,16 +27,12 @@ const InactiveCourseInfo = () => {
         </Text>
 
         {/*ТУТ НИЧЕГО НЕ ВЫВОДИТ Я НЕ ПОНИМАЮ ЧТО ЭТО <Text className='bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center'>{weekdays.join(' ')}</Text> */}
-        <View className='max-h-fit'>
-            <ScrollView className='max-h-10:'>
-            {course.schedule.split(',').map(((time, index) => (
-            <Text key={index}>
-                {time}
-            </Text>
-            )))}
-        </ScrollView>
-        </View>
-        <TouchableOpacity className='bg-primary-text rounded-xl items-center justify-center' onPress={ () => {
+        {course.schedule.split(',').map(((time, index) => (
+            <View className='bg-white py-2 px-4 rounded-md my-1 justify-center'>
+                <Text className="text-black" key={index}>   {index+1} прием {time}</Text>
+            </View>
+        )))}
+        <TouchableOpacity className='bg-primary-text my-2 rounded-xl items-center justify-center' onPress={ () => {
             let newCourses = [...courses];
             let indexToRemoved = newCourses.findIndex(c => c.id === course.id);
             newCourses.splice(indexToRemoved, 1);

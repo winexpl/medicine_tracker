@@ -1,12 +1,11 @@
 import React, { useContext, useState } from 'react';
-import RNPickerSelect from 'react-native-picker-select';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { CourseContext } from '../../contexts/CoursesContext';
 import { MedicamentContext } from '../../contexts/MedicamentContext';
+import { TakeContext, saveTakes } from '../../contexts/TakesContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DatePicker from 'react-native-date-picker';
-import TimerPickerModal from "react-native-timer-picker";
-import { saveTakes, TakeContext } from '../../contexts/TakesContext';
+import { Picker } from '@react-native-picker/picker'; // Импортируем Picker
 import uuid from 'react-native-uuid';
 import { router } from 'expo-router';
 
@@ -25,7 +24,7 @@ export default AddTake = () => {
     const [take, setTake ] = useState({id:uuid.v4(), courseId:null, datetime: new Date(), state:true});
 
     // Фильтруем курсы, чтобы отображать только тип 3
-    const course3 = courses.filter(c => c.typeCourse === '3');
+    const course3 = courses.filter(c => Number(c.typeCourse) === 3);
     
     // Обновляем лейблы курсов на основе медикаментов
     course3.forEach(c => {
@@ -45,52 +44,42 @@ export default AddTake = () => {
     };
 
     // Обновляем дату и время
-    const handleDateChange = (event, selectedDate) => {
-        setShowDatePicker(false);
-        console.log('СТАРЫЙ ПРИЕМ', newTake);
-        let newTake = take;
-        try {
-            newTake.datetime.setDate(selectedDate.getDate());
-            newTake.datetime.setMonth(selectedDate.getMonth());
-            newTake.datetime.setFullYear(selectedDate.getFullYear());
-        } catch (error) {
-            console.error('АШИБКА УСТАНОВКИ ДАТЫ', error);
-        }
-        console.log('НОВЫЙ ПРИЕМ', newTake, new Date(newTake.datetime).toLocaleDateString());
+    const handleDateChange = (date) => {
+        let newTake = { ...take, datetime: date };
         setTake(newTake);
-        setSelectedDate(selectedDate);
+        setSelectedDate(date);
+        setShowDatePicker(false);
+        console.log('НОВЫЙ ПРИЕМ - ДАТА', newTake, date.toLocaleDateString());
     };
 
-    const handleTimeChange = (event, selectedTime) => {
-        setShowTimePicker(false);
-        let newTake = take;
-        console.log('СТАРЫЙ ПРИЕМ', newTake);
-        try {
-            setSelectedTime(selectedTime);
-            newTake.datetime.setHours(selectedTime.getHours());
-            newTake.datetime.setMinutes(selectedTime.getMinutes());
-            newTake.datetime.setSeconds(selectedTime.getSeconds());
-        } catch (error) {
-            console.error('АШИБКА УСТАНОВКИ ВРЕМЕНИ', error);
-        }
-        console.log('НОВЫЙ ПРИЕМ', newTake, new Date(newTake.datetime).toLocaleTimeString());
+    const handleTimeChange = (date) => {
+        let newTake = { ...take };
+        newTake.datetime.setHours(date.getHours());
+        newTake.datetime.setMinutes(date.getMinutes());
+        newTake.datetime.setSeconds(date.getSeconds());
         setTake(newTake);
+        setSelectedTime(date);
+        setShowTimePicker(false);
+        console.log('НОВЫЙ ПРИЕМ - ВРЕМЯ', newTake, date.toLocaleTimeString());
     };
 
     return (
         <View className="flex-1 p-4 bg-primary-back">
             <View>
                 <Text style={styles.label}>Выберите курс:</Text>
-                <View className="bg-primary-text">
-                    <RNPickerSelect
+                <View className="bg-white mb-3">
+                    {/* Заменили RNPickerSelect на Picker */}
+                    <Picker
+                        selectedValue={selectedCourse}
                         onValueChange={handleValueChange}
-                        items={course3}
-                        placeholder={{
-                            label: 'Выберите курс',
-                            value: null,
-                        }}
-                    />
+                    >
+                        <Picker.Item label="Выберите курс" value={null} />
+                        {course3.map((course) => (
+                            <Picker.Item key={course.id} label={course.label} value={course.id} />
+                        ))}
+                    </Picker>
                 </View>
+
                 <View>
                     {selectedCourse && (
                     <View>
@@ -98,56 +87,52 @@ export default AddTake = () => {
                                 style={styles.button}
                                 onPress={() => {
                                     setShowDatePicker(true);
-                                } }
+                                }}
                             >
                                 <Text style={styles.text}>Выберите дату приема {selectedDate.toLocaleDateString()}</Text>
                             </TouchableOpacity>
-                            <DatePicker
-                                modal
-                                open={showDatePicker}
-                                date={date}
-                                onConfirm={(selectedDate) => {
-                                    setShowDatePicker(false);
-                                    if (selectedDate) {
-                                        handleDateChange(selectedDate);
-                                    }
-                                } }
-                                onCancel={() => {
-                                    setShowDatePicker(false);
-                                } } />
+
+                            {showDatePicker && (
+                                <DatePicker
+                                    modal
+                                    open={showDatePicker}
+                                    date={selectedDate}
+                                    onConfirm={handleDateChange}
+                                    onCancel={() => setShowDatePicker(false)}
+                                />
+                            )}
+
                             <TouchableOpacity
                                 style={styles.button}
                                 onPress={() => {
                                     setShowTimePicker(true);
-                                } }
+                                }}
                             >
                                 <Text style={styles.text}>Выберите время приема {selectedTime.toLocaleTimeString()}</Text>
-                            
                             </TouchableOpacity>
-                            <TimerPickerModal
-                                visible={showTimePicker}
-                                setIsVisible={setShowTimePicker}
-                                onConfirm={(selectedTime) => {
-                                    setShowTimePicker(false);
-                                    if (selectedTime) {
-                                        handleTimeChange(selectedTime);
-                                    }
-                                } }
-                                modalTitle="Выберите время"
-                                onCancel={() => setShowTimePicker(false)} />
-                                
+
+                            {showTimePicker && (
+                                <DatePicker
+                                    modal
+                                    open={showTimePicker}
+                                    date={selectedTime}
+                                    mode="time"
+                                    onConfirm={handleTimeChange}
+                                    onCancel={() => setShowTimePicker(false)}
+                                />
+                            )}
+
                             <TouchableOpacity
                                 style={styles.button}
                                 onPress={() => {
-                                    let newTake = take;
-                                    newTake.datetime = newTake.datetime.toISOString();
-                                    setTake(newTake);
+                                    let newTake = { ...take };
                                     setTakes([...takes, newTake]);
                                     saveTakes([...takes, newTake]);
                                     router.back();
-                                } }>
-                            <Text style={styles.text}>Сохранить прием</Text>
-                        </TouchableOpacity>
+                                }}
+                            >
+                                <Text style={styles.text}>Сохранить прием</Text>
+                            </TouchableOpacity>
                     </View>
                     )}
                 </View>

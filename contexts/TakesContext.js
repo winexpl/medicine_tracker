@@ -152,7 +152,7 @@ export const addTakes = async (data) => {
 
 export const clearTakes = async (data) => {
     try {
-        await SecureStorage.removeItem('takes');
+        await SecureStorage.deleteItemAsync('takes');
         console.log('Takes removed!');
     } catch (error) {
         console.error('Error removing takes: ', error);
@@ -161,7 +161,7 @@ export const clearTakes = async (data) => {
 
 export const clearDeletedTakes = async () => {
     try {
-        await SecureStorage.removeItem('deletedTakes');
+        await SecureStorage.deleteItemAsync('deletedTakes');
         console.log('Deleted takes removed!');
     } catch (error) {
         console.error('Error removing deleted takes: ', error);

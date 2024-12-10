@@ -1,28 +1,26 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Modal, FlatList} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Modal, FlatList } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import DatePicker from 'react-native-date-picker';
-import { TimerPickerModal } from "react-native-timer-picker";
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { dosageFormTo } from '../../../components/Models';
 import { addCourses, CourseContext, saveCourses } from '../../../contexts/CoursesContext';
 import { TakeContext } from '../../../contexts/TakesContext';
 import { saveTakes } from '../../../contexts/TakesContext';
+import ErrorModal from '../../../components/ErrorModal'; // Import the error modal
 
 const AddCourseWithPeriod = () => {
   const { courses, setCourses } = useContext(CourseContext);
   const { takes, setTakes } = useContext(TakeContext);
   const localParams = useLocalSearchParams();
   const [course, setCourse] = useState({
-    ...JSON.parse(localParams.course), // сохраняем данные из localParams
-    regimen: 'Независимо от приема пищи', // устанавливаем значение по умолчанию
+    ...JSON.parse(localParams.course), 
+    regimen: 'Независимо от приема пищи',
   });
   const [medicament] = useState(JSON.parse(localParams.medicament));
-  console.debug(course, medicament);
-
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedDateType, setSelectedDateType] = useState(null); // 'start' или 'end'
+  const [selectedDateType, setSelectedDateType] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectIndexInSchedule, setSelectIndexInSchedule] = useState(0);
   const [showPeriodicityModal, setShowPeriodicityModal] = useState(false);
@@ -31,55 +29,52 @@ const AddCourseWithPeriod = () => {
   const [endDate, setEndDate] = useState(new Date());
   const [startDate, setStartDate] = useState(new Date());
   const [period, setPeriod] = useState(1);
-  
+
+  // State for error modal
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showErrorModal, setShowErrorModal] = useState(false);
+
+  // Function to show error messages in the modal
+  const showError = (message) => {
+    setErrorMessage(message);
+    setShowErrorModal(true);
+  };
+
+  // Function to close the error modal
+  const closeErrorModal = () => {
+    setShowErrorModal(false);
+    setErrorMessage('');
+  };
 
   async function setAll() {
     let newCourses = [course];
-    if(courses.length > 0) {
+    if (courses.length > 0) {
       newCourses = [...courses, ...newCourses];
-    }
-    if(course.period<=0){
-      alert('Периодичность должна быть больше нуля!');
-      return;
-    }
-    if(course.startDate > course.endDate){
-      alert('Начало приема не должно превышать окончание приема!');
-      return;
-    }
-
-    for(let i=0; course.schedule.length>i; i++){
-      for(let j=0; course.schedule.length>j; j++){
-        if(course.schedule[i]==course.schedule[j] && i!=j){
-          alert('Время приема не должно совпадать!');
-          return;
-        }
-      }
     }
     setCourses(newCourses);
     const newTakes = [...takes, ...await addCourses(course)];
     setTakes(newTakes);
     saveTakes(newTakes);
-    router.back();
+    router.push('coursesActive');
   }
+
   const addTake = () => {
     setSchedule(["00:00:00", ...schedule]);
   };
-  
 
   useEffect(() => {
     setCourse(prevState => ({ ...prevState,
-          startDate: startDate.toLocaleDateString("en-CA"),
-          endDate: endDate.toLocaleDateString("en-CA"),
-          schedule: schedule,
-          period: period,
-          numberMedicine: calculateTotalTakes()}));
-  }, [endDate, startDate, schedule, period])
+      startDate: startDate.toLocaleDateString("en-CA"),
+      endDate: endDate.toLocaleDateString("en-CA"),
+      schedule: schedule,
+      period: period,
+      numberMedicine: calculateTotalTakes()}));
+  }, [endDate, startDate, schedule, period]);
 
   // Расчет общего количества приемов
   const calculateTotalTakes = () => {
-    console.log(course.schedule.length );
     const days = Math.ceil(
-        (new Date(endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) + 1; // +1 чтобы включить начальную дату
+        (new Date(endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) + 1;
     const result = (days / period) * schedule.length;
     return Math.ceil(result);
   };
@@ -88,7 +83,12 @@ const AddCourseWithPeriod = () => {
     <SafeAreaView className="flex-1 p-4 bg-primary-back">
       <ScrollView>
         <Text className="text-lg font-bold text-center mb-4 text-white">Добавление курса</Text>
-        
+        <ErrorModal
+          isVisible={showErrorModal}
+          message={errorMessage}
+          onClose={closeErrorModal}
+        />
+    
         <View className="flex-row justify-between mb-4">
           <TouchableOpacity
             className="p-3 bg-gray-200 rounded-lg"
@@ -138,21 +138,7 @@ const AddCourseWithPeriod = () => {
             return(
             <View className="flex-row justify-between p-3 bg-white rounded-lg mb-2 items-center">
               <Text className="text-base">{index+1}</Text>
-              <TimerPickerModal
-                  visible={showTimePicker}
-                  setIsVisible={setShowTimePicker}
-                  onConfirm={(selectedTime) => {
-                    setShowTimePicker(false);
-                    if (selectedTime) {
-                      const newSchedule = [...schedule];
-                      newSchedule[selectIndexInSchedule] = selectedTime.toLocaleTimeString();
-                      newSchedule.sort();
-                      setSchedule(newSchedule);
-                    }
-                  }}
-                  modalTitle="Выберите время"
-                  onCancel={() => setShowTimePicker(false)}
-              />
+
               <TouchableOpacity
                 className="p-2 bg-gray-200 rounded-lg"
                 onPress={() => {
@@ -181,23 +167,46 @@ const AddCourseWithPeriod = () => {
           <Text className="text-center text-black">+ Добавить прием</Text>
         </TouchableOpacity>
 
-        <DatePicker
-        modal
-        open={setShowDatePicker}
-        date={selectedDate}
-        onConfirm={(selectedDate) => {
-          if (selectedDate) {
-            if (selectedDateType === 'start') {
-              setStartDate(selectedDate);
-            } else {
-              setEndDate(selectedDate);
+        {showTimePicker && (
+        <DateTimePicker
+          mode="time"
+          value={new Date()}
+          onChange={(event, selectedTime) => {
+            setShowTimePicker(false);
+            if (selectedTime) {
+              const newSchedule = [...schedule];
+              newSchedule[selectIndexInSchedule] = selectedTime.toLocaleTimeString();
+              newSchedule.sort();
+              setSchedule(newSchedule);
             }
-          }
-        }}
-        onCancel={() => {
-          setShowDatePicker(false)
-        }}
-      />
+          }}
+        />
+      )}
+
+      {showDatePicker && (
+        <DateTimePicker
+          mode="date"
+          value={selectedDate}
+          onChange={(event, selectedDate) => {
+            setShowDatePicker(false);
+            if (selectedDate) {
+              if (selectedDateType === 'start') {
+                if(selectedDate > endDate) {
+                  showError('Дата начала не может быть позже даты окончания');
+                  return;
+                }
+                setStartDate(selectedDate);
+              } else {
+                if(selectedDate < startDate) {
+                  showError('Дата окончания не может быть раньше даты начала');
+                  return;
+                }
+                setEndDate(selectedDate);
+              }
+            }
+          }}
+        />
+      )}
 
         <Modal visible={showPeriodicityModal} transparent>
           <View className="flex-1 justify-center items-center bg-black/50">
@@ -205,11 +214,20 @@ const AddCourseWithPeriod = () => {
               className="w-48 p-3 bg-white rounded-lg mb-4"
               keyboardType="number-pad"
               placeholder="Введите периодичность"
-              onChangeText={(text) => setPeriod(Number(text))}
+              onChangeText={(text) => {
+                let n = (Number(text));
+                setPeriod(n);
+              }
+              }
             />
             <TouchableOpacity
               className="p-3 bg-primary-text rounded-lg"
-              onPress={() => setShowPeriodicityModal(false)}
+              onPress={() =>  {
+                setShowPeriodicityModal(false)
+                if(period <= 0){
+                  showError('Периодчиность должна быть положительной');
+                  setPeriod(1);
+                }}}
             >
               <Text className="text-base text-black">OK</Text>
             </TouchableOpacity>
@@ -257,7 +275,6 @@ const AddCourseWithPeriod = () => {
           </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
-    
   );
 };
 

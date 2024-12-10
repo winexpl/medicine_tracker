@@ -2,7 +2,7 @@ import { StyleSheet, Text, TouchableOpacity, View, ScrollView, Button } from 're
 import React, { useContext, useEffect, useState} from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useLocalSearchParams } from 'expo-router'
-import DatePicker  from 'react-native-date-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
 import { CourseContext, saveCourses } from '../../contexts/CoursesContext';
 import { dosageFormTo, updateTakes } from '../../components/Models';
@@ -29,10 +29,10 @@ const ActiveCourseInfo = () => {
     setTakes([...newTakes]);
     router.push('schedule');
   }
-
   let weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-  let n = course.weekday;
-  weekdays = weekdays.filter((e, i) => (n & (1 << 6-i) == 1));
+  let selectedWeekdays = weekdays.filter((_, i) => (course.weekday & (1 << (6 - i))) !== 0);
+  let per = course.period;
+
   return (
     <View className='bg-primary-back h-full'>
       <ScrollView>
@@ -46,35 +46,39 @@ const ActiveCourseInfo = () => {
           </Text>
         </View>
       </View>
+
+      {showDatePicker && (
+          <DateTimePicker
+            mode="date"
+            value={endDate}
+            onChange={(event, selectedDate) => {
+              setShowDatePicker(false);
+              if (selectedDate) {
+                  setEndDate(selectedDate);
+                }
+              }
+            }
+      />)}
+      <Text className='bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center'>
+          Начало: {new Date(course.startDate).toLocaleDateString()}
+      </Text>
       <TouchableOpacity onPress={() => {setShowDatePicker(true)}}>
         <Text className='bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center'>
-          Начало: {new Date(course.startDate).toLocaleDateString()}
+          Окончание: {endDate.toLocaleDateString()}
         </Text>
       </TouchableOpacity>
-      <DatePicker
-        modal
-        openPicker={showDatePicker}
-        open={showDatePicker}
-        
-        date={endDate}
-        onConfirm={(selectedDate) => {
-          if (selectedDate) {
-            setEndDate(selectedDate);
-          }
-        }}
-        onCancel={() => {
-          setShowDatePicker(false);
-        }}
-      />
 
-      <Text className='bg-primary-text py-1 px-4 rounded-md my-2 items-center justify-center'>
-        Окончание: {endDate.toLocaleDateString()}
+      {/* ИНУЖНО ДОБАВИТЬ ЛОГИКУ ЧТОБЫ В ЗАВИСИМОСТИ ОТ КУРСА ВЫБИРАЛОСЬ ВЫВОДИТЬ ДНИ НЕДЕЛИ ИЛИ ПЕРИОД */}
+      <Text className='bg-primary-text py-4 px-4 rounded-md my-2 text items-center justify-center'>
+        {course.typeCourse === '1' 
+          ? `Выбранные дни недели: ${selectedWeekdays.join(' ')}`
+          : course.typeCourse === '2'
+          ? `Выбранная периодичность: ${per} д.`
+          : 'Прием по необходимости'}
       </Text>
+      {/*<Text className='bg-primary-text py-4 px-4 rounded-md my-2 text items-center justify-center'>Выбранный период: {per} д.</Text> */} 
       
-      <Text className='bg-primary-text py-4 px-4 rounded-md my-2 text items-center justify-center'>{weekdays.join(' ')}</Text> 
-      
-        
-        {course.schedule.split(',').map(((time, index) => (
+        { course.schedule.length > 0 && course.schedule.split(',').map(((time, index) => (
           <View className='bg-white py-2 px-4 rounded-md my-1 justify-center'>
             <Text className="text-black" key={index}>   {index+1} прием {time}</Text>
           </View>
