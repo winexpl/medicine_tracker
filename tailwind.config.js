@@ -6,16 +6,16 @@ module.exports = {
       colors: {
         primary: {
           back: {
-            DEFAULT: '#1C1C2B',
+            DEFAULT: '#000',
           },
-          text: "blue",
+          text: "#FF8F00",
           text1: "#FFF",
         }, 
         secondary: {
           back: {
             DEFAULT: '#161622',
           },
-          text: "white",
+          text: "#FFD5AA",
         }
       },
       fontFamily: {

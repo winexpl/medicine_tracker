@@ -45,8 +45,7 @@ const UserLayout = () => {
               <Ionicons name={focused ? 'settings-sharp' : 'settings-outline'} color={color} size={24} />
             )
           }}
-        />
-        
+        />z
       </Tabs>
     </>
 

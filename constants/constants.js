@@ -1,4 +1,4 @@
-export const API_URL = 'http://192.168.1.134:7634';//'http://192.168.1.134:7634';//'http://172.20.10.9:7634';
+export const API_URL = 'http://192.168.0.102:7634';//'http://192.168.1.134:7634';//'http://172.20.10.9:7634';
 export const API_URL_LOGIN = API_URL + '/login';
 export const API_URL_REGISTRATION = API_URL + '/registration';
 export const API_URL_COURSES = API_URL + '/courses';
