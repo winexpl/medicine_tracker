@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Modal, FlatList } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DatePicker from '@react-native-community/datetimepicker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { dosageFormTo } from '../../../components/Models';
 import { addCourses, CourseContext, saveCourses } from '../../../contexts/CoursesContext';
@@ -168,7 +168,7 @@ const AddCourseWithPeriod = () => {
         </TouchableOpacity>
 
         {showTimePicker && (
-        <DateTimePicker
+        <DatePicker
           mode="time"
           value={new Date()}
           onChange={(event, selectedTime) => {
@@ -184,7 +184,7 @@ const AddCourseWithPeriod = () => {
       )}
 
       {showDatePicker && (
-        <DateTimePicker
+        <DatePicker
           mode="date"
           value={selectedDate}
           onChange={(event, selectedDate) => {

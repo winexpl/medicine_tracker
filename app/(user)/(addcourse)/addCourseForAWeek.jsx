@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, FlatList, ScrollView} from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DatePicker from '@react-native-community/datetimepicker';
 import { dosageFormTo } from '../../../components/Models';
 import { addCourses, CourseContext, saveCourses } from '../../../contexts/CoursesContext';
 import { saveTakes, TakeContext } from '../../../contexts/TakesContext';
@@ -216,7 +216,7 @@ const hideError = () => {
                         onClose={hideError}
                     />
                     {showTimePicker && (
-                        <DateTimePicker
+                        <DatePicker
                         mode="time"
                         value={new Date()}
                         onChange={(event, selectedTime) => {
@@ -232,7 +232,7 @@ const hideError = () => {
                     )}
 
                     {showDatePicker && (
-                        <DateTimePicker
+                        <DatePicker
                         mode="date"
                         value={selectedDate}
                         onChange={(event, selectedDate) => {

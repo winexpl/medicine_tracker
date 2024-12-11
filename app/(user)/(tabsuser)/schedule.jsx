@@ -32,68 +32,109 @@ import * as Notifications from 'expo-notifications';
 export default function Schedule() {
 
   const [notificationId, setNotificationId] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]); // Выбранная дата
+  const [selectedDate, setSelectedDate] = useState(new Date().toLocaleDateString('en-CA')); // Выбранная дата
+  const [currentDay] = useState(new Date());
   const [selectedDayIndex, setSelectedDayIndex] = useState(new Date().getDay() || 7); // Индекс выбранного дня недели
   const [showCalendar, setShowCalendar] = useState(false); // Состояние для показа календаря
-  const { courses, setCourses } = useContext(CourseContext);
+  const { courses, setCourses } = useContext(CourseContext); 
   const { medicaments } = useContext(MedicamentContext);
   const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   const { takes, setTakes } = useContext(TakeContext);
-  const [takesToday, setTakesToday] = useState([...getTakesByDate(selectedDate, takes, courses, medicaments)] );
-  // Функция для настройки уведомления
-  const scheduleNotification = async () => {
-    let ts = takesToday;
-    if(ts.length > 0) {
-      ts = ts.sort((a, b) => {
-        return new Date(a.datetime) - new Date(b.datetime);
-      });
-      let temp = ts;
-      ts = [];
-      temp.forEach(e => {if(e.datetime > new Date().toISOString() && e.state === false) ts.push(e)});
-    setTakesToday(ts);
-    const triggerTime = new Date(takesToday[0].datetime);
+  const [takesToday, setTakesToday] = useState([] );
+  const [scheduledNotifications, setScheduledNotifications] = useState(new Set()); // Для отслеживания уведомлений
+
+
+  useEffect(() => {
+    async function name(params) {
+      const newTakes = takes;
+      for(let i in newTakes) {
+        if(newTakes[i].state === true) {
+          try {
+            await Notifications.cancelScheduledNotificationAsync(newTakes[i].id);
+            console.log('Notification canceled:', newTakes[i].id);
+            // Удалите ID из состояния, чтобы больше не пытаться отменить это уведомление
+            setScheduledNotifications(prev => {
+              const updatedSet = new Set(prev);
+              updatedSet.delete(newTakes[i].id); // Удаляем ID уведомления
+              console.log('updatedSet',updatedSet);
+              return updatedSet;
+            });
+          } catch (error) {
+            console.error('Error canceling notification:', error);
+          }
+        }
+      }
+    }
+    name();
+    
+    
+  }, [takes]);
+
+  useEffect(() => {
+    async function update() {
+      const newTakes = await getTakes();
+      setTakes(newTakes);
+      console.log('ИЗМЕНЯЕМ ПРИЕМЫ ДЛЯ ОТОБРАЖЕНИЯ В РАСПИСАНИИ', newTakes);
+      console.log('УВЕДОМЛЕНИЯ',scheduledNotifications)
+      
+    }
+    update();
+    
+  }, [courses]);
+
+   // Функция планирования уведомлений
+  const scheduleNotification = async (take) => {
+    if (!take) return;
+
+    const triggerTime = new Date(take.datetime);
+    
+    // Проверяем, запланировано ли уже уведомление
+    if (scheduledNotifications.has(take.id)) {
+      console.log('Notification already scheduled for this take:', take.id);
+      return; // Если уведомление уже запланировано, не планируем повторно
+    }
+
     const notificationId = await Notifications.scheduleNotificationAsync({
       content: {
-        title: ts[0].title,
+        title: take.title,
         body: "Примите лекарство!",
       },
       trigger: triggerTime,
     });
+
+    setScheduledNotifications(prev => new Set(prev.add(take.id))); // Добавляем в Set запланированное уведомление
     setNotificationId(notificationId);
-    }
+    console.log('Scheduled notification for:', triggerTime.toLocaleString());
   };
 
-  // Обработчик уведомлений
   useEffect(() => {
-    if(takesToday.length > 0) {
-      Notifications.setNotificationHandler({
-      handleNotification: async (notification) => {
-        // Когда уведомление срабатывает, переназначаем следующее уведомление
-        console.log('Notification received:', notification);
-        let newCourses = [];
-        courses.forEach(c => {
-          if(c.title != ts[0].title) {
-            let cc = c;
-            cc.numberMedicine = cc.numberMedicine - 1;
-            if(cc.numberMedicine != 0) {
-              newCourses.push(cc);
-            }
-          }
-        });
-        setCourses(newCourses);
-        let ts = takesToday;
-        ts.shift();
-        setTakesToday(ts);
-        const nextTrigger = new Date(ts[0].datetime);
+    let todayTakes = getTakesByDate(currentDay, takes, courses, medicaments);
+    setTakesToday(todayTakes);
 
-        // Планируем следующее уведомление
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title: ts[0].title,
-            body: "Примите лекарство!",
-          },
-          trigger: nextTrigger,
-        });
+    if (todayTakes.length > 0) {
+      todayTakes.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+      todayTakes = todayTakes.filter(t => t.state === false);
+      console.log('ОТФИЛЬТРОВАННЫЕ ПРИЕМЫ', todayTakes);
+      todayTakes.forEach(take => {
+        if (!scheduledNotifications.has(take.id)) {
+          scheduleNotification(take);
+        }
+      });
+    }
+
+    // Обработчик уведомлений
+    Notifications.setNotificationHandler({
+      handleNotification: async (notification) => {
+        console.log('Notification received:', notification);
+
+        // Обновляем список приемов
+        const updatedTakes = [...takes];
+        const nextTake = updatedTakes.find(t => new Date(t.datetime) > new Date() && !t.state);
+
+        if (nextTake) {
+          // Планируем следующее уведомление
+          scheduleNotification(nextTake);
+        }
 
         return {
           shouldShowAlert: true,
@@ -101,22 +142,11 @@ export default function Schedule() {
           shouldSetBadge: false,
         };
       },
-      });
-    }
-    // Запланируем первое уведомление при монтировании
-    scheduleNotification();
-
-  }, []); // Пустой массив зависимостей, чтобы выполнить только при первом рендере
+    });
+  }, [currentDay, takes]);
   
 
-  useEffect(() => {
-    async function update() {
-      const newTakes = await getTakes();
-      setTakes(newTakes);
-      console.log('ИЗМЕНЯЕМ ПРИЕМЫ ДЛЯ ОТОБРАЖЕНИЯ В РАСПИСАНИИ', newTakes);
-    }
-    update();
-  }, [courses]);
+  
 
   const take = (id) => {
     const updatedTakes = [...takes];  // Создаем копию массива
@@ -124,8 +154,9 @@ export default function Schedule() {
     if (index !== -1) {
       updatedTakes[index] = { ...updatedTakes[index], state: true }; // Обновляем элемент
     }
+    console.log('ОБНОВЛЕННЫЙ ПРИЕМ', updatedTakes[index]);
     setTakes(updatedTakes); // Обновляем состояние с новым массивом
-    saveTakes(takes);
+    saveTakes(updatedTakes);
   };
 
   const donttake = (id) => {
@@ -135,7 +166,7 @@ export default function Schedule() {
       updatedTakes[index] = { ...updatedTakes[index], state: false }; // Обновляем элемент
     }
     setTakes(updatedTakes); // Обновляем состояние с новым массивом
-    saveTakes(takes);
+    saveTakes(updatedTakes);
   };
 
   const handleDateChange = (date) => {

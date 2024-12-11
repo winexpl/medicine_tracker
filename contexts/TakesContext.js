@@ -69,9 +69,8 @@ export const deleteDeletedTakes = async () => {
 export const addDeletedTakes = async (data) => {
     try {
         const deletedTakes = await getDeletedTakes();
-        
         deletedTakes.push(...data);
-        console.log('deletedTakes', deletedTakes);
+        console.log('deletedTakes in addDeletedTakes', deletedTakes);
         let newDeletedTakes = [];
         for(let i in deletedTakes) {
             try {
@@ -80,6 +79,7 @@ export const addDeletedTakes = async (data) => {
                         'Authorization': `Bearer ${await getToken()}`,
                     },
                 });
+                console.debug('ПРИЕМ ', deletedTakes[i], 'УДАЛЕН');
             } catch (error) {
                 console.error('Невозможно удалить прием: ', error);
                 newDeletedTakes.push(deletedTakes[i]);
@@ -116,8 +116,9 @@ export const saveTakes = async ([...data]) => {
                         'Content-Type': 'application/json'
                     },
                 });
+                console.debug('ПРИЕМ ', takes[i], 'ОТПРАВЛЕН НА СЕРВЕР');
             } catch (error) {
-                console.error('Невозможно отправить прием на сервер: ', error);
+                console.error('Невозможно отправить прием на сервер: ', error, takes[i]);
             }
         }
         
