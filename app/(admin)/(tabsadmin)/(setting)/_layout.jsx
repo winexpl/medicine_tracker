@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React, { useContext } from 'react'
+import { StyleSheet, Text, Modal, TouchableOpacity, View } from 'react-native'
+import React, { useContext,  useState } from 'react'
 import { Tabs } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import RouterButton from '../../../../components/RouterButton'
@@ -15,14 +15,24 @@ import { getToken } from '../../../../contexts/Secure'
 
 const SettingLayout = () => {
   const { userInfo, setUserInfo } = useContext(AuthContext);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible1, setModalVisible1] = useState(false);
 
   return (
     <SafeAreaView className="flex-1 bg-primary-back p-4">
       <Text className="text-xl font-bold mb-4 text-white">Настройки</Text>
-      <RouterButton title="О разработчиках" 
-                            handlePress={() => router.push('/about')}
-                            containerStyle="w-full"
-      />
+      <TouchableOpacity
+        className="w-full bg-primary-text py-4 px-6 rounded-md mb-4"
+        onPress={() => setModalVisible(true)}
+      >
+        <Text className="text-center text-black text-lg">О разработчиках</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        className="w-full bg-primary-text py-4 px-6 rounded-md mb-4"
+        onPress={() => setModalVisible1(true)}
+      >
+        <Text className="text-center text-black text-lg">О системе</Text>
+      </TouchableOpacity>
       <RouterButton title="Выход"
                             handlePress={() => {
                             removeToken();
@@ -54,6 +64,56 @@ const SettingLayout = () => {
                             }}
                             containerStyle="w-full"
       />
+           <Modal
+              animationType="slide"
+              transparent={true}
+              visible={modalVisible}
+              onRequestClose={() => setModalVisible(false)}
+            >
+              <View className="flex-1 justify-center items-center">
+                <View className="bg-primary-text rounded-lg p-6">
+                  <Text className="text-xl font-bold text-black mb-4">{`О разработчиках`}</Text>
+                  <Text className="text-black mb-4">{`Лабораторный практикум по дисциплине “Технологии программирования”`}{'\n'}
+                    {`Тема: “Мобильное приложение для поиска лекарств из открытых источников и напоминания об их приеме”`}{'\n'}
+                    {'\n'}
+                    {`Разработчики:`}{'\n'}
+                    {`Обучающиеся группы 6402-090301D`}{'\n'}
+                    {`Древина Мария Дмитриевна`}{'\n'}
+                    {`Жидяев Данила Алексеевич`}{'\n'}
+                    {'\n'}
+                    {`Руководитель:`}{'\n'}
+                    {`Зеленко Лариса Сергеевна`}</Text>
+                  <TouchableOpacity
+                    className="w-full bg-black py-4 px-6 rounded-md"
+                    onPress={() => setModalVisible(false)}
+                  >
+                    <Text className="text-center text-white text-lg">{`Закрыть`}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={modalVisible1}
+              onRequestClose={() => setModalVisible1(false)}
+            >
+              <View className="flex-1 justify-center items-center">
+                <View className="bg-primary-text rounded-lg p-6">
+                  <Text className="text-xl font-bold text-black mb-4">{`О системе`}</Text>
+                  <Text className="text-black mb-4">{`	          После авторизации администратора он попадает на главный экран `} <Text className="font-bold text-black ">{`"Поиск из открытых источников"`}</Text> {`.`}{'\n'}
+                    {`	          На экранной форме `} <Text className="font-bold text-black ">{`"Поиск из открытых источников"`}</Text> {` администратор может добавить новое лекарственное средство нажав на кнопку `} <Text className="font-bold text-black ">{`"Добавить новое лекарство"`}</Text> {`. При нажатии на кнопку у администратора откроется экранная форма `} <Text className="font-bold text-black ">{`"Добавление лекарства"`}</Text> {`, где после ввода всех полей можно будет добавить лекарственное средстов нажав на кнопку `} <Text className="font-bold text-black ">{`"Добавить"`}</Text> {'\n'}
+                    {`	          Для поиска лекарственных средств из базы данных администратор должен нажать на кнопку `} <Text className="font-bold text-black ">{`"Поиск в базе"`}</Text> {` снизу экранной формы. В этой экранной форме администратор так же может добавить новое лекарственное средство нажав на кнопку `} <Text className="font-bold text-black ">{`"Добавить новое лекарство"`}</Text> {`. При нажатии на кнопку у администратора откроется экранная форма `} <Text className="font-bold text-black ">{`"Добавление лекарства"`}</Text> {`, где после ввода всех полей можно будет добавить лекарственное средстов нажав на кнопку `} <Text className="font-bold text-black ">{`"Добавить"`}</Text> {`.`}{'\n'}
+                   </Text>
+                  <TouchableOpacity
+                    className="w-full bg-black py-4 px-6 rounded-md"
+                    onPress={() => setModalVisible1(false)}
+                  >
+                    <Text className="text-center text-white text-lg">{`Закрыть`}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
     </SafeAreaView>
   )
 }

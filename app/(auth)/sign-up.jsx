@@ -78,12 +78,12 @@ const SignUp = () => {
   };
 
   return (
-    <SafeAreaView className='bg-secondary-back h-full'>
+    <SafeAreaView className='bg-primary-back h-full'>
       <ScrollView className='px-6'>
         <View className='w-full'>
           <Image
-            source={require('@/assets/images/logo-h.png')}
-            className="w-[350px] h-[200px] items-center justify-center"
+            source={require('@/assets/images/3.png')}
+            className="w-[320px] h-[200px] items-center justify-center"
             resizeMode="contain"
           />
           <Text className='font-pmedium text-lg text-secondary-text text-center'>
@@ -120,7 +120,7 @@ const SignUp = () => {
         />
         
         <View className='pt-7 flex-row gap-4 items-center justify-center'>
-          <Text className='font-psemibold'>У Вас уже есть учетная запись?</Text>
+          <Text className='font-psemibold text-secondary-text'>У Вас уже есть учетная запись?</Text>
           <Link replace href='/sign-in' className='text-primary-text font-psemibold'>Войдите!</Link>
         </View>
       </ScrollView>

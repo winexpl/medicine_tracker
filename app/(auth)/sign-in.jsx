@@ -77,12 +77,12 @@ const SignIn = () => {
     };
 
     return (
-        <SafeAreaView className='bg-secondary-back h-full'>
+        <SafeAreaView className='bg-primary-back h-full'>
             <ScrollView className='px-6'>
                 <View className='w-full'>
                     <Image
-                        source={require('@/assets/images/logo-h.png')}
-                        className="w-[350px] h-[200px] items-center justify-center"
+                        source={require('@/assets/images/3.png')}
+                        className="w-[320px] h-[200px] items-center justify-center"
                         resizeMode="contain"
                     />
                     <Text className='font-pmedium text-lg text-secondary-text text-center'>
@@ -90,12 +90,12 @@ const SignIn = () => {
                     </Text>
                     <FormField
                         title='Логин'
+                        className="bg-white"
                         value={form.username}
                         handleChangeText={(e) => setForm({ ...form, username: e })}
                         otherStyles='mt-7'
                         keyboardType='login'
                     />
-
                     <FormField
                         title='Пароль'
                         value={form.password}
@@ -109,7 +109,7 @@ const SignIn = () => {
                     containerStyle='mt-7'
                 />
                 <View className='pt-7 flex-row gap-4 items-center justify-center'>
-                    <Text className='font-psemibold'>У Вас нет учетной записи?</Text>
+                    <Text className='font-psemibold text-secondary-text'>У Вас нет учетной записи?</Text>
                     <Link replace href='/sign-up' className='text-primary-text font-psemibold'>Зарегестрируйтесь!</Link>
                 </View>
             </ScrollView>

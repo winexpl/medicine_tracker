@@ -140,6 +140,7 @@ export const getTakesByDate = (date, takes, courses, medicaments) => {
     try {
         for(let index in takes) {
         let take = takes[index];
+        // console.log("ПРИЕМ в getTakesByDate",take, new Date(take.datetime).toLocaleDateString(), new Date(date).toLocaleDateString())
         if(new Date(take.datetime).toLocaleDateString() === new Date(date).toLocaleDateString()) {
             let indexCourse = courses.findIndex(m => m.id === take.courseId);
             
@@ -153,8 +154,10 @@ export const getTakesByDate = (date, takes, courses, medicaments) => {
                 }
             }
         }
-    }
-    return takesForDate;
+        }
+        console.log("ВОЗВРАЩАЕМ из getTakesByDate",takesForDate);
+
+        return takesForDate;
     } finally {
         return takesForDate;
     }
