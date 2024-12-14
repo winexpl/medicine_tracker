@@ -136,7 +136,7 @@ const AddCourseWithPeriod = () => {
           keyExtractor={(item, index) => index.toString()}
           renderItem={({item, index}) => {
             return(
-            <View className="flex-row justify-between p-3 bg-white rounded-lg mb-2 items-center">
+            <View className="flex-row justify-between p-3 bg-gray-200 rounded-lg mb-2 items-center">
               <Text className="text-base">{index+1}</Text>
 
               <TouchableOpacity
@@ -244,8 +244,16 @@ const AddCourseWithPeriod = () => {
             />
             <TouchableOpacity
               className="p-3 bg-primary-text rounded-lg"
-              onPress={() => setShowDoseModal(false)}
+              onPress={() => {setShowDoseModal(false)
+                if (course.dose <= 0) {
+                  showError('Доза должна быть положительной');
+                  setCourse(prevState => ({ ...prevState, dose: 0 }));
+                }
+              }
+              }
+              
             >
+            
               <Text className="text-base text-black">OK</Text>
             </TouchableOpacity>
           </View>
@@ -256,7 +264,7 @@ const AddCourseWithPeriod = () => {
             <TouchableOpacity
               key={item}
               className={`p-3 bg-gray-200 rounded-lg mb-4  ${
-                course.regimen === item ? 'bg-white' : 'bg-primary-text'
+                course.regimen === item ? 'bg-gray-200' : 'bg-primary-text'
               }`}
               onPress={() => setCourse(prevState => ({...prevState, regimen: item}))}>
               <Text className="text-bg-black">{item}</Text>

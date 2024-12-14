@@ -16,12 +16,12 @@ const Sign = () => {
     }, []);
 
     return (
-        <SafeAreaView className="bg-secondary-back h-full.">
+        <SafeAreaView className="bg-primary-back h-full.">
                 <ScrollView contentContainerStyle={{ height:'100%' }}>
                     <View className="w-full justify-center items-center min-h-[85vh] px-6">
                         <Text className="text-3xl text-primary-text font-pbold">Welcome to {dt}</Text>
                         <Image
-                            source={require('@/assets/images/logo.png')}
+                            source={require('@/assets/images/4.png')}
                             className="w-[350px] h-[200px] items-center justify-center"
                             resizeMode="contain"
                         />

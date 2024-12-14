@@ -146,7 +146,7 @@ const hideError = () => {
                             <View>
                             {['понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота','воскресенье'].map((day, index) => (
                                 <View key={day} className="flex-row items-center mb-2">
-                                <Checkbox
+                                <Checkbox 
                                     status={(weekday & (1 << 6-index)) > 0 ? 'checked' : 'unchecked'}
                                     onPress={() => {
                                         let i = 6-index;
@@ -181,10 +181,10 @@ const hideError = () => {
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={({item, index}) => {
                         return(
-                        <View className="flex-row justify-between p-2 bg-white rounded-lg mb-2 items-center">
+                        <View className="flex-row justify-between p-2 bg-gray-200 rounded-lg mb-2 items-center">
                             <Text className="">{index+1}</Text>
                             <TouchableOpacity
-                            className="p-2 bg-gray-200 rounded-lg"
+                            className="p-2 bg-gray-300 rounded-lg"
                             onPress={() => {
                                 setSelectIndexInSchedule(index);
                                 setShowTimePicker(true);
@@ -239,8 +239,16 @@ const hideError = () => {
                             setShowDatePicker(false);
                             if (selectedDate) {
                             if (selectedDateType === 'start') {
+                                if(selectedDate > endDate) {
+                                showError('Дата начала не может быть позже даты окончания');
+                                return;
+                                }
                                 setStartDate(selectedDate);
                             } else {
+                                if(selectedDate < startDate) {
+                                showError('Дата окончания не может быть раньше даты начала');
+                                return;
+                                }
                                 setEndDate(selectedDate);
                             }
                             }
@@ -258,8 +266,15 @@ const hideError = () => {
                         />
                         <TouchableOpacity
                             className="p-3 bg-blue-500 rounded-lg"
-                            onPress={() => setShowDoseModal(false)}
+                            onPress={() => {setShowDoseModal(false) 
+                                if (course.dose <= 0) {
+                                    showError('Доза должна быть положительной');
+                                    setCourse(prevState => ({ ...prevState, dose: 0 }));
+                                }
+                            }}
+
                         >
+                        
                             <Text className="text-white text-lg">OK</Text>
                         </TouchableOpacity>
                         </View>
@@ -268,7 +283,7 @@ const hideError = () => {
                     <TouchableOpacity
                         key={item}
                         className={`p-3 bg-gray-200 rounded-lg mb-4  ${
-                        course.regimen === item ? 'bg-white' : 'bg-primary-text'
+                        course.regimen === item ? 'bg-gray-200' : 'bg-primary-text'
                         }`}
                         onPress={() => setCourse(prevState => ({...prevState, regimen: item}))}>
                         <Text className="text-bg-black">{item}</Text>

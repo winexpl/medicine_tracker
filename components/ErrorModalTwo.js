@@ -22,7 +22,7 @@ const ErrorModal = ({ visible, message, onClose }) => {
           </Text>
           <Text style={{ marginBottom: 20 }}>{message}</Text>
           <TouchableOpacity onPress={onClose} style={{
-            backgroundColor: '#FF8F00',
+            backgroundColor: '#42aaff',
             paddingVertical: 10,
             paddingHorizontal: 20,
             borderRadius: 5,

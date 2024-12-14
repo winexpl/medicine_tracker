@@ -8,12 +8,12 @@ const UserLayout = () => {
 
   return (
     <>
-      <StatusBar backgroundColor='#161622' style='light'/>
+      <StatusBar backgroundColor='#403a3a' style='light'/>
       <Tabs screenOptions={{
-        tabBarActiveTintColor: "#FF8F00", //primary-back
-        tabBarInactiveTintColor: '#FF8F00',
-        tabBarActiveBackgroundColor: '#161622',
-        tabBarInactiveBackgroundColor: '#161622',
+        tabBarActiveTintColor: "#42aaff", //primary-back
+        tabBarInactiveTintColor: '#42aaff',
+        tabBarActiveBackgroundColor: '#403a3a',
+        tabBarInactiveBackgroundColor: '#403a3a',
       }}
       >
         <Tabs.Screen
@@ -45,8 +45,7 @@ const UserLayout = () => {
               <Ionicons name={focused ? 'settings-sharp' : 'settings-outline'} color={color} size={24} />
             )
           }}
-        />
-        
+        />z
       </Tabs>
     </>
 

@@ -21,12 +21,12 @@ const CoursesLayout = () => {
                         top: -11, // Перемещаем наверх
                         left: 0,
                         right: 0,
-                        backgroundColor: '#1C1C2B', // Цвет панели
+                        backgroundColor: '#403a3a', // Цвет панели
                     },
-                    tabBarActiveTintColor: 'orange', // Цвет активного текста
+                    tabBarActiveTintColor: '#42aaff', // Цвет активного текста
                     tabBarInactiveTintColor: 'white', // Цвет неактивного текста
                     tabBarIcon: () => (
-                        <AntDesign name="carryout" size={24} color="orange" />
+                        <AntDesign name="carryout" size={24} color="#42aaff" />
                     ),
                 }}
                 
@@ -46,7 +46,7 @@ export default CoursesLayout
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1C1C2B',
+        backgroundColor: '#403a3a',
         padding: 10,
     },
 })

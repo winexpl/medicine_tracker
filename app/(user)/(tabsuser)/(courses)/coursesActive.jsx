@@ -20,7 +20,7 @@ export default function CoursesActive () {
     update();
   },[courses, medicaments]);
     return (
-    <SafeAreaView className="flex-1 bg-primary-back p-1">
+    <SafeAreaView className="flex-1 bg-primary-back p-4">
       <ScrollView className="flex-1 mb-12">
       {activeCourses.active.length > 0 ? (
         activeCourses.active.map((course, index) => (

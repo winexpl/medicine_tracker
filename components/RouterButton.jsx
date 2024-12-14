@@ -16,7 +16,7 @@ const RouterButton = ({
         onPress={handlePress}
         className={`bg-primary-text rounded-lg mb-4 min-h-[60px]
         min-w-[285px] items-center justify-center ${containerStyle}`}>
-        <Text className={`text-3xl text-primary-back ${textStyle}`}>{title}</Text>
+        <Text className={`text-center text-black text-lg ${textStyle}`}>{title}</Text>
         {isLoading && (
         <ActivityIndicator
             animating={isLoading}

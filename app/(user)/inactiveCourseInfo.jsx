@@ -28,7 +28,7 @@ const InactiveCourseInfo = () => {
 
         {/*ТУТ НИЧЕГО НЕ ВЫВОДИТ Я НЕ ПОНИМАЮ ЧТО ЭТО <Text className='bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center'>{weekdays.join(' ')}</Text> */}
         {course.schedule.split(',').map(((time, index) => (
-            <View className='bg-white py-2 px-4 rounded-md my-1 justify-center'>
+            <View className='bg-gray-200 py-2 px-4 rounded-md my-1 justify-center'>
                 <Text className="text-black" key={index}>   {index+1} прием {time}</Text>
             </View>
         )))}

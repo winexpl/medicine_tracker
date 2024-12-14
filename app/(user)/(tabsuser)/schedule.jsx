@@ -236,11 +236,11 @@ export default function Schedule() {
         <Calendar
           onDayPress={(day) => handleDateChange(day.dateString)}
           markedDates={{
-            [selectedDate]: { selected: true, selectedColor: '#FF8F00' },
+            [selectedDate]: { selected: true, selectedColor: '#42aaff' },
           }}
           theme={{
             backgroundColor: '#1C1C2B',
-            calendarBackground: '#FF8F00',
+            calendarBackground: '#42aaff',
             textSectionTitleColor: '#fff',
             selectedDayBackgroundColor: '#000',
             selectedDayTextColor: '#fff',
@@ -265,11 +265,11 @@ export default function Schedule() {
           <View
             key={index}
             style={{
-              backgroundColor: takem.state ? '#7cfc00' : '#ff4c5b',
+              backgroundColor: takem.state ? '#013a33' : '#800000',
             }}
             className="flex-row items-center bg-white p-3 rounded mb-2"
           >
-            <Text className="flex-1 text-black">
+            <Text className="flex-1 text-white">
               {`${new Date(takem.datetime).toLocaleTimeString()} ${takem.title}`}
             </Text>
 

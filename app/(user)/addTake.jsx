@@ -158,7 +158,7 @@ fontSize: 18,
 },
 button: {
 padding: 10,
-backgroundColor: '#FF8F00',
+backgroundColor: '#42aaff',
 borderRadius: 5,
 marginBottom: 10,
 },

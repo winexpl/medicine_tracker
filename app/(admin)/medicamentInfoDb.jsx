@@ -29,6 +29,10 @@ const AddMedicineForm = () => {
   };
 
   const handleAddSubstance = () => {
+    if (dosage <= 0) {
+      showErrorModal('Дозировка активного вещества должна быть больше 0!');
+      return;
+    }
     if (activeSubstance.trim() === '' || dosage.trim() === '') {
       showErrorModal('Введите активное вещество и дозировку!');
       return;
@@ -44,14 +48,11 @@ const AddMedicineForm = () => {
   };
 
   const handleSubmit = async () => {
-    if (activeSubstance.trim() === '' || dosage.trim() === '' || manufacturer.trim() === '' || form.trim() === '' || name.trim() === '') {
+    if (manufacturer.trim() === '' || form.trim() === '' || name.trim() === '') {
       showErrorModal('Заполните все поля!');
       return;
     }
-    if (dosage <= 0) {
-      showErrorModal('Дозировка активного вещества должна быть больше 0!');
-      return;
-    }
+  
     console.log(1);
     let newMedicament = { 
       id: medicament.id, 

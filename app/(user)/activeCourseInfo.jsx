@@ -40,7 +40,7 @@ const ActiveCourseInfo = () => {
       <Text className='bg-primary-text py-4 px-4 rounded-md my-2 items-center justify-center'>   {course.medicament}</Text>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 8 }}>
         <Text style={{ fontSize: 26, color: 'white' }}>Доза:</Text>
-        <View style={{ backgroundColor: '#FF8F00', borderRadius: 8, paddingVertical: 5, paddingHorizontal: 10, marginRight: 200 }}>
+        <View style={{ backgroundColor: '#42aaff', borderRadius: 8, paddingVertical: 5, paddingHorizontal: 10, marginRight: 200 }}>
           <Text style={{ fontSize: 18, color: 'black' }}>
             {course.dose} {dosageFormTo(course.dosageForm)}
           </Text>
