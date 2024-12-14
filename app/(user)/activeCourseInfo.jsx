@@ -99,6 +99,7 @@ const ActiveCourseInfo = () => {
         let deletedTakes = [];
         let newTakes = [];
         for(let i in takes) {
+          console.error(new Date(takes[i].datetime), new Date())
           if(takes[i].courseId === course.id && new Date(takes[i].datetime) > new Date()) {
             deletedTakes.push(takes[i]);
           } else {
