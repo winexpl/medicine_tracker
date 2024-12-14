@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import { CourseContext } from '../../../contexts/CoursesContext';
+import { CourseContext, saveCourses } from '../../../contexts/CoursesContext';
 import { getTakesByDate } from '../../../components/Models';
 import { Ionicons } from '@expo/vector-icons'; // Импортируем иконки
 import { getTakes, saveTakes, TakeContext } from '../../../contexts/TakesContext';
@@ -52,7 +52,7 @@ export default function Schedule() {
           try {
             await Notifications.cancelScheduledNotificationAsync(newTakes[i].id);
             console.log('Notification canceled:', newTakes[i].id);
-            // Удалите ID из состояния, чтобы больше не пытаться отменить это уведомление
+
             setScheduledNotifications(prev => {
               const updatedSet = new Set(prev);
               updatedSet.delete(newTakes[i].id); // Удаляем ID уведомления
@@ -99,6 +99,7 @@ export default function Schedule() {
         title: take.title,
         body: "Примите лекарство!",
       },
+      identifier: take.id,
       trigger: triggerTime,
     });
 
@@ -127,15 +128,15 @@ export default function Schedule() {
       handleNotification: async (notification) => {
         console.log('Notification received:', notification);
 
-        // Обновляем список приемов
-        const updatedTakes = [...takes];
-        const nextTake = updatedTakes.find(t => new Date(t.datetime) > new Date() && !t.state);
-
-        if (nextTake) {
-          // Планируем следующее уведомление
-          scheduleNotification(nextTake);
-        }
-
+        let index = takes.findIndex(tm => tm.id === notification.identifier);
+        index = courses.findIndex(c => takes[index].courseId === c.id);
+        let newCourses = [...courses];
+        newCourses[index].numberMedicine = newCourses[index].numberMedicine - 1;
+        if(newCourses[index].numberMedicine === 0) {
+          newCourses[index].state = "Завершенный"; }
+        saveCourses(newCourses);
+        setCourses(newCourses);
+        
         return {
           shouldShowAlert: true,
           shouldPlaySound: true,
