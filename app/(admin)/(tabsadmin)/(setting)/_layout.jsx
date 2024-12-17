@@ -1,4 +1,4 @@
-import { StyleSheet, Text, Modal, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, Modal, TouchableOpacity, View, Image, ScrollView} from 'react-native'
 import React, { useContext,  useState } from 'react'
 import { Tabs } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -98,12 +98,36 @@ const SettingLayout = () => {
               visible={modalVisible1}
               onRequestClose={() => setModalVisible1(false)}
             >
+              <ScrollView>
               <View className="flex-1 justify-center items-center">
                 <View className="bg-primary-text rounded-lg p-6">
                   <Text className="text-xl font-bold text-black mb-4">{`О системе`}</Text>
                   <Text className="text-black mb-4">{`	          После авторизации администратора он попадает на главный экран `} <Text className="font-bold text-black ">{`"Поиск из открытых источников"`}</Text> {`.`}{'\n'}
-                    {`	          На экранной форме `} <Text className="font-bold text-black ">{`"Поиск из открытых источников"`}</Text> {` администратор может добавить новое лекарственное средство нажав на кнопку `} <Text className="font-bold text-black ">{`"Добавить новое лекарство"`}</Text> {`. При нажатии на кнопку у администратора откроется экранная форма `} <Text className="font-bold text-black ">{`"Добавление лекарства"`}</Text> {`, где после ввода всех полей можно будет добавить лекарственное средстов нажав на кнопку `} <Text className="font-bold text-black ">{`"Добавить"`}</Text> {'\n'}
-                    {`	          Для поиска лекарственных средств из базы данных администратор должен нажать на кнопку `} <Text className="font-bold text-black ">{`"Поиск в базе"`}</Text> {` снизу экранной формы. В этой экранной форме администратор так же может добавить новое лекарственное средство нажав на кнопку `} <Text className="font-bold text-black ">{`"Добавить новое лекарство"`}</Text> {`. При нажатии на кнопку у администратора откроется экранная форма `} <Text className="font-bold text-black ">{`"Добавление лекарства"`}</Text> {`, где после ввода всех полей можно будет добавить лекарственное средстов нажав на кнопку `} <Text className="font-bold text-black ">{`"Добавить"`}</Text> {`.`}{'\n'}
+                    <Image
+                      source={require('@/assets/images/poiskOpen.png')}
+                      className="w-[420px] h-[400px] items-center justify-center"
+                      resizeMode="contain"
+                    />
+                    {`	          На экранной форме `} <Text className="font-bold text-black ">{`"Поиск из открытых источников"`}</Text> {` администратор может добавить новое лекарственное средство нажав на кнопку `} <Text className="font-bold text-black ">{`"Добавить новое лекарство"`}</Text> {`. При нажатии на кнопку у администратора откроется экранная форма `} <Text className="font-bold text-black ">{`"Добавление лекарства"`}</Text> {`,`}
+                    <Image
+                      source={require('@/assets/images/addMedicamentAdmin.png')}
+                      className="w-[420px] h-[400px] items-center justify-center"
+                      resizeMode="contain"
+                    />
+                    {`где после ввода всех полей можно будет добавить лекарственное средстов нажав на кнопку `} <Text className="font-bold text-black ">{`"Добавить"`}</Text> {'\n'}
+                    {`	          Для поиска лекарственных средств из базы данных администратор должен нажать на кнопку `} <Text className="font-bold text-black ">{`"Поиск в базе"`}</Text> {` снизу экранной формы.`} 
+                    <Image
+                      source={require('@/assets/images/poiskBD.png')}
+                      className="w-[420px] h-[400px] items-center justify-center"
+                      resizeMode="contain"
+                    />
+                    {`В этой экранной форме администратор так же может добавить новое лекарственное средство нажав на кнопку `} <Text className="font-bold text-black ">{`"Добавить новое лекарство"`}</Text> {`. При нажатии на кнопку у администратора откроется экранная форма `} <Text className="font-bold text-black ">{`"Добавление лекарства"`}</Text> {`,`} 
+                    <Image
+                      source={require('@/assets/images/addMedicamentAdmin.png')}
+                      className="w-[420px] h-[400px] items-center justify-center"
+                      resizeMode="contain"
+                    />
+                    {`где после ввода всех полей можно будет добавить лекарственное средстов нажав на кнопку `} <Text className="font-bold text-black ">{`"Добавить"`}</Text> {`.`}{'\n'}
                    </Text>
                   <TouchableOpacity
                     className="w-full bg-black py-4 px-6 rounded-md"
@@ -113,6 +137,7 @@ const SettingLayout = () => {
                   </TouchableOpacity>
                 </View>
               </View>
+              </ScrollView>
             </Modal>
     </SafeAreaView>
   )
